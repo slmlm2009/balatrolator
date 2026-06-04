@@ -1,6 +1,7 @@
 /// <reference types="vitest" />
 
 import { defineConfig } from 'vitest/config'
+import { viteSingleFile } from 'vite-plugin-singlefile'
 
 export default defineConfig({
 	test: {
@@ -10,4 +11,5 @@ export default defineConfig({
 		},
 		include: ['src/**/*.test.ts'],
 	},
+	plugins: [viteSingleFile()],
 })

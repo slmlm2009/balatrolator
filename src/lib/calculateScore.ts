@@ -5,7 +5,7 @@ import { isFaceCard, isRank } from './cards.ts'
 import { resolveJoker } from './resolveJokers.ts'
 import { doBigMath } from './doBigMath.ts'
 import { getHand } from './getHand.ts'
-import type { Card, HandName, Joker, Luck, Result, ScoreValue, State } from './types.ts'
+import type { Card, HandName, Joker, Luck, Result, ScoreValue, State, JokerContribution } from './types.ts'
 
 export function calculateScore (unresolvedState: State): {
 	hand: HandName
@@ -31,6 +31,8 @@ export function calculateScore (unresolvedState: State): {
 		const scoreValues = getScore(state, playedHand, scoringCards, luck)
 		const { chips, multiplier, score, log } = doBigMath(scoreValues, state.deck)
 
+		const jokerContributions = calculateJokerContributions(state, playedHand, scoringCards, luck)
+
 		return {
 			chips,
 			multiplier,
@@ -38,6 +40,7 @@ export function calculateScore (unresolvedState: State): {
 			formattedScore: formatScore(score),
 			luck,
 			log,
+			jokerContributions,
 		}
 	})
 
@@ -48,13 +51,81 @@ export function calculateScore (unresolvedState: State): {
 	}
 }
 
+function calculateJokerContributions (state: State, playedHand: HandName, scoringCards: Card[], luck: Luck): JokerContribution[] {
+	const activeJokers = state.jokers.filter((j) => j.active)
+	if (activeJokers.length === 0) {
+		return []
+	}
+
+	const stateWithAllJokers = { ...state, jokers: activeJokers }
+	const scoreValuesWithAll = getScore(stateWithAllJokers, playedHand, scoringCards, luck)
+	const { score: totalScoreStr, chips: totalChipsStr } = doBigMath(scoreValuesWithAll, state.deck)
+	const totalScore = parseFloat(totalScoreStr)
+	const totalChips = parseFloat(totalChipsStr)
+
+	const stateWithoutAllJokers = { ...state, jokers: [] }
+	const scoreValuesWithoutAll = getScore(stateWithoutAllJokers, playedHand, scoringCards, luck)
+	const { chips: baseChipsStr } = doBigMath(scoreValuesWithoutAll, state.deck)
+	const baseChips = parseFloat(baseChipsStr)
+
+	const contributions: { joker: typeof activeJokers[0], contribution: number, chipsDelta: number }[] = []
+
+	for (const joker of activeJokers) {
+		const remainingJokers = activeJokers.filter((j) => j !== joker)
+		const stateWithoutJoker = { ...state, jokers: remainingJokers }
+
+		const scoreValuesWithoutJoker = getScore(stateWithoutJoker, playedHand, scoringCards, luck)
+		const { score: scoreWithoutStr, chips: chipsWithoutStr } = doBigMath(scoreValuesWithoutJoker, state.deck)
+		const scoreWithout = parseFloat(scoreWithoutStr)
+		const chipsWithout = parseFloat(chipsWithoutStr)
+
+		const contribution = totalScore - scoreWithout
+		const chipsDelta = Math.max(0, chipsWithout - baseChips)
+
+		contributions.push({
+			joker,
+			contribution,
+			chipsDelta,
+		})
+	}
+
+	const totalJokerContribution = contributions.reduce((sum, c) => sum + c.contribution, 0)
+
+	const normalizedContributions: JokerContribution[] = contributions.map((c) => {
+		const percentage = totalScore > 0 ? (c.contribution / totalScore) * 100 : 0
+		const chipsRatio = c.contribution > 0 ? c.chipsDelta / c.contribution : 0
+
+		return {
+			jokerIndex: c.joker.index,
+			jokerName: c.joker.name,
+			chipsContribution: c.chipsDelta,
+			multiplierContribution: c.contribution - c.chipsDelta,
+			totalContribution: c.contribution,
+			percentage,
+		}
+	})
+
+	const sumPercentages = normalizedContributions.reduce((sum, c) => sum + c.percentage, 0)
+
+	if (sumPercentages > 0 && sumPercentages !== 100) {
+		const scale = 100 / sumPercentages
+		let scaledTotal = 0
+		for (const c of normalizedContributions) {
+			c.totalContribution = c.totalContribution * scale
+			c.percentage = c.percentage * scale
+			scaledTotal += c.totalContribution
+		}
+		normalizedContributions[0].totalContribution += totalScore - scaledTotal
+		normalizedContributions[0].percentage = (normalizedContributions[0].totalContribution / totalScore) * 100
+	}
+
+	return normalizedContributions.sort((a, b) => b.percentage - a.percentage)
+}
+
 function getScore (state: State, playedHand: HandName, scoringCards: Card[], luck: Luck): ScoreValue[] {
 	const baseScore = state.handBaseScores[playedHand]
 
-	// Determine base chips and multiplier.
-	// The Flint halves the base chips and multiplier.
 	const baseFactor = (state.blind.name === 'The Flint' && state.blind.active ? 0.5 : 1)
-	// The base score seems to be rounded here.
 	const score: ScoreValue[] = []
 	score.push(
 		{
@@ -69,7 +140,6 @@ function getScore (state: State, playedHand: HandName, scoringCards: Card[], luc
 
 	for (const [index, card] of scoringCards.entries()) {
 		for (const trigger of getPlayedCardTriggers({ state, card, index })) {
-			// 1. Stone enhancement always applies even if a card is debuffed
 			if (card.enhancement === 'Stone') {
 				score.push({
 					chips: ['+', 50],
@@ -80,12 +150,10 @@ function getScore (state: State, playedHand: HandName, scoringCards: Card[], luc
 				})
 			}
 
-			// Beyond applying Stone enhancement, a debuffed card doesn't participate in scoring
 			if (card.debuffed) {
 				continue
 			}
 
-			// 2. Rank
 			if (card.enhancement !== 'Stone') {
 				score.push({
 					chips: ['+', RANK_TO_CHIP_MAP[card.rank]],
@@ -96,7 +164,6 @@ function getScore (state: State, playedHand: HandName, scoringCards: Card[], luc
 				})
 			}
 
-			// 2. Enhancement (other than Stone)
 			switch (card.enhancement) {
 				case 'Bonus': {
 					score.push({
@@ -145,7 +212,6 @@ function getScore (state: State, playedHand: HandName, scoringCards: Card[], luc
 				}
 			}
 
-			// 3. Edition
 			switch (card.edition) {
 				case 'Foil': {
 					score.push({
@@ -179,8 +245,8 @@ function getScore (state: State, playedHand: HandName, scoringCards: Card[], luc
 				}
 			}
 
-			// 4. Joker effects for played cards
 			for (const joker of state.jokers) {
+				if (!joker.active) continue
 				if (joker.playedCardEffect) {
 					for (const trigger of getJokerTriggers({ state, joker })) {
 						joker.playedCardEffect({ state, playedHand, scoringCards, score, card, luck, trigger })
@@ -191,13 +257,11 @@ function getScore (state: State, playedHand: HandName, scoringCards: Card[], luc
 	}
 
 	for (const card of state.cards.filter(({ played }) => !played)) {
-		// A debuffed card doesn't participate in scoring for held cards
 		if (card.debuffed) {
 			continue
 		}
 
 		for (const trigger of getHeldCardTriggers({ state, card })) {
-			// 1. Enhancement
 			switch (card.enhancement) {
 				case 'Steel': {
 					score.push({
@@ -211,8 +275,8 @@ function getScore (state: State, playedHand: HandName, scoringCards: Card[], luc
 				}
 			}
 
-			// 2. Joker effects for held cards
 			for (const joker of state.jokers) {
+				if (!joker.active) continue
 				if (joker.heldCardEffect) {
 					for (const trigger of getJokerTriggers({ state, joker })) {
 						joker.heldCardEffect({ state, playedHand, scoringCards, score, card, luck, trigger })
@@ -223,7 +287,8 @@ function getScore (state: State, playedHand: HandName, scoringCards: Card[], luc
 	}
 
 	for (const joker of state.jokers) {
-		// 1. Edition (additive)
+		if (!joker.active) continue
+
 		switch (joker.edition) {
 			case 'Foil': {
 				score.push({
@@ -244,19 +309,16 @@ function getScore (state: State, playedHand: HandName, scoringCards: Card[], luc
 			}
 		}
 
-		// 2. Joker effects
 		if (joker.effect) {
 			joker.effect({ state, playedHand, scoringCards, score, luck, trigger: 'Regular' })
 		}
 
-		// 3. Indirect Joker effects (i.e. effects depending on other jokers, e.g. Baseball Card)
 		if (joker.indirectEffect) {
 			for (const dependentJoker of state.jokers) {
 				joker.indirectEffect({ state, playedHand, scoringCards, score, joker: dependentJoker, luck, trigger: 'Regular' })
 			}
 		}
 
-		// 4. Edition (multiplicative)
 		switch (joker.edition) {
 			case 'Polychrome': {
 				score.push({
@@ -288,6 +350,7 @@ function getPlayedCardTriggers ({ state, card, index }: { state: State, card: Ca
 	}
 
 	for (const joker of state.jokers) {
+		if (!joker.active) continue
 		const resolvedJoker = resolveJoker(state.jokers, joker)
 		if (resolvedJoker === undefined) {
 			continue
@@ -330,6 +393,7 @@ function getHeldCardTriggers ({ state, card }: { state: State, card: Card }): st
 	}
 
 	for (const joker of state.jokers) {
+		if (!joker.active) continue
 		const resolvedJoker = resolveJoker(state.jokers, joker)
 		if (resolvedJoker === undefined) {
 			continue
@@ -349,8 +413,8 @@ function getHeldCardTriggers ({ state, card }: { state: State, card: Card }): st
 function getJokerTriggers (options: { state: State, joker: Joker }) {
 	const triggers = ['Regular']
 
-	// Increase triggers from Blueprint/Brainstorm
 	for (const joker of options.state.jokers) {
+		if (!joker.active) continue
 		if (['Blueprint', 'Brainstorm'].includes(joker.name)) {
 			const resolvedJoker = resolveJoker(options.state.jokers, joker)
 			if (resolvedJoker !== undefined && resolvedJoker.index === options.joker.index) {

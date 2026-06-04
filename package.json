@@ -26,6 +26,7 @@
 	},
 	"scripts": {
 		"start": "vite",
+		"serve:prod": "vite build && vite preview --host --port 5173",
 		"test:node": "vitest run",
 		"test:node:watch": "vitest watch",
 		"test:browser": "playwright test",
@@ -44,11 +45,11 @@
 	"devEngines": {
 		"runtime": {
 			"name": "node",
-			"version": "^24.15.0"
+			"version": "^22.0.0"
 		},
 		"packageManager": {
 			"name": "npm",
-			"version": "^11.12.1"
+			"version": "^10.0.0"
 		}
 	},
 	"dependencies": {
@@ -77,6 +78,7 @@
 		"typescript": "6.0.3",
 		"typescript-eslint": "8.59.3",
 		"vite": "8.0.13",
+		"vite-plugin-singlefile": "2.3.3",
 		"vitest": "4.1.6"
 	}
 }

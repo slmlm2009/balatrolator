@@ -9,7 +9,7 @@ import { PlayingCard } from './components/PlayingCard.ts'
 import { debounce } from './debounce.ts'
 import { readStateFromUrl, saveStateToUrl } from './Storage.ts'
 import { SaveManager } from './SaveManager.ts'
-import type { BlindName, Card, DeckName, HandName, InitialState, Joker, State, Result, InitialJoker, InitialCard } from '#lib/types.ts'
+import type { BlindName, Card, DeckName, HandName, InitialState, Joker, State, Result, InitialJoker, InitialCard, JokerContribution } from '#lib/types.ts'
 
 const dateTimeFormat = new Intl.DateTimeFormat(document.documentElement.lang, {
 	year: 'numeric',
@@ -225,9 +225,11 @@ function handleImportSubmit (event: SubmitEvent) {
 		if (typeof fileReader.result === 'string') {
 			const name = file.name.replace('.json', '')
 			const state = JSON.parse(fileReader.result) as State
+			state.jokerSet = new Set(state.jokers.map(({ name }: { name: string }) => name))
 			const { hand, results } = calculateScore(state)
 			saveManager.save(name, state, hand, results)
 			storeSaves()
+			populateUiWithState(state)
 		}
 	})
 	fileReader.readAsText(file)
@@ -286,6 +288,20 @@ function updateScore (hand: HandName, results: Result[]) {
 
 	const scoreLog = form.querySelector<HTMLPreElement>('[data-sc-log]')!
 	scoreLog.innerHTML = resultArray.map((result) => result.log.join('\n')).join('\n')
+
+	const contributionMap = new Map<number, JokerContribution>()
+	for (const result of resultArray) {
+		for (const contrib of result.jokerContributions ?? []) {
+			contributionMap.set(contrib.jokerIndex, contrib)
+		}
+	}
+
+	for (const jokerCard of jokerContainer.children) {
+		if (!(jokerCard instanceof JokerCard)) continue
+
+		const contrib = contributionMap.get(jokerCard.index)
+		jokerCard.contribution = contrib ?? null
+	}
 }
 
 /**

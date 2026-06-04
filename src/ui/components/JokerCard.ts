@@ -1,9 +1,13 @@
 import { html } from 'lit-html'
 
 import { JOKER_DEFINITIONS } from '#lib/data.ts'
-import type { Joker, JokerEdition, JokerName, Rank, Suit } from '#lib/types.ts'
+import type { Joker, JokerEdition, JokerName, JokerContribution, Rank, Suit } from '#lib/types.ts'
 import { MovableCard } from './MovableCard.ts'
 import { getShortcutKey } from '../getShortcutKey.ts'
+
+function formatNumberWithCommas (value: number): string {
+	return Math.round(value).toLocaleString('en-US')
+}
 
 const lightCss = /*css*/`
 	joker-card {
@@ -57,12 +61,15 @@ const lightCss = /*css*/`
 		display: none;
 	}
 
-	joker-card:not(.--has-is-active) .jc-is-active {
+	joker-card:not(.--has-rank):not(.--has-suit) .jc-card {
 		display: none;
 	}
 
-	joker-card:not(.--has-rank):not(.--has-suit) .jc-card {
-		display: none;
+	.jc-is-active {
+		display: flex;
+		align-items: center;
+		gap: 0.25rem;
+		margin-block-start: 0.25rem;
 	}
 
 	joker-card:not(.--has-rank) .jc-rank {
@@ -104,6 +111,70 @@ const lightCss = /*css*/`
 		inline-size: 7rem;
 		text-align: end;
 	}
+
+	.jc-contribution {
+		font-size: 0.8rem;
+		text-align: center;
+		padding: 0.25rem;
+		background: var(--c-background-lighter);
+		border-radius: 4px;
+		margin-block-start: 0.5rem;
+	}
+
+	.jc-contribution-value {
+		font-weight: bold;
+	}
+
+	.jc-contribution-percent {
+		color: var(--c-text-secondary, #666);
+	}
+
+	.jc-toggle-wrapper {
+		display: flex;
+		align-items: center;
+		gap: 0.25rem;
+		margin-block-start: 0.25rem;
+	}
+
+	.jc-toggle-switch {
+		appearance: none;
+		width: 2.5rem;
+		height: 1.25rem;
+		background: var(--c-text-disabled);
+		border-radius: 1rem;
+		cursor: pointer;
+		position: relative;
+		transition: background 0.2s;
+	}
+
+	.jc-toggle-switch::before {
+		content: '';
+		position: absolute;
+		width: 1rem;
+		height: 1rem;
+		background: white;
+		border-radius: 50%;
+		top: 0.125rem;
+		left: 0.125rem;
+		transition: transform 0.2s;
+	}
+
+	.jc-toggle-switch:checked {
+		background: var(--c-border);
+	}
+
+	.jc-toggle-switch:checked::before {
+		transform: translateX(1.25rem);
+	}
+
+	.jc-toggle-label {
+		font-size: 0.75rem;
+		color: var(--c-text-secondary, #666);
+	}
+
+	.jc-toggle-switch:checked + .jc-toggle-label {
+		color: var(--c-text);
+	}
 `
 const lightStyleSheet = await new CSSStyleSheet().replace(lightCss)
 
@@ -124,6 +195,7 @@ export class JokerCard extends MovableCard {
 	#active = true
 	#rank: Rank = 'Ace'
 	#suit: Suit = 'Clubs'
+	#contribution: JokerContribution | null = null
 
 	#commands: Record<string, { action: (event: KeyboardEvent) => void }> = {
 		ArrowLeft: {
@@ -206,7 +278,7 @@ export class JokerCard extends MovableCard {
 		this.classList[definition.hasPlusChipsInput ? 'add' : 'remove']('--has-plus-chips')
 		this.classList[definition.hasPlusMultiplierInput ? 'add' : 'remove']('--has-plus-multiplier')
 		this.classList[definition.hasTimesMultiplierInput ? 'add' : 'remove']('--has-times-multiplier')
-		this.classList[definition.hasIsActiveInput ? 'add' : 'remove']('--has-is-active')
+		this.classList.add('--has-is-active')
 		this.classList[definition.hasRankInput ? 'add' : 'remove']('--has-rank')
 		this.classList[definition.hasSuitInput ? 'add' : 'remove']('--has-suit')
 
@@ -289,6 +361,16 @@ export class JokerCard extends MovableCard {
 
 	set active (active) {
 		this.#active = active
+
+		this.queueRender()
+	}
+
+	get contribution () {
+		return this.#contribution
+	}
+
+	set contribution (contribution: JokerContribution | null) {
+		this.#contribution = contribution
 
 		this.queueRender()
 	}
@@ -480,21 +562,19 @@ export class JokerCard extends MovableCard {
 						>
 					</label>
 
-					<label class="jc-is-active checkbox-control">
+					<label class="jc-is-active">
 						<input
 							name="joker-active-${this.uniqueId}"
-							class="jc-is-active-input"
+							class="jc-toggle-switch"
 							type="checkbox"
 							value="is-active"
-							checked
 							.checked="${this.active}"
 							@change="${(event: Event) => {
 								const input = event.target as HTMLInputElement
 								this.active = input.checked
 							}}"
 						>
-
-						<span class="label">Active?</span>
+						<span class="jc-toggle-label">${this.active ? 'Active' : 'Inactive'}</span>
 					</label>
 
 					<div class="jc-card input-list">
@@ -571,6 +651,13 @@ export class JokerCard extends MovableCard {
 						</label>
 					</div>
 				</div>
+
+				${this.contribution !== null ? html`
+					<div class="jc-contribution">
+						<span class="jc-contribution-value">${formatNumberWithCommas(this.contribution.totalContribution)}</span>
+						<span class="jc-contribution-percent"> (${this.contribution.percentage.toFixed(1)}%)</span>
+					</div>
+				` : ''}
 			</div>
 		`
 	}

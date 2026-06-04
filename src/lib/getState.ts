@@ -88,7 +88,7 @@ function getJoker (initialJoker: InitialJoker, listIndex = 0): Joker {
 		timesMultiplier = 1,
 		rank,
 		suit,
-		active = false,
+		active = true,
 		count = 1,
 	} = initialJoker
 

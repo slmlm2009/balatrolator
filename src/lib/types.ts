@@ -159,6 +159,15 @@ export interface State {
 
 export type Luck = 'none' | 'average' | 'all'
 
+export interface JokerContribution {
+	jokerIndex: number
+	jokerName: JokerName
+	chipsContribution: number
+	multiplierContribution: number
+	totalContribution: number
+	percentage: number
+}
+
 export interface Result {
 	chips: string
 	multiplier: string
@@ -166,4 +175,5 @@ export interface Result {
 	formattedScore: string
 	luck: Luck
 	log: string[]
+	jokerContributions?: JokerContribution[]
 }
