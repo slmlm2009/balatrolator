@@ -3,6 +3,7 @@ dist/
 node_modules/
 .vscode/
 Thumbs.db
+ecosystem.config.cjs
 
 # Playwright
 /test-results/

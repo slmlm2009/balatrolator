@@ -4,7 +4,7 @@ import { dirname, join } from 'path'
 import { existsSync } from 'fs'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
-const distPath = join(__dirname, 'dist')
+const distPath = join(__dirname, 'docs')
 const viteCli = join(__dirname, 'node_modules', 'vite', 'bin', 'vite.js')
 
 console.log('Starting Balatrolator server...')
