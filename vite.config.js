@@ -12,4 +12,7 @@ export default defineConfig({
 		include: ['src/**/*.test.ts'],
 	},
 	plugins: [viteSingleFile()],
+	build: {
+		outDir: 'docs',
+		},
 })
