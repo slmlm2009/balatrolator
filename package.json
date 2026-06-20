@@ -45,11 +45,11 @@
 	"devEngines": {
 		"runtime": {
 			"name": "node",
-			"version": "^22.0.0"
+			"version": ">=22.0.0"
 		},
 		"packageManager": {
 			"name": "npm",
-			"version": "^10.0.0"
+			"version": ">=10.0.0"
 		}
 	},
 	"dependencies": {

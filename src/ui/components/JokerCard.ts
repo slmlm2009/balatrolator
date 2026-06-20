@@ -4,6 +4,9 @@ import { JOKER_DEFINITIONS } from '#lib/data.ts'
 import type { Joker, JokerEdition, JokerName, JokerContribution, Rank, Suit } from '#lib/types.ts'
 import { MovableCard } from './MovableCard.ts'
 import { getShortcutKey } from '../getShortcutKey.ts'
+import { getJokerSprite, getEditionOverlay } from '../sprites.ts'
+import { applyTilt } from '../tilt.ts'
+import { animateCardEntrance } from '../animations.ts'
 
 function formatNumberWithCommas (value: number): string {
 	return Math.round(value).toLocaleString('en-US')
@@ -233,7 +236,9 @@ export class JokerCard extends MovableCard {
 			this.id = `${this.tagName.toLowerCase()}-${this.uniqueId}`
 		}
 		this.classList.add('card')
-		this.draggable = true
+		// Native HTML5 drag is disabled: SortableJS handles pointer dragging. Keyboard/button
+		// reordering (via MovableCard) still works.
+		this.draggable = false
 		this.tabIndex = 0
 		this.role = 'group'
 		this.setAttribute('aria-labelledby', `${this.tagName.toLowerCase()}-${this.uniqueId}-title`)
@@ -301,6 +306,10 @@ export class JokerCard extends MovableCard {
 
 	set edition (edition) {
 		this.#edition = edition
+
+		for (const name of ['base', 'foil', 'holographic', 'polychrome', 'negative']) {
+			this.classList.toggle(`--edition-${name}`, edition.toLowerCase() === name)
+		}
 
 		this.queueRender()
 	}
@@ -381,6 +390,8 @@ export class JokerCard extends MovableCard {
 		return `Joker ${this.index + 1}: ${this.jokerName}` + (modifiers.length > 0 ? ` (${modifiers.join(', ')})` : '')
 	}
 
+	#tiltCleanup: (() => void) | undefined
+
 	connectedCallback () {
 		super.connectedCallback()
 
@@ -389,11 +400,37 @@ export class JokerCard extends MovableCard {
 		}
 
 		this.render()
+
+		if (!this.#tiltCleanup) {
+			this.#tiltCleanup = applyTilt(this)
+			animateCardEntrance(this)
+		}
+	}
+
+	disconnectedCallback () {
+		super.disconnectedCallback()
+		this.#tiltCleanup?.()
+		this.#tiltCleanup = undefined
+	}
+
+	#artTemplate () {
+		const sprite = getJokerSprite(this.jokerName)
+		const editionOverlay = getEditionOverlay(this.edition)
+
+		return html`
+			<div class="card-art" aria-hidden="true">
+				<img class="card-art-img" src="${sprite}" alt="" draggable="false">
+				${editionOverlay !== null ? html`<div class="card-edition" style="background:${editionOverlay}"></div>` : ''}
+				<div class="card-glare"></div>
+			</div>
+		`
 	}
 
 	template () {
 		return html`
 			<div class="stack">
+				${this.#artTemplate()}
+
 				<div class="action-list">
 					<button
 						class="button --icon"

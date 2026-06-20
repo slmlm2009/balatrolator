@@ -1,0 +1,298 @@
+/*
+Arcade theme — the tactile, high-performance visual layer.
+
+This stylesheet is loaded last and is purely additive: the app's structural CSS still lays everything
+out, so the calculator remains fully usable even if the runtime libraries (Tailwind/GSAP/SortableJS)
+fail to load. All card art is rendered with `image-rendering: pixelated` to keep the retro sprites
+crisp. The 3D tilt transform and glare consume the CSS custom properties written by `tilt.ts`; no
+layout work happens in JS.
+*/
+
+/* ---------- Table / page ---------- */
+
+html {
+	--arcade-felt: hsl(254 45% 12%);
+	--arcade-felt-2: hsl(262 50% 8%);
+	--arcade-ink: hsl(250 30% 95%);
+	--arcade-neon: hsl(45 98% 59%);
+	--arcade-panel: hsl(255 40% 16% / 0.82);
+	--arcade-panel-border: hsl(255 40% 38%);
+
+	color-scheme: dark;
+	background:
+		radial-gradient(ellipse 120% 80% at 50% -10%, hsl(268 60% 22%), transparent 60%),
+		radial-gradient(ellipse 100% 70% at 50% 110%, hsl(220 70% 18%), transparent 55%),
+		linear-gradient(160deg, var(--arcade-felt), var(--arcade-felt-2)) !important;
+	min-block-size: 100vh;
+	color: var(--arcade-ink);
+}
+
+body {
+	min-block-size: 100vh;
+}
+
+/* Keep crisp pixel art everywhere a sprite is shown. */
+.card-art-img,
+.card-seal,
+.deck-back-img,
+img[data-pixelated] {
+	image-rendering: pixelated;
+}
+
+/* ---------- Headline ---------- */
+
+.introduction h1 {
+	font-weight: 800;
+	letter-spacing: 0.04em;
+	text-transform: uppercase;
+	color: var(--arcade-neon);
+	text-shadow: 0 0 8px hsl(45 98% 59% / 0.6), 2px 3px 0 hsl(9 94% 39%);
+}
+
+/* ---------- Panels ---------- */
+
+.panel {
+	background-color: var(--arcade-panel) !important;
+	border-color: var(--arcade-panel-border) !important;
+	border-radius: 0.9rem !important;
+	box-shadow:
+		0 0 0 1px hsl(0 0% 0% / 0.4),
+		0 10px 30px hsl(258 60% 4% / 0.55),
+		inset 0 1px 0 hsl(0 0% 100% / 0.06);
+}
+
+.panel-header h1,
+.panel-header h2,
+.panel-header h3 {
+	letter-spacing: 0.02em;
+}
+
+.panel-header h2 {
+	color: var(--arcade-neon);
+	text-shadow: 0 1px 0 hsl(0 0% 0% / 0.6);
+}
+
+a {
+	color: hsl(45 98% 65%);
+}
+
+a:hover {
+	color: hsl(45 98% 80%);
+}
+
+/* ---------- Buttons ---------- */
+
+.button,
+::file-selector-button {
+	border-radius: 0.5rem;
+	font-weight: 700;
+	letter-spacing: 0.02em;
+	transition: transform 0.08s ease, box-shadow 0.15s ease, background-color 0.15s ease;
+	box-shadow: 0 2px 0 hsl(0 0% 0% / 0.45);
+}
+
+.button:where(:enabled):hover {
+	transform: translateY(-1px);
+	box-shadow: 0 4px 10px hsl(0 0% 0% / 0.4);
+}
+
+.button:where(:enabled):active {
+	transform: translateY(1px);
+	box-shadow: 0 0 0 hsl(0 0% 0% / 0.45);
+}
+
+/* ---------- Card art (jokers + playing cards) ---------- */
+
+joker-card,
+playing-card {
+	perspective: 700px;
+}
+
+.card-art {
+	position: relative;
+	display: block;
+	inline-size: 100%;
+	aspect-ratio: 71 / 95;
+	margin-block-end: 0.4rem;
+	border-radius: 0.6rem;
+	overflow: hidden;
+	background: linear-gradient(160deg, hsl(255 30% 22%), hsl(255 30% 14%));
+	box-shadow:
+		0 0 0 2px var(--c-border, hsl(255 40% 45%)),
+		0 6px 16px hsl(258 60% 4% / 0.6);
+	cursor: grab;
+	transform: rotateX(var(--tilt-rx, 0deg)) rotateY(var(--tilt-ry, 0deg));
+	transform-style: preserve-3d;
+	transition: transform 0.16s ease-out, box-shadow 0.2s ease;
+	will-change: transform;
+}
+
+.card-art:active {
+	cursor: grabbing;
+}
+
+.card-art-img {
+	position: absolute;
+	inset: 0;
+	inline-size: 100%;
+	block-size: 100%;
+	object-fit: contain;
+	-webkit-user-drag: none;
+	user-select: none;
+}
+
+/* Edition shine overlay (foil / holographic / polychrome / negative). */
+.card-edition {
+	position: absolute;
+	inset: 0;
+	mix-blend-mode: screen;
+	pointer-events: none;
+	opacity: 0.9;
+}
+
+/* Pointer-following glare; intensity scales with `--tilt-active`. */
+.card-glare {
+	position: absolute;
+	inset: 0;
+	pointer-events: none;
+	background: radial-gradient(
+		circle at var(--pointer-x, 50%) var(--pointer-y, 50%),
+		hsl(0 0% 100% / 0.35),
+		transparent 45%
+	);
+	opacity: calc(var(--tilt-active, 0) * 0.8);
+	transition: opacity 0.2s ease;
+	mix-blend-mode: soft-light;
+}
+
+/* Seal overlay sits in a corner of playing cards. */
+.card-seal {
+	position: absolute;
+	inset-block-start: 6%;
+	inset-inline-end: 6%;
+	inline-size: 34%;
+	block-size: auto;
+	pointer-events: none;
+	filter: drop-shadow(0 1px 2px hsl(0 0% 0% / 0.6));
+}
+
+/* Stone enhancement fallback (no rank/suit sprite). */
+.card-art.--is-stone {
+	background:
+		repeating-linear-gradient(45deg, hsl(30 8% 42%), hsl(30 8% 42%) 6px, hsl(30 8% 36%) 6px, hsl(30 8% 36%) 12px);
+}
+
+.card-art.--is-stone::after {
+	content: 'STONE';
+	position: absolute;
+	inset: 0;
+	display: grid;
+	place-items: center;
+	font-weight: 800;
+	letter-spacing: 0.1em;
+	color: hsl(0 0% 90%);
+	text-shadow: 0 2px 3px hsl(0 0% 0% / 0.7);
+}
+
+/* Debuffed cards read as “struck out”. */
+playing-card.--is-debuffed .card-art {
+	filter: grayscale(0.85) brightness(0.7);
+}
+
+playing-card.--is-debuffed .card-art::after {
+	content: '';
+	position: absolute;
+	inset-block-start: 50%;
+	inset-inline: 4%;
+	block-size: 3px;
+	background: hsl(0 90% 55%);
+	box-shadow: 0 0 6px hsl(0 90% 55%);
+	transform: rotate(-12deg);
+}
+
+/* Unplayed cards sit lower and dimmer; played cards lift toward the viewer. */
+playing-card:not(.--is-played) .card-art {
+	filter: brightness(0.78) saturate(0.8);
+	transform: translateY(8px) rotateX(var(--tilt-rx, 0deg)) rotateY(var(--tilt-ry, 0deg));
+}
+
+playing-card.--is-played .card-art {
+	box-shadow:
+		0 0 0 2px var(--c-border, hsl(45 98% 50%)),
+		0 0 14px hsl(45 98% 55% / 0.5),
+		0 10px 20px hsl(258 60% 4% / 0.6);
+}
+
+/* Joker edition glow. */
+joker-card.--edition-negative .card-art {
+	box-shadow:
+		0 0 0 2px hsl(190 90% 55%),
+		0 0 16px hsl(200 90% 50% / 0.6),
+		0 6px 16px hsl(258 60% 4% / 0.6);
+}
+
+joker-card.--edition-foil .card-art,
+joker-card.--edition-holographic .card-art,
+joker-card.--edition-polychrome .card-art {
+	box-shadow:
+		0 0 0 2px hsl(280 80% 65%),
+		0 0 16px hsl(280 80% 60% / 0.5),
+		0 6px 16px hsl(258 60% 4% / 0.6);
+}
+
+/* ---------- Contribution badge ---------- */
+
+.jc-contribution {
+	background: hsl(255 40% 10% / 0.7) !important;
+	border: 1px solid var(--c-border, hsl(45 98% 50%));
+	color: var(--arcade-neon);
+}
+
+/* ---------- Score cards ---------- */
+
+.score-card {
+	position: relative;
+	overflow: hidden;
+}
+
+[data-sc-formatted-score] {
+	display: inline-block;
+	color: hsl(45 98% 62%);
+	text-shadow:
+		0 0 calc(6px + var(--score-flash, 0) * 18px) hsl(45 98% 60% / calc(0.5 + var(--score-flash, 0) * 0.5)),
+		0 2px 0 hsl(9 94% 30%);
+}
+
+/* ---------- SortableJS drag states ---------- */
+
+.sortable-ghost .card-art {
+	opacity: 0.35;
+	filter: brightness(1.3);
+}
+
+.sortable-chosen .card-art {
+	box-shadow:
+		0 0 0 3px var(--arcade-neon),
+		0 0 22px hsl(45 98% 55% / 0.7),
+		0 14px 28px hsl(258 60% 4% / 0.7);
+}
+
+.sortable-drag .card-art {
+	cursor: grabbing;
+}
+
+/* ---------- Misc ---------- */
+
+.log {
+	background: hsl(255 40% 8% / 0.7);
+	border-radius: 0.5rem;
+	padding: 0.5rem;
+	color: hsl(150 40% 75%);
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.card-art {
+		transition: none;
+		transform: none;
+	}
+}

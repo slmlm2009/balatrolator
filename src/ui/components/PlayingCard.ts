@@ -3,6 +3,9 @@ import { html } from 'lit-html'
 import type { BlindName, Card, Edition, Enhancement, Rank, Seal, Suit } from '#lib/types.ts'
 import { MovableCard } from './MovableCard.ts'
 import { getShortcutKey } from '../getShortcutKey.ts'
+import { getPlayingCardSprite, getSealSprite, getEditionOverlay } from '../sprites.ts'
+import { applyTilt } from '../tilt.ts'
+import { animatePlayToggle, animateCardEntrance } from '../animations.ts'
 
 const lightCss = /*css*/`
 	playing-card {
@@ -134,7 +137,9 @@ export class PlayingCard extends MovableCard {
 			this.id = `${this.tagName.toLowerCase()}-${this.uniqueId}`
 		}
 		this.classList.add('card', '--is-played')
-		this.draggable = true
+		// Native HTML5 drag is disabled: SortableJS handles pointer dragging. Keyboard/button
+		// reordering (via MovableCard) still works.
+		this.draggable = false
 		this.tabIndex = 0
 		this.role = 'group'
 		this.setAttribute('aria-labelledby', `${this.tagName.toLowerCase()}-${this.uniqueId}-title`)
@@ -225,9 +230,14 @@ export class PlayingCard extends MovableCard {
 	}
 
 	set played (played) {
+		const changed = this.#played !== played
 		this.#played = played
 
 		this.classList[this.played ? 'add' : 'remove']('--is-played')
+
+		if (changed && this.isConnected) {
+			animatePlayToggle(this, played)
+		}
 
 		this.queueRender()
 	}
@@ -264,6 +274,8 @@ export class PlayingCard extends MovableCard {
 		return `Card ${this.index + 1}: ${this.rank} of ${this.suit}` + (modifiers.length > 0 ? ` (${modifiers.join(', ')})` : '')
 	}
 
+	#tiltCleanup: (() => void) | undefined
+
 	connectedCallback () {
 		super.connectedCallback()
 
@@ -272,11 +284,40 @@ export class PlayingCard extends MovableCard {
 		}
 
 		this.render()
+
+		if (!this.#tiltCleanup) {
+			this.#tiltCleanup = applyTilt(this)
+			animateCardEntrance(this)
+		}
+	}
+
+	disconnectedCallback () {
+		super.disconnectedCallback()
+		this.#tiltCleanup?.()
+		this.#tiltCleanup = undefined
+	}
+
+	#artTemplate () {
+		const sprite = getPlayingCardSprite(this.rank, this.suit, this.enhancement)
+		const sealSprite = getSealSprite(this.seal)
+		const editionOverlay = getEditionOverlay(this.edition)
+		const isStone = this.enhancement === 'Stone'
+
+		return html`
+			<div class="card-art ${isStone ? '--is-stone' : ''}" aria-hidden="true">
+				${sprite !== null ? html`<img class="card-art-img" src="${sprite}" alt="" draggable="false">` : ''}
+				${editionOverlay !== null ? html`<div class="card-edition" style="background:${editionOverlay}"></div>` : ''}
+				${sealSprite !== null ? html`<img class="card-seal" src="${sealSprite}" alt="" draggable="false">` : ''}
+				<div class="card-glare"></div>
+			</div>
+		`
 	}
 
 	template () {
 		return html`
 			<div class="stack">
+				${this.#artTemplate()}
+
 				<div class="action-list">
 					<button
 						class="button --icon"

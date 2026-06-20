@@ -9,6 +9,8 @@ import { PlayingCard } from './components/PlayingCard.ts'
 import { debounce } from './debounce.ts'
 import { readStateFromUrl, saveStateToUrl } from './Storage.ts'
 import { SaveManager } from './SaveManager.ts'
+import { loadSortable, type SortableOptions } from './vendor.ts'
+import { animateScoreReveal } from './animations.ts'
 import type { BlindName, Card, DeckName, HandName, InitialState, Joker, State, Result, InitialJoker, InitialCard, JokerContribution } from '#lib/types.ts'
 
 const dateTimeFormat = new Intl.DateTimeFormat(document.documentElement.lang, {
@@ -106,6 +108,38 @@ export function init () {
 	populateUiWithState(state)
 
 	populateSavesUi()
+
+	setupDragAndDrop()
+}
+
+/**
+ * Enables SortableJS pointer drag-and-drop for reordering jokers and playing cards. Interactive
+ * controls are excluded from dragging via the `filter` so editing still works, and reordering
+ * triggers a recalculation. Falls back silently to keyboard/button reordering if SortableJS can't
+ * be loaded.
+ */
+function setupDragAndDrop () {
+	void loadSortable().then((Sortable) => {
+		if (!Sortable) {
+			return
+		}
+
+		const options: SortableOptions = {
+			animation: 180,
+			easing: 'cubic-bezier(0.2, 0, 0, 1)',
+			filter: 'input, select, button, label, combo-box, .checkbox-control, .control-box',
+			preventOnFilter: false,
+			ghostClass: 'sortable-ghost',
+			chosenClass: 'sortable-chosen',
+			dragClass: 'sortable-drag',
+			delay: 60,
+			delayOnTouchOnly: true,
+			onEnd: () => calculate(),
+		}
+
+		Sortable.create(jokerContainer, options)
+		Sortable.create(playingCardContainer, options)
+	})
 }
 
 function calculate () {
@@ -225,7 +259,7 @@ function handleImportSubmit (event: SubmitEvent) {
 		if (typeof fileReader.result === 'string') {
 			const name = file.name.replace('.json', '')
 			const state = JSON.parse(fileReader.result) as State
-			state.jokerSet = new Set(state.jokers.map(({ name }: { name: string }) => name))
+			state.jokerSet = new Set(state.jokers.map((joker) => joker.name))
 			const { hand, results } = calculateScore(state)
 			saveManager.save(name, state, hand, results)
 			storeSaves()
@@ -272,6 +306,8 @@ function updateScore (hand: HandName, results: Result[]) {
 
 		scoreCardContainer.appendChild(fragment)
 	}
+
+	animateScoreReveal(scoreCardContainer)
 
 	const resultArray = Array.from(resultsByScore.values())
 
