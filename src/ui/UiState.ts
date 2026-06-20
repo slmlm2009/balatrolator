@@ -298,15 +298,56 @@ function handleImportSubmit (event: SubmitEvent) {
 	fileReader.readAsText(file)
 }
 
+// Persisting (URL + localStorage + saves-table rebuild + log) is the heavy part of a recalc, so it's
+// debounced — the scoreboard updates immediately while rapid edits stay snappy. The pending result is
+// flushed on page hide/visibility change so nothing is lost if the user leaves within the window.
+let pendingPersist: { state: State, hand: HandName, results: Result[] } | null = null
+
+function flushPersist () {
+	if (!pendingPersist) {
+		return
+	}
+	const { state, hand, results } = pendingPersist
+	pendingPersist = null
+	saveStateToUrl(state)
+	// Save the current state as a special auto save overwriting the previous auto save.
+	saveManager.autoSave(state, hand, results)
+	storeSaves()
+	updateLog(results)
+}
+
+const schedulePersist = debounce(flushPersist, 350)
+
+window.addEventListener('pagehide', flushPersist)
+document.addEventListener('visibilitychange', () => {
+	if (document.visibilityState === 'hidden') {
+		flushPersist()
+	}
+})
+
 function applyState (state: State) {
 	const { hand, results } = calculateScore(state)
 	const level = state.handLevels[hand]?.level ?? 1
 	updateScore(hand, results, level)
-	saveStateToUrl(state)
 
-	// Save the current state as a special auto save overwriting the previous auto save.
-	saveManager.autoSave(state, hand, results)
-	storeSaves()
+	pendingPersist = { state, hand, results }
+	schedulePersist()
+}
+
+function updateLog (results: Result[]) {
+	const seen = new Set<string>()
+	const lines: string[] = []
+	for (const result of results) {
+		if (seen.has(result.score)) {
+			continue
+		}
+		seen.add(result.score)
+		lines.push(result.log.join('\n'))
+	}
+
+	// The log lives in the log drawer (outside the form).
+	const scoreLog = document.querySelector<HTMLPreElement>('[data-sc-log]')!
+	scoreLog.innerHTML = lines.join('\n')
 }
 
 function updateScore (hand: HandName, results: Result[], level: number) {
@@ -335,10 +376,6 @@ function updateScore (hand: HandName, results: Result[], level: number) {
 		scoreAnnouncement = `${hand} scoring ${resultArray.at(0)!.formattedScore}.`
 	}
 	debouncedAriaNotify(scoreAnnouncement)
-
-	// The log lives in the log drawer (outside the form).
-	const scoreLog = document.querySelector<HTMLPreElement>('[data-sc-log]')!
-	scoreLog.innerHTML = resultArray.map((result) => result.log.join('\n')).join('\n')
 
 	const contributionMap = new Map<number, JokerContribution>()
 	for (const result of resultArray) {

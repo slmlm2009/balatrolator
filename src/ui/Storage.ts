@@ -40,5 +40,8 @@ export function saveStateToUrl (state: State) {
 	const minified = minify(state)
 	urlParams.set('state', minified)
 
-	window.history.pushState({}, '', `?${urlParams.toString()}`)
+	// Use replaceState (not pushState): the URL mirrors the live hand, so each edit should update the
+	// current entry rather than pushing a new one. pushState here grows the history stack unbounded,
+	// which progressively slows the page and breaks the back button.
+	window.history.replaceState({}, '', `?${urlParams.toString()}`)
 }
