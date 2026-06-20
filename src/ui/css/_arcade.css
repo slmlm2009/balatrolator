@@ -1,111 +1,312 @@
 /*
-Arcade theme — the tactile, high-performance visual layer.
+Arcade theme — a tactile, mobile-first Balatro "game table" UI.
 
-This stylesheet is loaded last and is purely additive: the app's structural CSS still lays everything
-out, so the calculator remains fully usable even if the runtime libraries (Tailwind/GSAP/SortableJS)
-fail to load. All card art is rendered with `image-rendering: pixelated` to keep the retro sprites
-crisp. The 3D tilt transform and glare consume the CSS custom properties written by `tilt.ts`; no
-layout work happens in JS.
+Layout: a top bar with drawer toggles, a compact round-data bar, a joker tray, the chips × mult
+scoreboard, and the hand tray. Config panels (levels, planets, saves, log) live in slide-up drawers.
+Everything is loaded after the structural CSS and is additive: the calculator still works if the
+runtime libraries fail. Card art is rendered with image-rendering: pixelated.
+
+Input surfaces are themed by setting the existing --c-* custom properties on container scopes, which
+the form components read — this avoids fighting the components' adopted stylesheets.
 */
 
-/* ---------- Table / page ---------- */
-
 html {
-	--arcade-felt: hsl(254 45% 12%);
-	--arcade-felt-2: hsl(262 50% 8%);
-	--arcade-ink: hsl(250 30% 95%);
-	--arcade-neon: hsl(45 98% 59%);
-	--arcade-panel: hsl(255 40% 16% / 0.82);
-	--arcade-panel-border: hsl(255 40% 38%);
+	--felt-0: hsl(202 45% 9%);
+	--felt-1: hsl(208 44% 13%);
+	--ink: hsl(40 30% 94%);
+	--ink-dim: hsl(210 16% 68%);
+
+	--chips: hsl(206 100% 52%);
+	--chips-dark: hsl(208 100% 30%);
+	--mult: hsl(5 95% 64%);
+	--mult-dark: hsl(5 75% 38%);
+	--gold: hsl(43 96% 56%);
+	--gold-dark: hsl(38 92% 38%);
+
+	--surface: hsl(209 38% 16%);
+	--surface-2: hsl(209 34% 20%);
+	--surface-line: hsl(208 30% 32%);
+
+	--radius: 0.85rem;
+	--shadow: 0 6px 0 hsl(206 60% 4% / 0.55), 0 14px 26px hsl(206 60% 4% / 0.5);
 
 	color-scheme: dark;
+	color: var(--ink);
 	background:
-		radial-gradient(ellipse 120% 80% at 50% -10%, hsl(268 60% 22%), transparent 60%),
-		radial-gradient(ellipse 100% 70% at 50% 110%, hsl(220 70% 18%), transparent 55%),
-		linear-gradient(160deg, var(--arcade-felt), var(--arcade-felt-2)) !important;
-	min-block-size: 100vh;
-	color: var(--arcade-ink);
+		radial-gradient(ellipse 110% 70% at 50% -8%, hsl(196 60% 20%), transparent 60%),
+		radial-gradient(ellipse 120% 80% at 50% 120%, hsl(265 50% 18%), transparent 55%),
+		linear-gradient(165deg, var(--felt-1), var(--felt-0)) !important;
+	font-family: var(--f-family-sans-serif);
 }
 
 body {
-	min-block-size: 100vh;
+	min-block-size: 100dvh;
+	margin: 0;
+	padding-block-end: env(safe-area-inset-bottom);
+	overflow-x: hidden;
 }
 
-/* Keep crisp pixel art everywhere a sprite is shown. */
+img[class*='card-'],
 .card-art-img,
 .card-seal,
-.deck-back-img,
-img[data-pixelated] {
+.deck-back-img {
 	image-rendering: pixelated;
 }
 
-/* ---------- Headline ---------- */
+/* ============ TOP BAR ============ */
 
-.introduction h1 {
-	font-weight: 800;
-	letter-spacing: 0.04em;
-	text-transform: uppercase;
-	color: var(--arcade-neon);
-	text-shadow: 0 0 8px hsl(45 98% 59% / 0.6), 2px 3px 0 hsl(9 94% 39%);
+.topbar {
+	position: sticky;
+	inset-block-start: 0;
+	z-index: 20;
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+	flex-wrap: wrap;
+	padding: 0.5rem 0.6rem;
+	padding-block-start: max(0.5rem, env(safe-area-inset-top));
+	background: linear-gradient(hsl(206 50% 7% / 0.96), hsl(206 50% 7% / 0.82));
+	border-block-end: 1px solid var(--surface-line);
+	box-shadow: 0 4px 14px hsl(206 60% 4% / 0.5);
 }
 
-/* ---------- Panels ---------- */
-
-.panel {
-	background-color: var(--arcade-panel) !important;
-	border-color: var(--arcade-panel-border) !important;
-	border-radius: 0.9rem !important;
-	box-shadow:
-		0 0 0 1px hsl(0 0% 0% / 0.4),
-		0 10px 30px hsl(258 60% 4% / 0.55),
-		inset 0 1px 0 hsl(0 0% 100% / 0.06);
+.brand {
+	display: flex;
+	align-items: center;
+	gap: 0.45rem;
 }
 
-.panel-header h1,
-.panel-header h2,
-.panel-header h3 {
-	letter-spacing: 0.02em;
+.brand-name {
+	font-weight: 900;
+	font-size: 1.1rem;
+	letter-spacing: 0.06em;
+	color: var(--gold);
+	text-shadow: 0 0 10px hsl(43 96% 56% / 0.45), 1px 2px 0 hsl(5 75% 30%);
 }
 
-.panel-header h2 {
-	color: var(--arcade-neon);
-	text-shadow: 0 1px 0 hsl(0 0% 0% / 0.6);
+.brand-suits {
+	display: inline-flex;
+	gap: 0.1rem;
 }
 
-a {
-	color: hsl(45 98% 65%);
+.brand-suits .--suit-h, .brand-suits .--suit-d { color: var(--mult); }
+.brand-suits .--suit-s, .brand-suits .--suit-c { color: var(--chips); }
+.brand-suits .icon { inline-size: 0.9rem; block-size: 0.9rem; }
+
+.toolbar {
+	display: flex;
+	gap: 0.35rem;
+	margin-inline-start: auto;
+	overflow-x: auto;
+	scrollbar-width: thin;
+	-webkit-overflow-scrolling: touch;
 }
 
-a:hover {
-	color: hsl(45 98% 80%);
-}
-
-/* ---------- Buttons ---------- */
-
-.button,
-::file-selector-button {
-	border-radius: 0.5rem;
+.chip-button {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.3rem;
+	flex: 0 0 auto;
+	min-block-size: 2.25rem;
+	padding: 0 0.7rem;
+	border: 2px solid var(--surface-line);
+	border-radius: 999px;
+	background: var(--surface);
+	color: var(--ink);
 	font-weight: 700;
-	letter-spacing: 0.02em;
-	transition: transform 0.08s ease, box-shadow 0.15s ease, background-color 0.15s ease;
-	box-shadow: 0 2px 0 hsl(0 0% 0% / 0.45);
+	font-size: 0.82rem;
+	cursor: pointer;
+	transition: transform 0.08s ease, background-color 0.15s ease, border-color 0.15s ease;
 }
 
-.button:where(:enabled):hover {
-	transform: translateY(-1px);
-	box-shadow: 0 4px 10px hsl(0 0% 0% / 0.4);
+.chip-button:hover { background: var(--surface-2); border-color: var(--gold); }
+.chip-button:active { transform: translateY(1px); }
+.chip-button.--danger:hover { border-color: var(--mult); }
+.chip-button .icon { inline-size: 1.05rem; block-size: 1.05rem; }
+
+/* ============ TABLE ============ */
+
+.game-table {
+	inline-size: 100%;
+	max-inline-size: 64rem;
+	margin: 0 auto;
+	padding: 0.6rem;
+	display: block;
 }
 
-.button:where(:enabled):active {
-	transform: translateY(1px);
-	box-shadow: 0 0 0 hsl(0 0% 0% / 0.45);
+.game {
+	display: flex;
+	flex-direction: column;
+	gap: 0.6rem;
+	min-inline-size: 0;
 }
 
-/* ---------- Card art (jokers + playing cards) ---------- */
+/* Flex/scroll children must be allowed to shrink below their content width so the horizontal-scroll
+   trays don't inflate the page width on mobile. */
+.round-bar,
+.tray-section,
+.scoreboard,
+.tray {
+	min-inline-size: 0;
+	max-inline-size: 100%;
+}
+
+/* ============ ROUND DATA BAR ============ */
+
+.round-bar {
+	--c-text: var(--ink);
+	--c-background-lighter: var(--surface);
+	--c-background-light: var(--surface-2);
+	--c-border: var(--surface-line);
+
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.4rem;
+	padding: 0.5rem;
+	background: hsl(209 38% 16% / 0.6);
+	border: 1px solid var(--surface-line);
+	border-radius: var(--radius);
+}
+
+.stat-pill {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.35rem;
+	padding: 0.2rem 0.5rem;
+	background: var(--surface);
+	border: 2px solid var(--surface-line);
+	border-radius: 0.6rem;
+	min-block-size: 2.4rem;
+}
+
+.stat-pill.--grow { flex: 1; }
+.stat-pill.--money { border-color: var(--gold-dark); }
+.stat-pill.--money .stat-label { color: var(--gold); font-weight: 900; }
+
+.stat-label {
+	font-size: 0.72rem;
+	font-weight: 700;
+	letter-spacing: 0.03em;
+	color: var(--ink-dim);
+	text-transform: uppercase;
+	white-space: nowrap;
+}
+
+.stat-input {
+	inline-size: 3.2rem;
+	min-block-size: 1.9rem;
+	padding: 0 0.35rem;
+	border: 2px solid var(--surface-line);
+	border-radius: 0.4rem;
+	background: hsl(208 40% 11%);
+	color: var(--ink);
+	font-weight: 700;
+	text-align: end;
+}
+
+.stat-input.--text { inline-size: 100%; text-align: start; }
+.stat-pill.--grow .stat-input { flex: 1; }
+
+.stat-combo { inline-size: 8.5rem; }
+.stat-pill.--blind .stat-combo { inline-size: 8rem; }
+
+.blind-active-toggle { display: inline-flex; align-items: center; }
+.blind-active-toggle input { inline-size: 1.1rem; block-size: 1.1rem; accent-color: var(--gold); }
+
+/* ============ TRAYS (jokers / hand) ============ */
+
+.tray-section {
+	background: hsl(209 38% 16% / 0.55);
+	border: 1px solid var(--surface-line);
+	border-radius: var(--radius);
+	padding: 0.5rem;
+}
+
+.tray-section.--jokers { border-color: hsl(5 60% 32%); }
+.tray-section.--hand { border-color: hsl(43 70% 34%); }
+
+.tray-header {
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+	margin-block-end: 0.5rem;
+}
+
+.tray-header h2 {
+	font-size: 0.95rem;
+	font-weight: 800;
+	letter-spacing: 0.05em;
+	text-transform: uppercase;
+}
+
+.tray-section.--jokers .tray-header h2 { color: var(--mult); }
+.tray-section.--hand .tray-header h2 { color: var(--gold); }
+
+.round-add-button {
+	margin-inline-start: auto;
+	display: inline-grid;
+	place-items: center;
+	inline-size: 2.1rem;
+	block-size: 2.1rem;
+	border: 2px solid var(--surface-line);
+	border-radius: 0.5rem;
+	background: var(--surface);
+	color: var(--ink);
+	cursor: pointer;
+	transition: transform 0.08s ease, background-color 0.15s ease;
+}
+
+.round-add-button:hover { background: var(--gold); color: hsl(206 60% 8%); border-color: var(--gold); }
+.round-add-button:active { transform: translateY(1px); }
+.round-add-button .icon { inline-size: 1.2rem; block-size: 1.2rem; }
+
+.tray {
+	display: flex;
+	gap: 0.55rem;
+	overflow-x: auto;
+	overflow-y: hidden;
+	padding: 0.35rem 0.15rem 0.6rem;
+	min-block-size: 6.5rem;
+	scroll-snap-type: x proximity;
+	scrollbar-width: thin;
+	scrollbar-color: var(--surface-line) transparent;
+	-webkit-overflow-scrolling: touch;
+}
+
+.tray:empty::after {
+	content: 'Tap + to add';
+	color: var(--ink-dim);
+	font-size: 0.85rem;
+	align-self: center;
+	margin: 0 auto;
+	font-style: italic;
+}
+
+.tray::-webkit-scrollbar { block-size: 0.5rem; }
+.tray::-webkit-scrollbar-thumb { background: var(--surface-line); border-radius: 999px; }
+
+/* Cards inside a tray */
+.tray > joker-card,
+.tray > playing-card {
+	flex: 0 0 auto;
+	inline-size: var(--tray-card-w, 6.6rem);
+	scroll-snap-align: start;
+	padding: 0;
+	border: none;
+	background: transparent;
+	max-inline-size: none;
+}
+
+.tray > .card.--editing {
+	inline-size: min(16rem, 82vw);
+}
+
+/* ============ CARD ART ============ */
 
 joker-card,
 playing-card {
 	perspective: 700px;
+	color: var(--ink);
 }
 
 .card-art {
@@ -113,13 +314,12 @@ playing-card {
 	display: block;
 	inline-size: 100%;
 	aspect-ratio: 71 / 95;
-	margin-block-end: 0.4rem;
-	border-radius: 0.6rem;
+	border-radius: 0.55rem;
 	overflow: hidden;
-	background: linear-gradient(160deg, hsl(255 30% 22%), hsl(255 30% 14%));
+	background: linear-gradient(160deg, hsl(255 25% 24%), hsl(255 25% 15%));
 	box-shadow:
 		0 0 0 2px var(--c-border, hsl(255 40% 45%)),
-		0 6px 16px hsl(258 60% 4% / 0.6);
+		0 5px 12px hsl(206 60% 4% / 0.6);
 	cursor: grab;
 	transform: rotateX(var(--tilt-rx, 0deg)) rotateY(var(--tilt-ry, 0deg));
 	transform-style: preserve-3d;
@@ -127,9 +327,7 @@ playing-card {
 	will-change: transform;
 }
 
-.card-art:active {
-	cursor: grabbing;
-}
+.card-art:active { cursor: grabbing; }
 
 .card-art-img {
 	position: absolute;
@@ -141,7 +339,6 @@ playing-card {
 	user-select: none;
 }
 
-/* Edition shine overlay (foil / holographic / polychrome / negative). */
 .card-edition {
 	position: absolute;
 	inset: 0;
@@ -150,36 +347,27 @@ playing-card {
 	opacity: 0.9;
 }
 
-/* Pointer-following glare; intensity scales with `--tilt-active`. */
 .card-glare {
 	position: absolute;
 	inset: 0;
 	pointer-events: none;
-	background: radial-gradient(
-		circle at var(--pointer-x, 50%) var(--pointer-y, 50%),
-		hsl(0 0% 100% / 0.35),
-		transparent 45%
-	);
+	background: radial-gradient(circle at var(--pointer-x, 50%) var(--pointer-y, 50%), hsl(0 0% 100% / 0.35), transparent 45%);
 	opacity: calc(var(--tilt-active, 0) * 0.8);
 	transition: opacity 0.2s ease;
 	mix-blend-mode: soft-light;
 }
 
-/* Seal overlay sits in a corner of playing cards. */
 .card-seal {
 	position: absolute;
 	inset-block-start: 6%;
 	inset-inline-end: 6%;
 	inline-size: 34%;
-	block-size: auto;
 	pointer-events: none;
 	filter: drop-shadow(0 1px 2px hsl(0 0% 0% / 0.6));
 }
 
-/* Stone enhancement fallback (no rank/suit sprite). */
 .card-art.--is-stone {
-	background:
-		repeating-linear-gradient(45deg, hsl(30 8% 42%), hsl(30 8% 42%) 6px, hsl(30 8% 36%) 6px, hsl(30 8% 36%) 12px);
+	background: repeating-linear-gradient(45deg, hsl(30 8% 42%), hsl(30 8% 42%) 6px, hsl(30 8% 36%) 6px, hsl(30 8% 36%) 12px);
 }
 
 .card-art.--is-stone::after {
@@ -189,16 +377,12 @@ playing-card {
 	display: grid;
 	place-items: center;
 	font-weight: 800;
-	letter-spacing: 0.1em;
+	letter-spacing: 0.08em;
 	color: hsl(0 0% 90%);
 	text-shadow: 0 2px 3px hsl(0 0% 0% / 0.7);
 }
 
-/* Debuffed cards read as “struck out”. */
-playing-card.--is-debuffed .card-art {
-	filter: grayscale(0.85) brightness(0.7);
-}
-
+playing-card.--is-debuffed .card-art { filter: grayscale(0.85) brightness(0.7); }
 playing-card.--is-debuffed .card-art::after {
 	content: '';
 	position: absolute;
@@ -210,89 +394,388 @@ playing-card.--is-debuffed .card-art::after {
 	transform: rotate(-12deg);
 }
 
-/* Unplayed cards sit lower and dimmer; played cards lift toward the viewer. */
 playing-card:not(.--is-played) .card-art {
-	filter: brightness(0.78) saturate(0.8);
-	transform: translateY(8px) rotateX(var(--tilt-rx, 0deg)) rotateY(var(--tilt-ry, 0deg));
+	filter: brightness(0.74) saturate(0.8);
+	transform: translateY(10px) rotateX(var(--tilt-rx, 0deg)) rotateY(var(--tilt-ry, 0deg));
 }
 
 playing-card.--is-played .card-art {
-	box-shadow:
-		0 0 0 2px var(--c-border, hsl(45 98% 50%)),
-		0 0 14px hsl(45 98% 55% / 0.5),
-		0 10px 20px hsl(258 60% 4% / 0.6);
+	box-shadow: 0 0 0 2px var(--gold), 0 0 14px hsl(43 96% 56% / 0.5), 0 8px 16px hsl(206 60% 4% / 0.6);
 }
 
-/* Joker edition glow. */
-joker-card.--edition-negative .card-art {
-	box-shadow:
-		0 0 0 2px hsl(190 90% 55%),
-		0 0 16px hsl(200 90% 50% / 0.6),
-		0 6px 16px hsl(258 60% 4% / 0.6);
-}
-
+joker-card.--edition-negative .card-art { box-shadow: 0 0 0 2px hsl(190 90% 55%), 0 0 16px hsl(200 90% 50% / 0.6), 0 5px 12px hsl(206 60% 4% / 0.6); }
 joker-card.--edition-foil .card-art,
 joker-card.--edition-holographic .card-art,
-joker-card.--edition-polychrome .card-art {
-	box-shadow:
-		0 0 0 2px hsl(280 80% 65%),
-		0 0 16px hsl(280 80% 60% / 0.5),
-		0 6px 16px hsl(258 60% 4% / 0.6);
+joker-card.--edition-polychrome .card-art { box-shadow: 0 0 0 2px hsl(280 80% 65%), 0 0 16px hsl(280 80% 60% / 0.5), 0 5px 12px hsl(206 60% 4% / 0.6); }
+
+/* ============ CARD CHROME (compact face + collapsible editor) ============ */
+
+joker-card .stack,
+playing-card .stack {
+	display: flex;
+	flex-direction: column;
+	gap: 0.35rem;
 }
 
-/* ---------- Contribution badge ---------- */
+/* The face action row: tight, wrapping icon buttons under the art. */
+joker-card > .stack > .action-list,
+playing-card > .stack > .action-list {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.2rem;
+	justify-content: center;
+}
 
+joker-card .button.--icon,
+playing-card .button.--icon {
+	min-block-size: 1.9rem;
+	inline-size: 1.9rem;
+	padding: 0;
+	border-radius: 0.4rem;
+	border-color: var(--surface-line);
+	background: var(--surface);
+	color: var(--ink);
+}
+
+joker-card .button.--icon:hover,
+playing-card .button.--icon:hover { background: var(--surface-2); }
+
+/* Editor is collapsed until the card is tapped into edit mode. */
+.card-editor {
+	display: none;
+	flex-direction: column;
+	gap: 0.4rem;
+	--c-text: var(--ink);
+	--c-background-lighter: hsl(208 40% 11%);
+	--c-background-light: var(--surface-2);
+	--c-border: var(--surface-line);
+	padding-block-start: 0.35rem;
+	border-block-start: 1px dashed var(--surface-line);
+}
+
+.card.--editing .card-editor { display: flex; }
+
+.card-editor .text-input,
+.card-editor select,
+.card-editor .cb-button {
+	inline-size: 100%;
+	max-inline-size: 100%;
+}
+
+/* The play toggle stays on the compact face for quick access. */
+playing-card .checkbox-control {
+	gap: 0.3rem;
+	font-size: 0.78rem;
+	font-weight: 700;
+}
+
+playing-card .checkbox-control input { inline-size: 1.05rem; block-size: 1.05rem; accent-color: var(--gold); }
+
+/* Joker contribution badge sits on the face. */
 .jc-contribution {
-	background: hsl(255 40% 10% / 0.7) !important;
-	border: 1px solid var(--c-border, hsl(45 98% 50%));
-	color: var(--arcade-neon);
+	margin-block-start: 0.1rem;
+	padding: 0.15rem 0.3rem;
+	text-align: center;
+	font-size: 0.72rem;
+	font-weight: 800;
+	background: hsl(206 60% 6% / 0.7) !important;
+	border: 1px solid var(--mult-dark);
+	border-radius: 0.4rem;
+	color: var(--mult);
 }
 
-/* ---------- Score cards ---------- */
+.jc-contribution-percent { color: var(--ink-dim); font-weight: 600; }
 
-.score-card {
-	position: relative;
+/* ============ SCOREBOARD ============ */
+
+.scoreboard {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 0.55rem;
+	padding: 0.9rem 0.7rem;
+	background:
+		radial-gradient(ellipse 80% 60% at 50% 0%, hsl(206 50% 22% / 0.7), transparent 70%),
+		hsl(208 42% 14% / 0.85);
+	border: 2px solid var(--surface-line);
+	border-radius: var(--radius);
+	box-shadow: var(--shadow), inset 0 1px 0 hsl(0 0% 100% / 0.06);
+}
+
+.sb-hand {
+	display: flex;
+	align-items: baseline;
+	gap: 0.5rem;
+}
+
+.sb-hand-name {
+	font-size: 1.35rem;
+	font-weight: 900;
+	letter-spacing: 0.02em;
+	color: var(--ink);
+	text-shadow: 0 2px 0 hsl(206 60% 6%);
+}
+
+.sb-hand-level {
+	font-size: 0.8rem;
+	font-weight: 800;
+	color: hsl(206 60% 8%);
+	background: var(--gold);
+	padding: 0.05rem 0.45rem;
+	border-radius: 999px;
+}
+
+.sb-equation {
+	display: flex;
+	align-items: stretch;
+	gap: 0.5rem;
+	inline-size: 100%;
+	max-inline-size: 26rem;
+}
+
+.sb-box {
+	flex: 1;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	min-block-size: 3.4rem;
+	padding: 0.3rem 0.6rem;
+	border-radius: 0.6rem;
+	font-weight: 900;
+	font-size: clamp(1.4rem, 7vw, 2.4rem);
+	font-variant-numeric: tabular-nums;
+	color: var(--ink);
+	box-shadow: inset 0 2px 0 hsl(0 0% 100% / 0.18), 0 4px 0 hsl(0 0% 0% / 0.35);
 	overflow: hidden;
 }
 
-[data-sc-formatted-score] {
-	display: inline-block;
-	color: hsl(45 98% 62%);
+.sb-box-value { overflow: hidden; text-overflow: ellipsis; }
+
+.sb-box.--chips { background: linear-gradient(hsl(206 100% 58%), var(--chips)); border: 2px solid var(--chips-dark); }
+.sb-box.--mult { background: linear-gradient(hsl(5 95% 70%), var(--mult)); border: 2px solid var(--mult-dark); }
+
+.sb-times {
+	display: flex;
+	align-items: center;
+	font-size: 1.6rem;
+	font-weight: 900;
+	color: var(--ink-dim);
+}
+
+.sb-total {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 0.1rem;
+}
+
+.sb-total-label {
+	font-size: 0.7rem;
+	font-weight: 800;
+	letter-spacing: 0.18em;
+	text-transform: uppercase;
+	color: var(--ink-dim);
+}
+
+.sb-total-value {
+	font-size: clamp(2rem, 11vw, 3.4rem);
+	font-weight: 900;
+	line-height: 1;
+	font-variant-numeric: tabular-nums;
+	color: var(--gold);
 	text-shadow:
-		0 0 calc(6px + var(--score-flash, 0) * 18px) hsl(45 98% 60% / calc(0.5 + var(--score-flash, 0) * 0.5)),
-		0 2px 0 hsl(9 94% 30%);
+		0 0 calc(6px + var(--score-flash, 0) * 22px) hsl(43 96% 56% / calc(0.5 + var(--score-flash, 0) * 0.5)),
+		0 3px 0 hsl(38 92% 26%);
 }
 
-/* ---------- SortableJS drag states ---------- */
-
-.sortable-ghost .card-art {
-	opacity: 0.35;
-	filter: brightness(1.3);
+.sb-luck {
+	display: flex;
+	gap: 0.4rem;
+	inline-size: 100%;
+	max-inline-size: 26rem;
 }
 
-.sortable-chosen .card-art {
-	box-shadow:
-		0 0 0 3px var(--arcade-neon),
-		0 0 22px hsl(45 98% 55% / 0.7),
-		0 14px 28px hsl(258 60% 4% / 0.7);
+.scoreboard.--no-luck-variance .sb-luck { display: none; }
+
+.sb-luck-pill {
+	flex: 1;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 0.1rem;
+	padding: 0.35rem 0.3rem;
+	border: 2px solid var(--surface-line);
+	border-radius: 0.55rem;
+	background: var(--surface);
+	color: var(--ink-dim);
+	cursor: pointer;
+	transition: transform 0.08s ease, border-color 0.15s ease, color 0.15s ease, background-color 0.15s ease;
 }
 
-.sortable-drag .card-art {
-	cursor: grabbing;
+.sb-luck-pill:hover { background: var(--surface-2); }
+.sb-luck-pill:active { transform: translateY(1px); }
+
+.sb-luck-pill.--active {
+	border-color: var(--gold);
+	color: var(--ink);
+	background: hsl(43 60% 20% / 0.5);
 }
 
-/* ---------- Misc ---------- */
+.sb-luck-name { font-size: 0.66rem; font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase; }
+.sb-luck-score { font-size: 0.95rem; font-weight: 900; font-variant-numeric: tabular-nums; }
+.sb-luck-pill.--active .sb-luck-score { color: var(--gold); }
+
+/* ============ DRAWERS ============ */
+
+.drawer {
+	--c-text: var(--ink);
+	--c-background-lighter: hsl(208 40% 11%);
+	--c-background-light: var(--surface-2);
+	--c-border: var(--surface-line);
+
+	color: var(--ink);
+	inline-size: min(34rem, 96vw);
+	max-block-size: 86dvh;
+	margin: auto;
+	padding: 0;
+	border: 2px solid var(--surface-line);
+	border-radius: var(--radius);
+	background: linear-gradient(hsl(208 40% 15%), hsl(208 42% 12%));
+	box-shadow: var(--shadow);
+	overflow: auto;
+	overscroll-behavior: contain;
+}
+
+.drawer:popover-open {
+	display: flex;
+	flex-direction: column;
+	gap: 0.6rem;
+	padding: 0.85rem;
+}
+
+.drawer::backdrop { background: hsl(206 60% 4% / 0.6); backdrop-filter: blur(2px); }
+
+.drawer-header {
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+	position: sticky;
+	inset-block-start: -0.85rem;
+	margin: -0.85rem -0.85rem 0;
+	padding: 0.7rem 0.85rem;
+	background: hsl(208 45% 11% / 0.95);
+	border-block-end: 1px solid var(--surface-line);
+	z-index: 1;
+}
+
+.drawer-header h2 { font-size: 1.1rem; font-weight: 800; color: var(--gold); }
+.drawer-header .button { margin-inline-start: auto; }
+.drawer-hint { font-size: 0.82rem; color: var(--ink-dim); }
+
+.level-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(8.5rem, 1fr)); gap: 0.4rem; }
+.level-grid hand-level-card fieldset { padding: 0.4rem; border: 2px solid var(--surface-line); border-radius: 0.5rem; background: var(--surface); }
+.level-grid legend { font-size: 0.78rem; font-weight: 800; color: var(--gold); }
+
+.planet-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(7rem, 1fr)); gap: 0.4rem; }
+.planet-cell {
+	display: flex;
+	flex-direction: column;
+	gap: 0.2rem;
+	padding: 0.4rem;
+	background: var(--surface);
+	border: 2px solid var(--surface-line);
+	border-radius: 0.5rem;
+	font-size: 0.78rem;
+	font-weight: 700;
+}
+.planet-cell .stat-input { inline-size: 100%; text-align: end; }
+
+.save-form, .import-row { display: flex; gap: 0.5rem; align-items: stretch; }
+.import-form { display: flex; flex-direction: column; gap: 0.4rem; }
+.import-form h3 { font-size: 0.95rem; font-weight: 800; }
+
+.file-input {
+	flex: 1;
+	min-inline-size: 0;
+	padding: 0.4rem;
+	background: hsl(208 40% 11%);
+	border: 2px solid var(--surface-line);
+	border-radius: 0.5rem;
+	color: var(--ink);
+	font-size: 0.82rem;
+}
+
+.table-wrapper { max-block-size: 16rem; overflow: auto; border: 1px solid var(--surface-line); border-radius: 0.5rem; }
+.drawer table { inline-size: 100%; border-collapse: collapse; font-size: 0.82rem; }
+.drawer th, .drawer td { padding: 0.35rem 0.5rem; text-align: start; }
+.drawer thead th { position: sticky; inset-block-start: 0; background: hsl(208 45% 11%); color: var(--gold); }
+.drawer tbody tr { border-block-start: 1px solid var(--surface-line); }
+
+/* ============ BUTTONS ============ */
+
+.button {
+	min-block-size: 2.2rem;
+	padding: 0 0.8rem;
+	border: 2px solid var(--surface-line);
+	border-radius: 0.5rem;
+	display: inline-flex;
+	align-items: center;
+	gap: 0.3rem;
+	color: var(--ink);
+	background: var(--surface);
+	font-weight: 700;
+	cursor: pointer;
+	transition: transform 0.08s ease, background-color 0.15s ease, border-color 0.15s ease;
+}
+
+.button:hover { background: var(--surface-2); }
+.button:active { transform: translateY(1px); }
+.button.--icon { inline-size: 2.2rem; padding: 0; justify-content: center; }
+.button.--primary { background: linear-gradient(var(--gold), var(--gold-dark)); border-color: var(--gold-dark); color: hsl(206 60% 8%); }
+.button.--primary:hover { filter: brightness(1.08); background: linear-gradient(var(--gold), var(--gold-dark)); }
+.button:disabled { opacity: 0.45; cursor: default; }
+
+a { color: var(--gold); }
+a:hover { color: hsl(43 96% 75%); }
+
+/* ============ SORTABLEJS DRAG STATES ============ */
+
+.sortable-ghost .card-art { opacity: 0.35; filter: brightness(1.3); }
+.sortable-chosen .card-art { box-shadow: 0 0 0 3px var(--gold), 0 0 22px hsl(43 96% 56% / 0.7), 0 12px 24px hsl(206 60% 4% / 0.7); }
+.sortable-drag .card-art { cursor: grabbing; }
+
+/* ============ LOG ============ */
 
 .log {
-	background: hsl(255 40% 8% / 0.7);
+	background: hsl(206 50% 7% / 0.8);
+	border: 1px solid var(--surface-line);
 	border-radius: 0.5rem;
 	padding: 0.5rem;
-	color: hsl(150 40% 75%);
+	font-size: 0.78rem;
+	color: hsl(150 45% 75%);
+	max-block-size: 60dvh;
+	overflow: auto;
+	white-space: pre-wrap;
+	word-break: break-word;
+}
+
+/* ============ RESPONSIVE ============ */
+
+@media (min-width: 48rem) {
+	.brand-name { font-size: 1.35rem; }
+	.game-table { padding: 1rem; }
+	.game { gap: 0.85rem; }
+	:root { --tray-card-w: 8rem; }
+	.tray { min-block-size: 8rem; }
+	.sb-hand-name { font-size: 1.7rem; }
+}
+
+@media (max-width: 30rem) {
+	.chip-button span:not(.visually-hidden) { display: none; }
+	.chip-button { padding: 0 0.6rem; }
 }
 
 @media (prefers-reduced-motion: reduce) {
-	.card-art {
-		transition: none;
-		transform: none;
-	}
+	.card-art { transition: none; transform: none; }
+	.drawer::backdrop { backdrop-filter: none; }
 }

@@ -10,7 +10,7 @@ import { debounce } from './debounce.ts'
 import { readStateFromUrl, saveStateToUrl } from './Storage.ts'
 import { SaveManager } from './SaveManager.ts'
 import { loadSortable, type SortableOptions } from './vendor.ts'
-import { animateScoreReveal } from './animations.ts'
+import { animateScoreboard } from './animations.ts'
 import type { BlindName, Card, DeckName, HandName, InitialState, Joker, State, Result, InitialJoker, InitialCard, JokerContribution } from '#lib/types.ts'
 
 const dateTimeFormat = new Intl.DateTimeFormat(document.documentElement.lang, {
@@ -49,10 +49,17 @@ const blindIsActiveCheckbox = form.querySelector<HTMLInputElement>('[name="blind
 
 const deckInput = form.querySelector<ComboBox>('[name="deck"]')!
 
-const observatoryInputs = form.querySelectorAll<HTMLInputElement>('[data-r-observatory-hand]')
+// The observatory inputs and hand-level cards live in drawers, outside the form.
+const observatoryInputs = document.querySelectorAll<HTMLInputElement>('[data-r-observatory-hand]')
 const jokerSlotsInput = form.querySelector<HTMLInputElement>('[name="jokerSlots"]')!
 
-const handLevelContainer = form.querySelector<HTMLElement>('[data-h-container]')!
+const handLevelContainer = document.querySelector<HTMLElement>('[data-h-container]')!
+
+// These controls live in drawers outside the form, so recalculate explicitly when they change.
+handLevelContainer.addEventListener('change', () => calculate())
+for (const observatoryInput of observatoryInputs) {
+	observatoryInput.addEventListener('change', () => calculate())
+}
 
 const jokerContainer = form.querySelector<HTMLElement>('[data-j-container]')!
 const addJokerButton = form.querySelector<HTMLButtonElement>('[data-j-add-button]')!
@@ -66,11 +73,33 @@ addCardButton.addEventListener('click', () => addPlayingCard())
 const duplicateCardButton = document.querySelector<HTMLButtonElement>('[data-c-duplicate-button]')!
 duplicateCardButton.addEventListener('click', (event) => duplicate(event))
 
-const scoreCardContainer = form.querySelector<HTMLElement>('[data-sc-container]')!
 const playedHandEl = form.querySelector<HTMLElement>('[data-sc-played-hand]')!
-form.querySelector<HTMLButtonElement>('[data-sc-reset-button]')!.addEventListener('click', () => {
+// The reset button lives in the top bar, outside the form.
+document.querySelector<HTMLButtonElement>('[data-sc-reset-button]')!.addEventListener('click', () => {
 	populateUiWithState(getState({}))
 })
+
+// Scoreboard (Balatro-style chips × mult = score) elements.
+const scoreboardEl = document.querySelector<HTMLElement>('.scoreboard')!
+const sbHandEl = document.querySelector<HTMLElement>('[data-sb-hand]')!
+const sbLevelEl = document.querySelector<HTMLElement>('[data-sb-level]')!
+const sbChipsEl = document.querySelector<HTMLElement>('[data-sb-chips]')!
+const sbMultEl = document.querySelector<HTMLElement>('[data-sb-mult]')!
+const sbScoreEl = document.querySelector<HTMLElement>('[data-sb-score]')!
+const luckButtons = Array.from(document.querySelectorAll<HTMLButtonElement>('[data-sb-luck]'))
+
+type Luck = 'none' | 'average' | 'all'
+let selectedLuck: Luck = 'average'
+let latestResults: Result[] = []
+let latestHand: HandName = 'High Card'
+let latestLevel = 1
+
+for (const button of luckButtons) {
+	button.addEventListener('click', () => {
+		selectedLuck = button.getAttribute('data-sb-luck') as Luck
+		renderScoreboard()
+	})
+}
 
 const saveRowTemplate = document.querySelector<HTMLTemplateElement>('template#save-row')!
 const saveForm = document.querySelector<HTMLFormElement>('[data-s-form]')!
@@ -271,7 +300,8 @@ function handleImportSubmit (event: SubmitEvent) {
 
 function applyState (state: State) {
 	const { hand, results } = calculateScore(state)
-	updateScore(hand, results)
+	const level = state.handLevels[hand]?.level ?? 1
+	updateScore(hand, results, level)
 	saveStateToUrl(state)
 
 	// Save the current state as a special auto save overwriting the previous auto save.
@@ -279,36 +309,20 @@ function applyState (state: State) {
 	storeSaves()
 }
 
-function updateScore (hand: HandName, results: Result[]) {
+function updateScore (hand: HandName, results: Result[], level: number) {
+	latestResults = results
+	latestHand = hand
+	latestLevel = level
+
+	playedHandEl.textContent = hand
+	renderScoreboard()
+
 	const resultsByScore = new Map<string, Result>()
 	for (const result of results) {
 		if (!resultsByScore.has(result.score)) {
 			resultsByScore.set(result.score, result)
 		}
 	}
-
-	playedHandEl.textContent = hand
-
-	scoreCardContainer.innerHTML = ''
-	for (const result of resultsByScore.values()) {
-		const template = document.querySelector<HTMLTemplateElement>('template#score-card')!
-		const fragment = template.content.cloneNode(true) as Element
-
-		const luckEl = fragment.querySelector<HTMLElement>('[data-sc-luck]')!
-		luckEl.textContent = result.luck
-
-		const formattedScoreEl = fragment.querySelector<HTMLElement>('[data-sc-formatted-score]')!
-		formattedScoreEl.textContent = result.formattedScore
-
-		const scoreEl = fragment.querySelector<HTMLElement>('[data-sc-score]')!
-		const equation = `${result.chips}×${result.multiplier}`
-		scoreEl.textContent = equation + '\n= ' + result.score
-
-		scoreCardContainer.appendChild(fragment)
-	}
-
-	animateScoreReveal(scoreCardContainer)
-
 	const resultArray = Array.from(resultsByScore.values())
 
 	let scoreAnnouncement
@@ -322,7 +336,8 @@ function updateScore (hand: HandName, results: Result[]) {
 	}
 	debouncedAriaNotify(scoreAnnouncement)
 
-	const scoreLog = form.querySelector<HTMLPreElement>('[data-sc-log]')!
+	// The log lives in the log drawer (outside the form).
+	const scoreLog = document.querySelector<HTMLPreElement>('[data-sc-log]')!
 	scoreLog.innerHTML = resultArray.map((result) => result.log.join('\n')).join('\n')
 
 	const contributionMap = new Map<number, JokerContribution>()
@@ -338,6 +353,44 @@ function updateScore (hand: HandName, results: Result[]) {
 		const contrib = contributionMap.get(jokerCard.index)
 		jokerCard.contribution = contrib ?? null
 	}
+}
+
+/**
+ * Renders the Balatro-style scoreboard (chips × mult = score) from the latest results, reflecting
+ * the currently selected luck mode. Re-runnable without recalculating (e.g. when toggling luck).
+ */
+function renderScoreboard () {
+	const byLuck = new Map(latestResults.map((result) => [result.luck, result]))
+	const selected = byLuck.get(selectedLuck) ?? latestResults.at(0)
+
+	sbHandEl.textContent = latestHand
+	sbLevelEl.textContent = `lvl.${latestLevel}`
+
+	if (!selected) {
+		sbChipsEl.textContent = '0'
+		sbMultEl.textContent = '0'
+		sbScoreEl.textContent = '0'
+		return
+	}
+
+	sbChipsEl.textContent = selected.chips
+	sbMultEl.textContent = selected.multiplier
+	sbScoreEl.textContent = selected.formattedScore
+
+	for (const button of luckButtons) {
+		const luck = button.getAttribute('data-sb-luck')
+		button.classList.toggle('--active', luck === selectedLuck)
+		const scoreSpan = button.querySelector<HTMLElement>('[data-sb-luck-score]')
+		if (scoreSpan && luck) {
+			scoreSpan.textContent = byLuck.get(luck as Luck)?.formattedScore ?? '—'
+		}
+	}
+
+	// Collapse the luck row when every mode yields the same score (no probabilistic effects in play).
+	const distinctScores = new Set(latestResults.map((result) => result.score))
+	scoreboardEl.classList.toggle('--no-luck-variance', distinctScores.size <= 1)
+
+	animateScoreboard(scoreboardEl)
 }
 
 /**

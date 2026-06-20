@@ -48,27 +48,25 @@ export function animatePlayToggle (element: HTMLElement, played: boolean): void 
 	)
 }
 
-/** Reveals the score result cards with a staggered pop and flashes the headline score values. */
-export function animateScoreReveal (container: HTMLElement): void {
+/** Pulses the Balatro scoreboard: the chips/mult boxes pop and the total flashes on each update. */
+export function animateScoreboard (scoreboard: HTMLElement): void {
 	if (!gsap) {
 		return
 	}
 
-	const cards = container.querySelectorAll('.score-card')
-	if (cards.length === 0) {
-		return
+	const boxes = scoreboard.querySelectorAll('.sb-box')
+	gsap.fromTo(boxes,
+		{ scale: 0.82 },
+		{ scale: 1, duration: 0.4, ease: 'back.out(2.4)', stagger: 0.06, clearProps: 'scale' },
+	)
+
+	const total = scoreboard.querySelector('.sb-total-value')
+	if (total) {
+		gsap.fromTo(total,
+			{ '--score-flash': 1, scale: 1.16 },
+			{ '--score-flash': 0, scale: 1, duration: 0.55, ease: 'power2.out', clearProps: 'scale' },
+		)
 	}
-
-	gsap.fromTo(cards,
-		{ opacity: 0, scale: 0.8, y: 12 },
-		{ opacity: 1, scale: 1, y: 0, duration: 0.45, ease: 'back.out(2)', stagger: 0.08, clearProps: 'opacity,scale' },
-	)
-
-	const headlineScores = container.querySelectorAll('[data-sc-formatted-score]')
-	gsap.fromTo(headlineScores,
-		{ '--score-flash': 1, scale: 1.18 },
-		{ '--score-flash': 0, scale: 1, duration: 0.6, ease: 'power2.out', stagger: 0.08, clearProps: 'scale' },
-	)
 }
 
 /** Subtle shake to signal an invalid input / failed calculation. */

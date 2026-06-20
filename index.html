@@ -3,11 +3,12 @@
 
 <head>
 	<meta charset="utf-8" />
-	<meta name="viewport" content="width=device-width,initial-scale=1.0" />
+	<meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover" />
 
 	<title>Balatrolator – Balatro calculator</title>
 
 	<meta name="description" content="Figure out how best to score by comparing variations of your Balatro hand before playing it." />
+	<meta name="theme-color" content="#1a1430" />
 
 	<link rel="icon" href="favicon.ico" sizes="48x48">
 	<link rel="icon" href="icon.svg" sizes="any" type="image/svg+xml">
@@ -28,411 +29,319 @@
 		<div aria-live="polite" aria-atomic="true"></div>
 	</div>
 
-	<main class="main-content">
-		<div class="stack">
-			<div class="header">
-				<div class="introduction panel">
-					<header class="panel-header">
-						<h1>Balatrolator</h1>
-					</header>
-
-					<p>Balatrolator is a score calculator for <a href="https://www.playbalatro.com/">Balatro</a>. Go, buy the game!</p>
-
-					<p>Please, <a href="https://github.com/slmlm2009/balatrolator/issues/">report any bugs you encounter</a>. Want to <a href="https://github.com/slmlm2009/balatrolator">contribute</a>?</p>
-
-					<p>Current version: <code>1.0.1o</code></p>
-
-					<p>This version is forked by <a href="https://github.com/slmlm2009">slmlm2009</a>. Originally made with love by <a href="https://kleinfreund.de">kleinfreund</a>.</p>
-
-					<p>
-						<svg class="icon">
-							<use xlink:href="#spades-icon"></use>
-						</svg>
-						<svg class="icon">
-							<use xlink:href="#hearts-icon"></use>
-						</svg>
-						<svg class="icon">
-							<use xlink:href="#clubs-icon"></use>
-						</svg>
-						<svg class="icon">
-							<use xlink:href="#diamonds-icon"></use>
-						</svg>
-					</p>
-				</div>
-
-				<div class="saves panel">
-					<div class="stack">
-						<header class="panel-header">
-							<h2>Saves</h2>
-						</header>
-
-						<p>The current hand is auto-saved whenever the score updates. Saves are stored in the browser's local storage.</p>
-
-						<div class="table-wrapper">
-							<table>
-								<caption>Saves</caption>
-								<thead>
-									<tr>
-										<th>Name</th>
-										<th>Hand</th>
-										<th>Score</th>
-										<th>Time</th>
-										<th>Actions</th>
-									</tr>
-								</thead>
-
-								<tbody data-s-saves></tbody>
-							</table>
-						</div>
-
-						<form data-s-form>
-							<div class="s-save-container">
-								<label class="s-save-name control-box --flat --grow">
-									<span class="label truncate">Save name</span>
-
-									<input class="s-save-name-input text-input" name="name" type="text" required placeholder="Hand 1" autocomplete="off" data-s-name-input>
-								</label>
-
-								<button class="s-save-button button" type="submit" data-s-save-button>
-									<svg class="icon">
-										<use xlink:href="#floppy-disk-icon"></use>
-									</svg>
-
-									<span>Save</span>
-								</button>
-							</div>
-						</form>
-
-						<form class="stack" data-s-import-form>
-							<h3>Import save</h3>
-
-							<div class="s-import-container">
-								<div class="s-import control-box --flat --grow">
-									<label class="visually-hidden" for="import">Import save</label>
-
-									<input
-										class="s-import-input file-input"
-										id="import"
-										name="import"
-										type="file"
-										accept=".json,application/json"
-										required
-										aria-describedby="import-description"
-										data-s-import-input
-									>
-
-									<span class="secondary-label" id="import-description">Import any saves you previously exported in JSON format.</span>
-								</div>
-
-								<button class="s-import-button button" type="submit" data-s-import-button>
-									<svg class="icon">
-										<use xlink:href="#file-arrow-up-icon"></use>
-									</svg>
-
-									<span>Import</span>
-								</button>
-							</div>
-						</form>
-					</div>
-				</div>
-			</div>
-
-			<form class="form" data-form>
-				<div class="form__hands panel">
-					<div class="stack">
-						<header class="panel-header">
-							<h2>Levels</h2>
-						</header>
-
-						<div class="stack" data-h-container></div>
-					</div>
-				</div>
-
-				<div class="form__round panel">
-					<div class="stack">
-						<header class="panel-header">
-							<h2>Round data</h2>
-						</header>
-
-						<div class="list">
-							<div class="card-stack">
-								<div class="card round-data-card">
-									<div class="r-hands control-box --flat --grow">
-										<label class="label truncate" for="hands">Hands</label>
-
-										<input class="r-hands-input text-input" id="hands" name="hands" type="number" min="0" value="0" aria-describedby="hands-description">
-
-										<span class="secondary-label" id="hands-description">Influences: Acrobat</span>
-									</div>
-								</div>
-
-								<div class="card round-data-card">
-									<div class="r-discards control-box --flat --grow">
-										<label class="label truncate" for="discards">Discards</label>
-
-										<input class="r-discards-input text-input" id="discards" name="discards" type="number" min="0" value="0" aria-describedby="discards-description">
-
-										<span class="secondary-label" id="discards-description">Influences: Banner, Mystic Summit</span>
-									</div>
-								</div>
-							</div>
-
-							<div class="card-stack">
-								<div class="card round-data-card">
-									<div class="r-money control-box --flat --grow">
-										<label class="label truncate" for="money">Money</label>
-
-										<input class="r-money-input text-input" id="money" name="money" type="number" value="0" aria-describedby="money-description">
-
-										<span class="secondary-label" id="money-description">Influences: Bull, Bootstraps</span>
-									</div>
-								</div>
-
-								<div class="card round-data-card">
-									<div class="stack">
-										<div class="r-blind-name control-box --flat --grow">
-											<label class="label truncate" for="blindName">Blind</label>
-
-											<combo-box
-												class="r-blind-name-input"
-												id="blindName"
-												name="blindName"
-												value="Small Blind"
-												options-json="blindNamesJson"
-												button-label="Show blind options"
-												input-label="Filter blinds"
-												listbox-label="Blinds"
-												aria-describedby="blindName-description"
-											></combo-box>
-
-											<span class="secondary-label" id="blindName-description">Influences: Debuffed cards, scoring</span>
-										</div>
-
-										<label class="r-blind-is-active checkbox-control">
-											<input class="r-blind-is-active-input" name="blindIsActive" type="checkbox" value="is-active" checked>
-
-											<span class="label" aria-hidden="true">Active?</span>
-											<span class="visually-hidden">Blind active</span>
-										</label>
-									</div>
-								</div>
-							</div>
-
-							<div class="card-stack">
-								<div class="card round-data-card">
-									<div class="r-deck control-box --flat --grow">
-										<label class="label truncate" for="deck">Deck</label>
-
-										<combo-box
-											class="r-deck-input"
-											id="deck"
-											name="deck"
-											value="Red Deck"
-											options-json="decksJson"
-											button-label="Show deck options"
-											input-label="Filter decks"
-											listbox-label="Decks"
-											aria-describedby="deck-description"
-										></combo-box>
-
-										<span class="secondary-label" id="deck-description">Influences: Scoring with Plasma Deck</span>
-									</div>
-								</div>
-
-								<div class="card round-data-card">
-									<div class="r-joker-slots control-box --flat --grow">
-										<label class="label truncate" for="jokerSlots">Joker slots</label>
-
-										<input class="r-joker-slots-input text-input" id="jokerSlots" name="jokerSlots" type="number" value="5" aria-describedby="jokerSlots-description">
-
-										<span class="secondary-label" id="jokerSlots-description">Influences: Joker Stencil</span>
-									</div>
-								</div>
-							</div>
-
-							<div class="card round-data-card observatory-card">
-								<fieldset class="stack">
-									<legend><span class="label truncate">Observatory</span></legend>
-
-									<div class="r-observatory-input-list stack">
-										<label class="control-box --flat">
-											<span class="label truncate">Pluto</span>
-											<input class="r-observatory-input text-input" type="number" min="0" value="0" data-r-observatory-hand="High Card">
-										</label>
-										<label class="control-box --flat">
-											<span class="label truncate">Mercury</span>
-											<input class="r-observatory-input text-input" type="number" min="0" value="0" data-r-observatory-hand="Pair">
-										</label>
-										<label class="control-box --flat">
-											<span class="label truncate">Uranus</span>
-											<input class="r-observatory-input text-input" type="number" min="0" value="0" data-r-observatory-hand="Two Pair">
-										</label>
-										<label class="control-box --flat">
-											<span class="label truncate">Venus</span>
-											<input class="r-observatory-input text-input" type="number" min="0" value="0" data-r-observatory-hand="Three of a Kind">
-										</label>
-										<label class="control-box --flat">
-											<span class="label truncate">Saturn</span>
-											<input class="r-observatory-input text-input" type="number" min="0" value="0" data-r-observatory-hand="Straight">
-										</label>
-										<label class="control-box --flat">
-											<span class="label truncate">Jupiter</span>
-											<input class="r-observatory-input text-input" type="number" min="0" value="0" data-r-observatory-hand="Flush">
-										</label>
-										<label class="control-box --flat">
-											<span class="label truncate">Earth</span>
-											<input class="r-observatory-input text-input" type="number" min="0" value="0" data-r-observatory-hand="Full House">
-										</label>
-										<label class="control-box --flat">
-											<span class="label truncate">Mars</span>
-											<input class="r-observatory-input text-input" type="number" min="0" value="0" data-r-observatory-hand="Four of a Kind">
-										</label>
-										<label class="control-box --flat">
-											<span class="label truncate">Neptune</span>
-											<input class="r-observatory-input text-input" type="number" min="0" value="0" data-r-observatory-hand="Straight Flush">
-										</label>
-										<label class="control-box --flat">
-											<span class="label truncate">Planet X</span>
-											<input class="r-observatory-input text-input" type="number" min="0" value="0" data-r-observatory-hand="Five of a Kind">
-										</label>
-										<label class="control-box --flat">
-											<span class="label truncate">Ceres</span>
-											<input class="r-observatory-input text-input" type="number" min="0" value="0" data-r-observatory-hand="Flush House">
-										</label>
-										<label class="control-box --flat">
-											<span class="label truncate">Eris</span>
-											<input class="r-observatory-input text-input" type="number" min="0" value="0" data-r-observatory-hand="Flush Five">
-										</label>
-									</div>
-								</fieldset>
-							</div>
-						</div>
-					</div>
-				</div>
-
-				<div class="form__jokers panel">
-					<div class="stack">
-						<header class="panel-header">
-							<h2>Jokers</h2>
-
-							<button class="add-joker-button button --icon" type="button" data-j-add-button>
-								<span class="visually-hidden">Add joker</span>
-
-								<svg class="icon">
-									<use xlink:href="#plus-icon"></use>
-								</svg>
-							</button>
-						</header>
-
-						<div class="list" data-j-container></div>
-					</div>
-				</div>
-
-				<div class="form__cards panel">
-					<div class="stack">
-						<header class="panel-header">
-							<h2>Hand</h2>
-
-							<button class="add-card-button button --icon" type="button" data-c-add-button>
-								<span class="visually-hidden">Add card</span>
-
-								<svg class="icon">
-									<use xlink:href="#plus-icon"></use>
-								</svg>
-							</button>
-						</header>
-
-						<div class="list" data-c-container></div>
-					</div>
-				</div>
-
-				<div class="form__score panel">
-					<div class="stack">
-						<header class="panel-header">
-							<h2>Score</h2>
-
-							<button class="button" type="button" data-sc-reset-button>
-								<svg class="icon">
-									<use xlink:href="#broom-icon"></use>
-								</svg>
-
-								Reset current hand
-							</button>
-						</header>
-
-						<div class="stack">
-							<p>Hand: <b data-sc-played-hand>—</b></p>
-
-							<div class="list" data-sc-container></div>
-						</div>
-					</div>
-				</div>
-
-				<div class="form__log panel">
-					<header class="panel-header">
-						<h2>Log</h2>
-					</header>
-
-					<pre class="log" data-sc-log></pre>
-				</div>
-			</form>
+	<!-- ============ TOP BAR ============ -->
+	<header class="topbar">
+		<div class="brand">
+			<span class="brand-name">BALATROLATOR</span>
+			<span class="brand-suits" aria-hidden="true">
+				<svg class="icon --suit-s"><use xlink:href="#spades-icon"></use></svg>
+				<svg class="icon --suit-h"><use xlink:href="#hearts-icon"></use></svg>
+				<svg class="icon --suit-c"><use xlink:href="#clubs-icon"></use></svg>
+				<svg class="icon --suit-d"><use xlink:href="#diamonds-icon"></use></svg>
+			</span>
 		</div>
-	</main>
 
-	<dialog id="jc-duplicate-modal" class="panel" closedby="any" popover aria-labelledby="jc-duplicate-modal-heading">
-		<div class="stack">
-			<header>
-				<div class="action-list">
-					<h2 id="jc-duplicate-modal-heading">Duplicate joker?</h2>
+		<nav class="toolbar" aria-label="Panels">
+			<button class="chip-button" type="button" popovertarget="drawer-levels">
+				<svg class="icon"><use xlink:href="#chart-icon"></use></svg><span>Levels</span>
+			</button>
+			<button class="chip-button" type="button" popovertarget="drawer-planets">
+				<svg class="icon"><use xlink:href="#planet-icon"></use></svg><span>Planets</span>
+			</button>
+			<button class="chip-button" type="button" popovertarget="drawer-saves">
+				<svg class="icon"><use xlink:href="#floppy-disk-icon"></use></svg><span>Saves</span>
+			</button>
+			<button class="chip-button" type="button" popovertarget="drawer-log">
+				<svg class="icon"><use xlink:href="#list-icon"></use></svg><span>Log</span>
+			</button>
+			<button class="chip-button" type="button" popovertarget="drawer-info">
+				<svg class="icon"><use xlink:href="#info-icon"></use></svg><span>Info</span>
+			</button>
+			<button class="chip-button --danger" type="button" data-sc-reset-button>
+				<svg class="icon"><use xlink:href="#broom-icon"></use></svg><span>Reset</span>
+			</button>
+		</nav>
+	</header>
 
-					<button class="button --icon push-inline-start" type="button" data-modal-close-button>
-						<span class="visually-hidden">Close</span>
+	<main class="game-table">
+		<form class="game" data-form>
+			<!-- ============ ROUND DATA BAR ============ -->
+			<section class="round-bar" aria-label="Round data">
+				<label class="stat-pill --blind">
+					<span class="stat-label">Blind</span>
+					<combo-box
+						class="stat-combo"
+						id="blindName"
+						name="blindName"
+						value="Small Blind"
+						options-json="blindNamesJson"
+						button-label="Show blind options"
+						input-label="Filter blinds"
+						listbox-label="Blinds"
+					></combo-box>
+					<span class="blind-active-toggle">
+						<input class="r-blind-is-active-input" name="blindIsActive" type="checkbox" value="is-active" checked>
+						<span class="visually-hidden">Blind active</span>
+					</span>
+				</label>
 
-						<svg class="icon">
-							<use xlink:href="#close-icon"></use>
-						</svg>
+				<label class="stat-pill --deck">
+					<span class="stat-label">Deck</span>
+					<combo-box
+						class="stat-combo"
+						id="deck"
+						name="deck"
+						value="Red Deck"
+						options-json="decksJson"
+						button-label="Show deck options"
+						input-label="Filter decks"
+						listbox-label="Decks"
+					></combo-box>
+				</label>
+
+				<label class="stat-pill --money">
+					<span class="stat-label">$</span>
+					<input class="stat-input" id="money" name="money" type="number" value="0" inputmode="numeric">
+				</label>
+
+				<label class="stat-pill">
+					<span class="stat-label">Hands</span>
+					<input class="stat-input" id="hands" name="hands" type="number" min="0" value="0" inputmode="numeric">
+				</label>
+
+				<label class="stat-pill">
+					<span class="stat-label">Discards</span>
+					<input class="stat-input" id="discards" name="discards" type="number" min="0" value="0" inputmode="numeric">
+				</label>
+
+				<label class="stat-pill">
+					<span class="stat-label">Slots</span>
+					<input class="stat-input" id="jokerSlots" name="jokerSlots" type="number" value="5" inputmode="numeric">
+				</label>
+			</section>
+
+			<!-- ============ JOKER TRAY ============ -->
+			<section class="tray-section --jokers">
+				<header class="tray-header">
+					<h2>Jokers</h2>
+					<button class="round-add-button" type="button" data-j-add-button>
+						<span class="visually-hidden">Add joker</span>
+						<svg class="icon"><use xlink:href="#plus-icon"></use></svg>
+					</button>
+				</header>
+				<div class="tray" data-j-container></div>
+			</section>
+
+			<!-- ============ SCOREBOARD ============ -->
+			<section class="scoreboard" aria-label="Score">
+				<div class="sb-hand">
+					<span class="sb-hand-name" data-sb-hand>—</span>
+					<span class="sb-hand-level" data-sb-level></span>
+				</div>
+
+				<div class="sb-equation">
+					<div class="sb-box --chips">
+						<span class="sb-box-value" data-sb-chips>0</span>
+					</div>
+					<div class="sb-times" aria-hidden="true">×</div>
+					<div class="sb-box --mult">
+						<span class="sb-box-value" data-sb-mult>0</span>
+					</div>
+				</div>
+
+				<div class="sb-total">
+					<span class="sb-total-label">Score</span>
+					<span class="sb-total-value" data-sb-score>0</span>
+				</div>
+
+				<div class="sb-luck" data-sb-luck-row role="group" aria-label="Luck mode">
+					<button class="sb-luck-pill" type="button" data-sb-luck="none">
+						<span class="sb-luck-name">Worst</span>
+						<span class="sb-luck-score" data-sb-luck-score="none">—</span>
+					</button>
+					<button class="sb-luck-pill --active" type="button" data-sb-luck="average">
+						<span class="sb-luck-name">Average</span>
+						<span class="sb-luck-score" data-sb-luck-score="average">—</span>
+					</button>
+					<button class="sb-luck-pill" type="button" data-sb-luck="all">
+						<span class="sb-luck-name">Best</span>
+						<span class="sb-luck-score" data-sb-luck-score="all">—</span>
 					</button>
 				</div>
-			</header>
 
-			<label class="control-box">
-				<span class="label truncate">Number of copies</span>
+				<!-- Legacy hooks kept for compatibility; populated but visually hidden. -->
+				<b class="visually-hidden" data-sc-played-hand>—</b>
+				<div class="visually-hidden" data-sc-container></div>
+			</section>
 
-				<input class="text-input" type="number" value="1" min="1">
-			</label>
+			<!-- ============ HAND TRAY ============ -->
+			<section class="tray-section --hand">
+				<header class="tray-header">
+					<h2>Hand</h2>
+					<button class="round-add-button" type="button" data-c-add-button>
+						<span class="visually-hidden">Add card</span>
+						<svg class="icon"><use xlink:href="#plus-icon"></use></svg>
+					</button>
+				</header>
+				<div class="tray" data-c-container></div>
+			</section>
+		</form>
+	</main>
 
-			<p>The new cards will be added to the right of the one you're duplicating.</p>
+	<!-- ============ DRAWERS ============ -->
+	<dialog id="drawer-levels" class="drawer" closedby="any" popover aria-labelledby="drawer-levels-heading">
+		<header class="drawer-header">
+			<h2 id="drawer-levels-heading">Hand levels</h2>
+			<button class="button --icon" type="button" popovertarget="drawer-levels" popovertargetaction="hide">
+				<span class="visually-hidden">Close</span>
+				<svg class="icon"><use xlink:href="#close-icon"></use></svg>
+			</button>
+		</header>
+		<p class="drawer-hint">Set the level and play count for each poker hand.</p>
+		<div class="level-grid" data-h-container></div>
+	</dialog>
 
-			<button class="button" type="button" data-j-duplicate-button>Ok</button>
+	<dialog id="drawer-planets" class="drawer" closedby="any" popover aria-labelledby="drawer-planets-heading">
+		<header class="drawer-header">
+			<h2 id="drawer-planets-heading">Observatory</h2>
+			<button class="button --icon" type="button" popovertarget="drawer-planets" popovertargetaction="hide">
+				<span class="visually-hidden">Close</span>
+				<svg class="icon"><use xlink:href="#close-icon"></use></svg>
+			</button>
+		</header>
+		<p class="drawer-hint">Number of each planet card used (Observatory xMult per hand).</p>
+		<div class="planet-grid">
+			<label class="planet-cell"><span>Pluto</span><input class="stat-input" type="number" min="0" value="0" inputmode="numeric" data-r-observatory-hand="High Card"></label>
+			<label class="planet-cell"><span>Mercury</span><input class="stat-input" type="number" min="0" value="0" inputmode="numeric" data-r-observatory-hand="Pair"></label>
+			<label class="planet-cell"><span>Uranus</span><input class="stat-input" type="number" min="0" value="0" inputmode="numeric" data-r-observatory-hand="Two Pair"></label>
+			<label class="planet-cell"><span>Venus</span><input class="stat-input" type="number" min="0" value="0" inputmode="numeric" data-r-observatory-hand="Three of a Kind"></label>
+			<label class="planet-cell"><span>Saturn</span><input class="stat-input" type="number" min="0" value="0" inputmode="numeric" data-r-observatory-hand="Straight"></label>
+			<label class="planet-cell"><span>Jupiter</span><input class="stat-input" type="number" min="0" value="0" inputmode="numeric" data-r-observatory-hand="Flush"></label>
+			<label class="planet-cell"><span>Earth</span><input class="stat-input" type="number" min="0" value="0" inputmode="numeric" data-r-observatory-hand="Full House"></label>
+			<label class="planet-cell"><span>Mars</span><input class="stat-input" type="number" min="0" value="0" inputmode="numeric" data-r-observatory-hand="Four of a Kind"></label>
+			<label class="planet-cell"><span>Neptune</span><input class="stat-input" type="number" min="0" value="0" inputmode="numeric" data-r-observatory-hand="Straight Flush"></label>
+			<label class="planet-cell"><span>Planet X</span><input class="stat-input" type="number" min="0" value="0" inputmode="numeric" data-r-observatory-hand="Five of a Kind"></label>
+			<label class="planet-cell"><span>Ceres</span><input class="stat-input" type="number" min="0" value="0" inputmode="numeric" data-r-observatory-hand="Flush House"></label>
+			<label class="planet-cell"><span>Eris</span><input class="stat-input" type="number" min="0" value="0" inputmode="numeric" data-r-observatory-hand="Flush Five"></label>
 		</div>
 	</dialog>
 
-	<dialog id="pc-duplicate-modal" class="panel" closedby="any" popover aria-labelledby="pc-duplicate-modal-heading">
-		<div class="stack">
-			<header>
-				<div class="action-list">
-					<h2 id="pc-duplicate-modal-heading">Duplicate card?</h2>
+	<dialog id="drawer-saves" class="drawer" closedby="any" popover aria-labelledby="drawer-saves-heading">
+		<header class="drawer-header">
+			<h2 id="drawer-saves-heading">Saves</h2>
+			<button class="button --icon" type="button" popovertarget="drawer-saves" popovertargetaction="hide">
+				<span class="visually-hidden">Close</span>
+				<svg class="icon"><use xlink:href="#close-icon"></use></svg>
+			</button>
+		</header>
 
-					<button class="button --icon push-inline-start" type="button" data-modal-close-button>
-						<span class="visually-hidden">Close</span>
+		<p class="drawer-hint">The current hand auto-saves whenever the score updates. Saves live in your browser.</p>
 
-						<svg class="icon">
-							<use xlink:href="#close-icon"></use>
-						</svg>
-					</button>
-				</div>
-			</header>
-
-			<label class="control-box">
-				<span class="label truncate">Number of copies</span>
-
-				<input class="text-input" type="number" value="1" min="1">
+		<form class="save-form" data-s-form>
+			<label class="stat-pill --grow">
+				<span class="stat-label">Name</span>
+				<input class="stat-input --text" name="name" type="text" required placeholder="Hand 1" autocomplete="off" data-s-name-input>
 			</label>
+			<button class="button --primary" type="submit" data-s-save-button>
+				<svg class="icon"><use xlink:href="#floppy-disk-icon"></use></svg>
+				<span>Save</span>
+			</button>
+		</form>
 
-			<p>The new cards will be added to the right of the one you're duplicating.</p>
-
-			<button class="button" type="button" data-c-duplicate-button>Ok</button>
+		<div class="table-wrapper">
+			<table>
+				<caption class="visually-hidden">Saves</caption>
+				<thead>
+					<tr>
+						<th>Name</th>
+						<th>Hand</th>
+						<th>Score</th>
+						<th>Time</th>
+						<th>Actions</th>
+					</tr>
+				</thead>
+				<tbody data-s-saves></tbody>
+			</table>
 		</div>
+
+		<form class="import-form" data-s-import-form>
+			<h3>Import save</h3>
+			<div class="import-row">
+				<label class="visually-hidden" for="import">Import save</label>
+				<input
+					class="file-input"
+					id="import"
+					name="import"
+					type="file"
+					accept=".json,application/json"
+					required
+					aria-describedby="import-description"
+					data-s-import-input
+				>
+				<button class="button" type="submit" data-s-import-button>
+					<svg class="icon"><use xlink:href="#file-arrow-up-icon"></use></svg>
+					<span>Import</span>
+				</button>
+			</div>
+			<span class="drawer-hint" id="import-description">Import any saves you previously exported as JSON.</span>
+		</form>
+	</dialog>
+
+	<dialog id="drawer-log" class="drawer" closedby="any" popover aria-labelledby="drawer-log-heading">
+		<header class="drawer-header">
+			<h2 id="drawer-log-heading">Scoring log</h2>
+			<button class="button --icon" type="button" popovertarget="drawer-log" popovertargetaction="hide">
+				<span class="visually-hidden">Close</span>
+				<svg class="icon"><use xlink:href="#close-icon"></use></svg>
+			</button>
+		</header>
+		<pre class="log" data-sc-log></pre>
+	</dialog>
+
+	<dialog id="drawer-info" class="drawer" closedby="any" popover aria-labelledby="drawer-info-heading">
+		<header class="drawer-header">
+			<h2 id="drawer-info-heading">About</h2>
+			<button class="button --icon" type="button" popovertarget="drawer-info" popovertargetaction="hide">
+				<span class="visually-hidden">Close</span>
+				<svg class="icon"><use xlink:href="#close-icon"></use></svg>
+			</button>
+		</header>
+		<p>Balatrolator is a score calculator for <a href="https://www.playbalatro.com/">Balatro</a>. Go, buy the game!</p>
+		<p>Add jokers and cards, tweak them, and compare scores across worst / average / best luck.</p>
+		<p>Please <a href="https://github.com/slmlm2009/balatrolator/issues/">report any bugs</a>. Want to <a href="https://github.com/slmlm2009/balatrolator">contribute</a>?</p>
+		<p>Version <code>1.0.1o</code> — forked by <a href="https://github.com/slmlm2009">slmlm2009</a>, originally by <a href="https://kleinfreund.de">kleinfreund</a>.</p>
+	</dialog>
+
+	<dialog id="jc-duplicate-modal" class="drawer" closedby="any" popover aria-labelledby="jc-duplicate-modal-heading">
+		<header class="drawer-header">
+			<h2 id="jc-duplicate-modal-heading">Duplicate joker?</h2>
+			<button class="button --icon" type="button" data-modal-close-button>
+				<span class="visually-hidden">Close</span>
+				<svg class="icon"><use xlink:href="#close-icon"></use></svg>
+			</button>
+		</header>
+		<label class="stat-pill --grow">
+			<span class="stat-label">Copies</span>
+			<input class="stat-input" type="number" value="1" min="1" inputmode="numeric">
+		</label>
+		<p class="drawer-hint">Copies are added to the right of the original.</p>
+		<button class="button --primary" type="button" data-j-duplicate-button>Duplicate</button>
+	</dialog>
+
+	<dialog id="pc-duplicate-modal" class="drawer" closedby="any" popover aria-labelledby="pc-duplicate-modal-heading">
+		<header class="drawer-header">
+			<h2 id="pc-duplicate-modal-heading">Duplicate card?</h2>
+			<button class="button --icon" type="button" data-modal-close-button>
+				<span class="visually-hidden">Close</span>
+				<svg class="icon"><use xlink:href="#close-icon"></use></svg>
+			</button>
+		</header>
+		<label class="stat-pill --grow">
+			<span class="stat-label">Copies</span>
+			<input class="stat-input" type="number" value="1" min="1" inputmode="numeric">
+		</label>
+		<p class="drawer-hint">Copies are added to the right of the original.</p>
+		<button class="button --primary" type="button" data-c-duplicate-button>Duplicate</button>
 	</dialog>
 
 	<template id="save-row">
@@ -463,16 +372,6 @@
 				</div>
 			</td>
 		</tr>
-	</template>
-
-	<template id="score-card">
-		<div class="card score-card">
-			<div class="stack">
-				<p><b data-sc-formatted-score></b></p>
-				<pre class="exact-score" data-sc-score></pre>
-				<span class="badge">Luck: <b data-sc-luck></b></span>
-			</div>
-		</div>
 	</template>
 
 	<svg style="display: none;">
@@ -527,8 +426,24 @@
 				<path d="M216,48H176V40a24,24,0,0,0-24-24H104A24,24,0,0,0,80,40v8H40a8,8,0,0,0,0,16h8V208a16,16,0,0,0,16,16H192a16,16,0,0,0,16-16V64h8a8,8,0,0,0,0-16ZM96,40a8,8,0,0,1,8-8h48a8,8,0,0,1,8,8v8H96Zm96,168H64V64H192ZM112,104v64a8,8,0,0,1-16,0V104a8,8,0,0,1,16,0Zm48,0v64a8,8,0,0,1-16,0V104a8,8,0,0,1,16,0Z"></path>
 			</symbol>
 
-			<symbol id="trash-icon" role="img" viewBox="0 0 256 256" xmlns="http://www.w3.org/2000/svg">
-				<path d="M216,48H176V40a24,24,0,0,0-24-24H104A24,24,0,0,0,80,40v8H40a8,8,0,0,0,0,16h8V208a16,16,0,0,0,16,16H192a16,16,0,0,0,16-16V64h8a8,8,0,0,0,0-16ZM96,40a8,8,0,0,1,8-8h48a8,8,0,0,1,8,8v8H96Zm96,168H64V64H192ZM112,104v64a8,8,0,0,1-16,0V104a8,8,0,0,1,16,0Zm48,0v64a8,8,0,0,1-16,0V104a8,8,0,0,1,16,0Z"></path>
+			<symbol id="pencil-icon" role="img" viewBox="0 0 256 256" xmlns="http://www.w3.org/2000/svg">
+				<path d="M227.31,73.37,182.63,28.68a16,16,0,0,0-22.63,0L36.69,152a15.86,15.86,0,0,0-4.69,11.31V208a16,16,0,0,0,16,16H92.69A15.86,15.86,0,0,0,104,219.31L227.31,96a16,16,0,0,0,0-22.63ZM92.69,208H48V163.31l88-88L180.69,120ZM192,108.68,147.31,64l24-24L216,84.68Z"></path>
+			</symbol>
+
+			<symbol id="chart-icon" role="img" viewBox="0 0 256 256" xmlns="http://www.w3.org/2000/svg">
+				<path d="M224,200h-8V40a8,8,0,0,0-8-8H152a8,8,0,0,0-8,8V80H96a8,8,0,0,0-8,8v40H48a8,8,0,0,0-8,8v64H32a8,8,0,0,0,0,16H224a8,8,0,0,0,0-16ZM160,48h40V200H160ZM104,96h40V200H104ZM56,144H88v56H56Z"></path>
+			</symbol>
+
+			<symbol id="planet-icon" role="img" viewBox="0 0 256 256" xmlns="http://www.w3.org/2000/svg">
+				<path d="M225.94,80.32c-7.55-13.21-36-11.39-67.06.91a96,96,0,1,0,42.78,42.66c30.9-31,32.84-59.36,24.28-43.57Zm-34.07,47.91A80,80,0,1,1,128,48a79.59,79.59,0,0,1,38.3,9.77,239.15,239.15,0,0,0-37.22,30.07A240.2,240.2,0,0,0,98.83,125c-12.32,31.06-14.13,59.51-.92,67.06a16.18,16.18,0,0,0,8.16,2c10.65,0,25.5-7.32,41.4-19.69A80,80,0,0,1,191.87,128.23ZM216.6,90.66c2,3.49-1.91,15.74-15.59,32.18a96.45,96.45,0,0,0-31.2-31.2C186.25,78,198.5,74.05,216,76Z"></path>
+			</symbol>
+
+			<symbol id="list-icon" role="img" viewBox="0 0 256 256" xmlns="http://www.w3.org/2000/svg">
+				<path d="M224,128a8,8,0,0,1-8,8H40a8,8,0,0,1,0-16H216A8,8,0,0,1,224,128ZM40,72H216a8,8,0,0,0,0-16H40a8,8,0,0,0,0,16ZM216,184H40a8,8,0,0,0,0,16H216a8,8,0,0,0,0-16Z"></path>
+			</symbol>
+
+			<symbol id="info-icon" role="img" viewBox="0 0 256 256" xmlns="http://www.w3.org/2000/svg">
+				<path d="M128,24A104,104,0,1,0,232,128,104.11,104.11,0,0,0,128,24Zm0,192a88,88,0,1,1,88-88A88.1,88.1,0,0,1,128,216Zm16-40a8,8,0,0,1-8,8,16,16,0,0,1-16-16V128a8,8,0,0,1,0-16,16,16,0,0,1,16,16v40A8,8,0,0,1,144,176ZM112,84a12,12,0,1,1,12,12A12,12,0,0,1,112,84Z"></path>
 			</symbol>
 
 			<symbol id="clubs-icon" role="img" viewBox="0 0 256 256" xmlns="http://www.w3.org/2000/svg">

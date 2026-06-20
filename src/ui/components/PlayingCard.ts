@@ -351,6 +351,18 @@ export class PlayingCard extends MovableCard {
 					<button
 						class="button --icon push-inline-start"
 						type="button"
+						@click="${() => this.classList.toggle('--editing')}"
+					>
+						<span class="visually-hidden">Edit card</span>
+
+						<svg class="icon">
+							<use xlink:href="#pencil-icon"></use>
+						</svg>
+					</button>
+
+					<button
+						class="button --icon"
+						type="button"
 						@click="${() => this.remove()}"
 					>
 						<span class="visually-hidden">Remove playing card</span>
@@ -374,6 +386,7 @@ export class PlayingCard extends MovableCard {
 					</button>
 				</div>
 
+				<div class="card-editor">
 				<div class="input-list">
 					<span id="${this.tagName.toLowerCase()}-${this.uniqueId}-title" class="visually-hidden">${this.toString()}</span>
 
@@ -579,6 +592,7 @@ export class PlayingCard extends MovableCard {
 						</option>
 					</select>
 				</label>
+				</div>
 			</div>
 		`
 	}

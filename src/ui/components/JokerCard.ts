@@ -448,6 +448,18 @@ export class JokerCard extends MovableCard {
 					<button
 						class="button --icon push-inline-start"
 						type="button"
+						@click="${() => this.classList.toggle('--editing')}"
+					>
+						<span class="visually-hidden">Edit joker</span>
+
+						<svg class="icon">
+							<use xlink:href="#pencil-icon"></use>
+						</svg>
+					</button>
+
+					<button
+						class="button --icon"
+						type="button"
 						@click="${() => this.remove()}"
 					>
 						<span class="visually-hidden">Remove joker</span>
@@ -473,6 +485,7 @@ export class JokerCard extends MovableCard {
 
 				<span id="${this.tagName.toLowerCase()}-${this.uniqueId}-title" class="visually-hidden">${this.toString()}</span>
 
+				<div class="card-editor">
 				<label>
 					<span class="visually-hidden">Joker name</span>
 
@@ -687,6 +700,7 @@ export class JokerCard extends MovableCard {
 							</select>
 						</label>
 					</div>
+				</div>
 				</div>
 
 				${this.contribution !== null ? html`
