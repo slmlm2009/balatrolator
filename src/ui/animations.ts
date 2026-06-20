@@ -1,82 +1,64 @@
 /*
-GSAP-powered presentation animations.
+Lightweight presentation animations using the native Web Animations API.
 
-GSAP is loaded lazily via the runtime CDN loader. Until it resolves (or if it fails to load), every
-helper here is a no-op, so animations never block or break the calculator. These functions only
-animate transform/opacity/CSS-variable properties — they never read or mutate scoring data.
+Previously these used GSAP loaded from a CDN, which added network + parse + init cost (felt as a
+first-interaction hang on mobile) for a few simple pops/flashes the browser can do natively.
+`element.animate()` has zero load cost and runs on the compositor. These are purely visual and never
+touch the scoring engine.
 */
-
-import { loadGsap, type Gsap } from './vendor.ts'
-
-let gsap: Gsap | null = null
 
 const prefersReducedMotion = typeof window.matchMedia === 'function'
 	&& window.matchMedia('(prefers-reduced-motion: reduce)').matches
 
-/** Kicks off loading GSAP and caches the instance for synchronous use by the helpers below. */
-export function initAnimations (): void {
+// Kept for API compatibility with main.ts; WAAPI needs no setup.
+export function initAnimations (): void {}
+
+/** Pops a freshly added joker/playing card into place. */
+export function animateCardEntrance (element: HTMLElement): void {
 	if (prefersReducedMotion) {
 		return
 	}
 
-	void loadGsap().then((instance) => {
-		gsap = instance
-	})
-}
-
-/** Pops a freshly added joker/playing card into place. */
-export function animateCardEntrance (element: HTMLElement): void {
-	if (!gsap) {
-		return
-	}
-
-	gsap.fromTo(element,
-		{ opacity: 0, y: 24, scale: 0.85 },
-		{ opacity: 1, y: 0, scale: 1, duration: 0.4, ease: 'back.out(1.7)', clearProps: 'opacity,scale' },
+	element.animate(
+		[
+			{ opacity: 0, transform: 'translateY(16px) scale(0.9)' },
+			{ opacity: 1, transform: 'none' },
+		],
+		{ duration: 320, easing: 'cubic-bezier(0.2, 0.8, 0.2, 1)' },
 	)
 }
 
 /** Lifts/drops a playing card as its “played” state toggles. */
 export function animatePlayToggle (element: HTMLElement, played: boolean): void {
-	if (!gsap) {
+	if (prefersReducedMotion) {
 		return
 	}
 
-	gsap.fromTo(element,
-		{ scale: played ? 0.96 : 1.04 },
-		{ scale: 1, duration: 0.35, ease: 'elastic.out(1, 0.6)', clearProps: 'scale' },
+	element.animate(
+		[
+			{ transform: `scale(${played ? 0.95 : 1.04})` },
+			{ transform: 'scale(1)' },
+		],
+		{ duration: 280, easing: 'cubic-bezier(0.34, 1.56, 0.64, 1)' },
 	)
 }
 
-/** Pulses the Balatro scoreboard: the chips/mult boxes pop and the total flashes on each update. */
+/** Pulses the scoreboard's chips/mult boxes and flashes the total on each update. */
 export function animateScoreboard (scoreboard: HTMLElement): void {
-	if (!gsap) {
+	if (prefersReducedMotion) {
 		return
 	}
 
-	const boxes = scoreboard.querySelectorAll('.sb-box')
-	gsap.fromTo(boxes,
-		{ scale: 0.82 },
-		{ scale: 1, duration: 0.4, ease: 'back.out(2.4)', stagger: 0.06, clearProps: 'scale' },
-	)
-
-	const total = scoreboard.querySelector('.sb-total-value')
-	if (total) {
-		gsap.fromTo(total,
-			{ '--score-flash': 1, scale: 1.16 },
-			{ '--score-flash': 0, scale: 1, duration: 0.55, ease: 'power2.out', clearProps: 'scale' },
+	for (const box of scoreboard.querySelectorAll<HTMLElement>('.sb-box')) {
+		box.animate(
+			[{ transform: 'scale(0.9)' }, { transform: 'scale(1)' }],
+			{ duration: 260, easing: 'cubic-bezier(0.34, 1.56, 0.64, 1)' },
 		)
 	}
-}
 
-/** Subtle shake to signal an invalid input / failed calculation. */
-export function animateInvalid (element: HTMLElement): void {
-	if (!gsap) {
-		return
-	}
-
-	gsap.fromTo(element,
-		{ x: -6 },
-		{ x: 0, duration: 0.5, ease: 'elastic.out(1, 0.3)', clearProps: 'x' },
+	const total = scoreboard.querySelector<HTMLElement>('.sb-total-value')
+	total?.animate(
+		[{ transform: 'scale(1.14)' }, { transform: 'scale(1)' }],
+		{ duration: 300, easing: 'ease-out' },
 	)
 }

@@ -142,13 +142,22 @@ export function init () {
 }
 
 /**
- * Enables SortableJS pointer drag-and-drop for reordering jokers and playing cards. Interactive
- * controls are excluded from dragging via the `filter` so editing still works, and reordering
- * triggers a recalculation. Falls back silently to keyboard/button reordering if SortableJS can't
- * be loaded.
+ * Enables SortableJS pointer drag-and-drop for reordering jokers and playing cards (desktop only).
+ *
+ * On touch devices SortableJS is intentionally NOT loaded: its non-passive touch listeners fight the
+ * horizontal tray scroll (causing a first-scroll hang) and dragging within a scroller is awkward —
+ * mobile reorders via the on-card move buttons instead. Skipping it also avoids a CDN load on phones.
+ * Interactive controls are excluded from dragging via the `filter`; reordering triggers a recalc.
  */
 function setupDragAndDrop () {
-	void loadSortable().then((Sortable) => {
+	const isFinePointer = typeof window.matchMedia === 'function'
+		&& window.matchMedia('(hover: hover) and (pointer: fine)').matches
+	if (!isFinePointer) {
+		return
+	}
+
+	// Loaded lazily and after first paint so it never competes with initial render/interaction.
+	const start = () => void loadSortable().then((Sortable) => {
 		if (!Sortable) {
 			return
 		}
@@ -169,6 +178,12 @@ function setupDragAndDrop () {
 		Sortable.create(jokerContainer, options)
 		Sortable.create(playingCardContainer, options)
 	})
+
+	if ('requestIdleCallback' in window) {
+		;(window as unknown as { requestIdleCallback: (cb: () => void) => void }).requestIdleCallback(start)
+	} else {
+		setTimeout(start, 500)
+	}
 }
 
 function calculate () {
