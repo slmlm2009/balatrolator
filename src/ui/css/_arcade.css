@@ -404,7 +404,8 @@ playing-card.--is-debuffed .card-art::after {
 }
 
 playing-card:not(.--is-played) .card-art {
-	filter: brightness(0.74) saturate(0.8);
+	/* opacity (composited, cheap) instead of a filter (forces re-paint/extra layer) for the dim. */
+	opacity: 0.62;
 	transform: perspective(700px) translateY(10px) rotateX(var(--tilt-rx, 0deg)) rotateY(var(--tilt-ry, 0deg));
 }
 
@@ -888,4 +889,10 @@ a:hover { color: hsl(43 96% 75%); }
 @media (prefers-reduced-motion: reduce) {
 	.card-art { transition: none; transform: none; }
 	.drawer::backdrop { backdrop-filter: none; }
+}
+
+/* On touch devices the pointer-follow glare never activates (tilt is mouse-only), so its
+   soft-light blended layer is pure paint cost per card — drop it entirely. */
+@media (hover: none) {
+	.card-glare { display: none; }
 }
