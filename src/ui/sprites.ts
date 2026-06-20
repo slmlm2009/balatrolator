@@ -14,6 +14,10 @@ import type { DeckName, Edition, Enhancement, JokerName, Rank, Seal, Suit } from
 
 const CARD_SPRITES = 'assets/1 - Card Sprites'
 const OTHER_SPRITES = 'assets/2 - Other Sprites'
+// Playing-card art is served from down-scaled copies (see assets/optimized): the originals are
+// ~1-megapixel upscaled pixel art, which is huge GPU-texture memory for an ~80px display and causes
+// scroll/interaction jank on phones. The optimized copies are ~193×256 and visually identical.
+const OPTIMIZED_CARDS = 'assets/optimized/DECK CARDS'
 
 /** Maps a rank to the token used in playing-card sprite filenames (e.g. `Ace` → `A`). */
 const RANK_FILE_TOKEN: Record<Rank, string> = {
@@ -74,7 +78,7 @@ export function getPlayingCardSprite (rank: Rank, suit: Suit, enhancement: Enhan
 
 	const folder = ENHANCEMENT_FOLDER[enhancement]
 	const token = RANK_FILE_TOKEN[rank]
-	return encode(`${CARD_SPRITES}/DECK CARDS/${folder}/${folder}-${suit.toUpperCase()}-${token}.png`)
+	return encode(`${OPTIMIZED_CARDS}/${folder}/${folder}-${suit.toUpperCase()}-${token}.png`)
 }
 
 /** Returns the sprite URL for a joker's art. */
@@ -89,7 +93,8 @@ export function getSealSprite (seal: Seal): string | null {
 		return null
 	}
 
-	return encode(`${OTHER_SPRITES}/CARD SEALS/Scaled/${seal.toLowerCase()}_seal.png`)
+	// "Unscaled" seals are ~73×97 vs the ~949×1261 "Scaled" ones — far cheaper to composite.
+	return encode(`${OTHER_SPRITES}/CARD SEALS/Unscaled/${seal.toLowerCase()}_seal.png`)
 }
 
 /** Returns the deck back sprite URL. */

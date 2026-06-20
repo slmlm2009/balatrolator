@@ -305,9 +305,9 @@ export class PlayingCard extends MovableCard {
 
 		return html`
 			<div class="card-art ${isStone ? '--is-stone' : ''}" aria-hidden="true">
-				${sprite !== null ? html`<img class="card-art-img" src="${sprite}" alt="" draggable="false">` : ''}
+				${sprite !== null ? html`<img class="card-art-img" src="${sprite}" alt="" draggable="false" decoding="async">` : ''}
 				${editionOverlay !== null ? html`<div class="card-edition" style="background:${editionOverlay}"></div>` : ''}
-				${sealSprite !== null ? html`<img class="card-seal" src="${sealSprite}" alt="" draggable="false">` : ''}
+				${sealSprite !== null ? html`<img class="card-seal" src="${sealSprite}" alt="" draggable="false" decoding="async">` : ''}
 				<div class="card-glare"></div>
 			</div>
 		`

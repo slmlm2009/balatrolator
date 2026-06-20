@@ -419,7 +419,7 @@ export class JokerCard extends MovableCard {
 
 		return html`
 			<div class="card-art" aria-hidden="true">
-				<img class="card-art-img" src="${sprite}" alt="" draggable="false">
+				<img class="card-art-img" src="${sprite}" alt="" draggable="false" decoding="async">
 				${editionOverlay !== null ? html`<div class="card-edition" style="background:${editionOverlay}"></div>` : ''}
 				<div class="card-glare"></div>
 			</div>
