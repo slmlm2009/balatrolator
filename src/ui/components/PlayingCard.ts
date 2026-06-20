@@ -155,13 +155,6 @@ export class PlayingCard extends MovableCard {
 			this.seal = card.seal
 		}
 
-		// Allow clicking the card to toggle its played state.
-		this.addEventListener('click', (event) => {
-			if (event.isTrusted && !isInteractive(event)) {
-				this.played = !this.played
-			}
-		}, { capture: true })
-
 		this.addEventListener('keydown', (event) => {
 			const key = getShortcutKey(event)
 			const command = this.#commands[key]
@@ -304,7 +297,7 @@ export class PlayingCard extends MovableCard {
 		const isStone = this.enhancement === 'Stone'
 
 		return html`
-			<div class="card-art ${isStone ? '--is-stone' : ''}" aria-hidden="true">
+			<div class="card-art ${isStone ? '--is-stone' : ''}" aria-hidden="true" @click="${this.toggleEditor}">
 				${sprite !== null ? html`<img class="card-art-img" src="${sprite}" alt="" draggable="false" decoding="async">` : ''}
 				${editionOverlay !== null ? html`<div class="card-edition" style="background:${editionOverlay}"></div>` : ''}
 				${sealSprite !== null ? html`<img class="card-seal" src="${sealSprite}" alt="" draggable="false" decoding="async">` : ''}
@@ -318,71 +311,38 @@ export class PlayingCard extends MovableCard {
 			<div class="stack">
 				${this.#artTemplate()}
 
-				<div class="action-list">
+				<div class="card-face-actions">
 					<button
-						class="button --icon"
+						class="face-btn"
 						?disabled="${this.previousElementSibling === null}"
 						type="button"
 						@click="${this.swapLeft}"
 					>
 						<span class="visually-hidden">Move card left</span>
-
-						<svg class="icon">
-							<use xlink:href="#arrow-left-icon"></use>
-						</svg>
+						<svg class="icon"><use xlink:href="#arrow-left-icon"></use></svg>
 					</button>
 
-					<label class="checkbox-control">
+					<label class="card-toggle ${this.played ? '--on' : ''}" title="Played">
 						<input
-							name="card-is-played-${this.uniqueId}"
 							type="checkbox"
-							value="is-played"
-							checked
 							.checked="${this.played}"
 							@change="${(event: Event) => {
 								const input = event.target as HTMLInputElement
 								this.played = input.checked
 							}}"
 						>
-
-						<span class="label">Play?</span>
+						<span class="visually-hidden">Played</span>
+						<svg class="icon"><use xlink:href="#check-icon"></use></svg>
 					</label>
 
 					<button
-						class="button --icon push-inline-start"
-						type="button"
-						@click="${this.toggleEditor}"
-					>
-						<span class="visually-hidden">Edit card</span>
-
-						<svg class="icon">
-							<use xlink:href="#pencil-icon"></use>
-						</svg>
-					</button>
-
-					<button
-						class="button --icon"
-						type="button"
-						@click="${() => this.remove()}"
-					>
-						<span class="visually-hidden">Remove playing card</span>
-
-						<svg class="icon">
-							<use xlink:href="#trash-icon"></use>
-						</svg>
-					</button>
-
-					<button
-						class="button --icon"
+						class="face-btn"
 						?disabled="${this.nextElementSibling === null}"
 						type="button"
 						@click="${this.swapRight}"
 					>
 						<span class="visually-hidden">Move card right</span>
-
-						<svg class="icon">
-							<use xlink:href="#arrow-right-icon"></use>
-						</svg>
+						<svg class="icon"><use xlink:href="#arrow-right-icon"></use></svg>
 					</button>
 				</div>
 
@@ -390,6 +350,10 @@ export class PlayingCard extends MovableCard {
 				<div class="editor-sheet">
 				<div class="editor-head">
 					<span class="editor-title">Edit card</span>
+					<button class="button --danger" type="button" @click="${() => this.remove()}">
+						<svg class="icon"><use xlink:href="#trash-icon"></use></svg>
+						<span>Delete</span>
+					</button>
 					<button class="button --primary" type="button" @click="${() => this.classList.remove('--editing')}">Done</button>
 				</div>
 				<div class="input-list">
@@ -640,24 +604,4 @@ export class PlayingCard extends MovableCard {
 			count: this.count,
 		})
 	}
-}
-
-function isInteractive (event: Event): boolean {
-	for (const target of event.composedPath()) {
-		if (target === event.currentTarget) {
-			break
-		}
-
-		if (
-			target instanceof HTMLLabelElement ||
-			target instanceof HTMLSelectElement ||
-			target instanceof HTMLInputElement ||
-			target instanceof HTMLButtonElement ||
-			(target instanceof HTMLAnchorElement && target.href)
-		) {
-			return true
-		}
-	}
-
-	return false
 }

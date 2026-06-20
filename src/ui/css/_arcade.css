@@ -64,66 +64,95 @@ img[class*='card-'],
 	z-index: 20;
 	display: flex;
 	align-items: center;
-	gap: 0.5rem;
+	gap: 0.6rem;
 	flex-wrap: wrap;
-	padding: 0.5rem 0.6rem;
+	padding: 0.5rem 0.75rem 0.55rem;
 	padding-block-start: max(0.5rem, env(safe-area-inset-top));
-	background: linear-gradient(hsl(206 50% 7% / 0.96), hsl(206 50% 7% / 0.82));
-	border-block-end: 1px solid var(--surface-line);
-	box-shadow: 0 4px 14px hsl(206 60% 4% / 0.5);
+	background:
+		radial-gradient(140% 200% at 0% 0%, hsl(266 55% 20% / 0.7), transparent 55%),
+		linear-gradient(hsl(208 48% 11%), hsl(208 52% 8%));
+	box-shadow: 0 6px 18px hsl(206 60% 4% / 0.55), inset 0 1px 0 hsl(0 0% 100% / 0.05);
+}
+
+/* Casino-marquee accent line along the bottom of the bar. */
+.topbar::after {
+	content: '';
+	position: absolute;
+	inset-inline: 0;
+	inset-block-end: 0;
+	block-size: 2px;
+	background: linear-gradient(90deg, transparent, var(--gold-dark), var(--gold), var(--mult), var(--chips), transparent);
+	opacity: 0.85;
 }
 
 .brand {
 	display: flex;
 	align-items: center;
-	gap: 0.45rem;
+	gap: 0.5rem;
 }
 
 .brand-name {
 	font-weight: 900;
-	font-size: 1.1rem;
-	letter-spacing: 0.06em;
-	color: var(--gold);
-	text-shadow: 0 0 10px hsl(43 96% 56% / 0.45), 1px 2px 0 hsl(5 75% 30%);
+	font-size: 1.3rem;
+	letter-spacing: 0.04em;
+	background: linear-gradient(hsl(48 100% 74%), var(--gold) 55%, var(--gold-dark));
+	-webkit-background-clip: text;
+	background-clip: text;
+	color: transparent;
+	filter: drop-shadow(0 1px 0 hsl(5 80% 24%)) drop-shadow(0 0 7px hsl(43 96% 56% / 0.35));
 }
 
 .brand-suits {
 	display: inline-flex;
-	gap: 0.1rem;
+	gap: 0.12rem;
+	padding: 0.2rem 0.3rem;
+	border-radius: 0.5rem;
+	background: hsl(208 45% 7% / 0.5);
+	border: 1px solid var(--surface-line);
 }
 
 .brand-suits .--suit-h, .brand-suits .--suit-d { color: var(--mult); }
 .brand-suits .--suit-s, .brand-suits .--suit-c { color: var(--chips); }
-.brand-suits .icon { inline-size: 0.9rem; block-size: 0.9rem; }
+.brand-suits .icon { inline-size: 0.85rem; block-size: 0.85rem; }
 
 .toolbar {
 	display: flex;
-	gap: 0.35rem;
+	gap: 0.3rem;
 	margin-inline-start: auto;
+	padding: 0.25rem;
+	border-radius: 0.7rem;
+	background: hsl(208 48% 6% / 0.6);
+	border: 1px solid var(--surface-line);
 	overflow-x: auto;
-	scrollbar-width: thin;
+	scrollbar-width: none;
 	-webkit-overflow-scrolling: touch;
 }
+
+.toolbar::-webkit-scrollbar { display: none; }
 
 .chip-button {
 	display: inline-flex;
 	align-items: center;
+	justify-content: center;
 	gap: 0.3rem;
 	flex: 0 0 auto;
-	min-block-size: 2.25rem;
-	padding: 0 0.7rem;
+	min-block-size: 2.35rem;
+	min-inline-size: 2.35rem;
+	padding: 0 0.6rem;
 	border: 2px solid var(--surface-line);
-	border-radius: 999px;
-	background: var(--surface);
+	border-radius: 0.55rem;
+	background: linear-gradient(hsl(209 36% 23%), hsl(209 40% 15%));
 	color: var(--ink);
 	font-weight: 700;
 	font-size: 0.82rem;
 	cursor: pointer;
-	transition: transform 0.08s ease, background-color 0.15s ease, border-color 0.15s ease;
+	box-shadow: inset 0 1px 0 hsl(0 0% 100% / 0.09), 0 2px 0 hsl(206 60% 4% / 0.5);
+	transition: transform 0.08s ease, border-color 0.15s ease, filter 0.15s ease;
 }
 
-.chip-button:hover { background: var(--surface-2); border-color: var(--gold); }
-.chip-button:active { transform: translateY(1px); }
+.chip-button:hover { border-color: var(--gold); filter: brightness(1.12); }
+.chip-button:active { transform: translateY(1px); box-shadow: inset 0 1px 0 hsl(0 0% 100% / 0.09); }
+.chip-button.--danger { color: hsl(5 95% 80%); }
 .chip-button.--danger:hover { border-color: var(--mult); }
 .chip-button .icon { inline-size: 1.05rem; block-size: 1.05rem; }
 
@@ -269,12 +298,13 @@ img[class*='card-'],
 .round-add-button .icon { inline-size: 1.2rem; block-size: 1.2rem; }
 
 .tray {
+	--tray-gap: 0.4rem;
 	display: flex;
-	gap: 0.55rem;
+	gap: var(--tray-gap);
 	position: relative; /* contain absolutely-positioned descendants (e.g. visually-hidden labels) within the scroll area */
 	overflow-x: auto;
 	overflow-y: hidden;
-	padding: 0.35rem 0.15rem 0.6rem;
+	padding: 0.35rem 0 0.5rem;
 	min-block-size: 6.5rem;
 	scroll-snap-type: x proximity;
 	scrollbar-width: thin;
@@ -294,16 +324,20 @@ img[class*='card-'],
 .tray::-webkit-scrollbar { block-size: 0.5rem; }
 .tray::-webkit-scrollbar-thumb { background: var(--surface-line); border-radius: 999px; }
 
-/* Cards inside a tray */
+/* Cards inside a tray: sized so exactly 5 fit the row (the normal count) with no horizontal scroll.
+   A 6th+ card overflows and the tray scrolls. max-inline-size keeps them sane on wide screens. */
 .tray > joker-card,
 .tray > playing-card {
-	flex: 0 0 auto;
-	inline-size: var(--tray-card-w, 6.6rem);
+	/* -3px safety margin absorbs sub-pixel flex rounding so exactly 5 fit without triggering scroll.
+	   min-inline-size:0 overrides the flex default (min-width:auto), which would otherwise clamp each
+	   card up to its content's min-content width and cause overflow. */
+	flex: 0 0 calc((100% - 4 * var(--tray-gap) - 3px) / 5);
+	min-inline-size: 0;
+	max-inline-size: 7.5rem;
 	scroll-snap-align: start;
 	padding: 0;
 	border: none;
 	background: transparent;
-	max-inline-size: none;
 }
 
 /* Cards keep their compact tray size while editing — the editor opens as a separate bottom sheet. */
@@ -424,31 +458,58 @@ joker-card .stack,
 playing-card .stack {
 	display: flex;
 	flex-direction: column;
-	gap: 0.35rem;
+	gap: 0.3rem;
 }
 
-/* The face action row: tight, wrapping icon buttons under the art. */
-joker-card > .stack > .action-list,
-playing-card > .stack > .action-list {
+.card-art { cursor: pointer; }
+
+/* Inactive jokers read as dimmed. */
+.card-art.--inactive { opacity: 0.5; }
+
+/* Compact face row that fits a ~64px card: [move-left] [play/active toggle] [move-right]. */
+.card-face-actions {
 	display: flex;
-	flex-wrap: wrap;
+	align-items: stretch;
 	gap: 0.2rem;
-	justify-content: center;
 }
 
-joker-card .button.--icon,
-playing-card .button.--icon {
-	min-block-size: 1.9rem;
-	inline-size: 1.9rem;
+.face-btn {
+	display: inline-grid;
+	place-items: center;
+	inline-size: 1.85rem;
+	min-block-size: 1.85rem;
+	flex: 0 0 auto;
 	padding: 0;
-	border-radius: 0.4rem;
-	border-color: var(--surface-line);
+	border: 2px solid var(--surface-line);
+	border-radius: 0.45rem;
 	background: var(--surface);
 	color: var(--ink);
+	cursor: pointer;
 }
 
-joker-card .button.--icon:hover,
-playing-card .button.--icon:hover { background: var(--surface-2); }
+.face-btn:hover:not(:disabled) { background: var(--surface-2); border-color: var(--gold); }
+.face-btn:active:not(:disabled) { transform: translateY(1px); }
+.face-btn:disabled { opacity: 0.3; cursor: default; }
+.face-btn .icon { inline-size: 1.05rem; block-size: 1.05rem; }
+
+/* Play (cards) / Active (jokers) tick — a clear checkbox flanked by the reorder arrows. */
+.card-toggle {
+	position: relative;
+	flex: 1 1 auto;
+	display: inline-grid;
+	place-items: center;
+	min-block-size: 1.85rem;
+	border: 2px solid var(--surface-line);
+	border-radius: 0.45rem;
+	background: hsl(208 40% 11%);
+	cursor: pointer;
+	transition: background-color 0.15s ease, border-color 0.15s ease;
+}
+
+.card-toggle input { position: absolute; inset: 0; opacity: 0; margin: 0; cursor: pointer; }
+.card-toggle .icon { inline-size: 1.15rem; block-size: 1.15rem; color: transparent; pointer-events: none; }
+.card-toggle.--on { background: linear-gradient(var(--gold), var(--gold-dark)); border-color: var(--gold-dark); }
+.card-toggle.--on .icon { color: hsl(206 60% 8%); }
 
 /* The editor opens as a bottom sheet: a fixed full-screen scrim (.card-editor) holding a sliding
    panel (.editor-sheet). Collapsed (display:none) until --editing. Roomy, touch-friendly controls. */
@@ -508,8 +569,9 @@ playing-card .button.--icon:hover { background: var(--surface-2); }
 	z-index: 1;
 }
 
-.editor-title { font-weight: 800; font-size: 16px; color: var(--gold); }
-.editor-head .button { margin-inline-start: auto; min-block-size: 44px; padding-inline: 1.5rem; font-size: 15px; }
+.editor-title { font-weight: 800; font-size: 16px; color: var(--gold); margin-inline-end: auto; }
+.editor-head .button { min-block-size: 44px; padding-inline: 1.1rem; font-size: 15px; }
+.editor-head .button.--danger .icon { inline-size: 1rem; block-size: 1rem; }
 
 /* Every attribute becomes a full-width, labeled, tall field — unambiguous and touch-friendly.
    !important overrides the components' fixed control widths/heights (set in adopted stylesheets). */
@@ -582,16 +644,19 @@ playing-card .checkbox-control {
 
 playing-card .checkbox-control input { inline-size: 1.05rem; block-size: 1.05rem; accent-color: var(--gold); }
 
-/* Joker contribution badge sits on the face. */
+/* Joker contribution badge sits on the face — compact so it fits a ~64px card without overflow. */
 .jc-contribution {
-	margin-block-start: 0.1rem;
-	padding: 0.15rem 0.3rem;
+	padding: 0.1rem 0.2rem;
 	text-align: center;
-	font-size: 0.72rem;
+	font-size: 0.66rem;
 	font-weight: 800;
+	line-height: 1.2;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
 	background: hsl(206 60% 6% / 0.7) !important;
 	border: 1px solid var(--mult-dark);
-	border-radius: 0.4rem;
+	border-radius: 0.35rem;
 	color: var(--mult);
 }
 
@@ -844,6 +909,8 @@ playing-card .checkbox-control input { inline-size: 1.05rem; block-size: 1.05rem
 .button.--icon { inline-size: 2.2rem; padding: 0; justify-content: center; }
 .button.--primary { background: linear-gradient(var(--gold), var(--gold-dark)); border-color: var(--gold-dark); color: hsl(206 60% 8%); }
 .button.--primary:hover { filter: brightness(1.08); background: linear-gradient(var(--gold), var(--gold-dark)); }
+.button.--danger { background: hsl(5 60% 22%); border-color: var(--mult-dark); color: hsl(5 95% 82%); }
+.button.--danger:hover { background: hsl(5 65% 30%); border-color: var(--mult); }
 .button:disabled { opacity: 0.45; cursor: default; }
 
 a { color: var(--gold); }

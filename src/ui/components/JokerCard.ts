@@ -418,7 +418,7 @@ export class JokerCard extends MovableCard {
 		const editionOverlay = getEditionOverlay(this.edition)
 
 		return html`
-			<div class="card-art" aria-hidden="true">
+			<div class="card-art ${this.active ? '' : '--inactive'}" aria-hidden="true" @click="${this.toggleEditor}">
 				<img class="card-art-img" src="${sprite}" alt="" draggable="false" decoding="async">
 				${editionOverlay !== null ? html`<div class="card-edition" style="background:${editionOverlay}"></div>` : ''}
 				<div class="card-glare"></div>
@@ -431,55 +431,38 @@ export class JokerCard extends MovableCard {
 			<div class="stack">
 				${this.#artTemplate()}
 
-				<div class="action-list">
+				<div class="card-face-actions">
 					<button
-						class="button --icon"
+						class="face-btn"
 						?disabled="${this.previousElementSibling === null}"
 						type="button"
 						@click="${this.swapLeft}"
 					>
 						<span class="visually-hidden">Move joker left</span>
-
-						<svg class="icon">
-							<use xlink:href="#arrow-left-icon"></use>
-						</svg>
+						<svg class="icon"><use xlink:href="#arrow-left-icon"></use></svg>
 					</button>
 
-					<button
-						class="button --icon push-inline-start"
-						type="button"
-						@click="${this.toggleEditor}"
-					>
-						<span class="visually-hidden">Edit joker</span>
-
-						<svg class="icon">
-							<use xlink:href="#pencil-icon"></use>
-						</svg>
-					</button>
-
-					<button
-						class="button --icon"
-						type="button"
-						@click="${() => this.remove()}"
-					>
-						<span class="visually-hidden">Remove joker</span>
-
-						<svg class="icon">
-							<use xlink:href="#trash-icon"></use>
-						</svg>
-					</button>
+					<label class="card-toggle ${this.active ? '--on' : ''}" title="Active">
+						<input
+							type="checkbox"
+							.checked="${this.active}"
+							@change="${(event: Event) => {
+								const input = event.target as HTMLInputElement
+								this.active = input.checked
+							}}"
+						>
+						<span class="visually-hidden">Active</span>
+						<svg class="icon"><use xlink:href="#check-icon"></use></svg>
+					</label>
 
 					<button
-						class="button --icon"
+						class="face-btn"
 						?disabled="${this.nextElementSibling === null}"
 						type="button"
 						@click="${this.swapRight}"
 					>
 						<span class="visually-hidden">Move joker right</span>
-
-						<svg class="icon">
-							<use xlink:href="#arrow-right-icon"></use>
-						</svg>
+						<svg class="icon"><use xlink:href="#arrow-right-icon"></use></svg>
 					</button>
 				</div>
 
@@ -489,6 +472,10 @@ export class JokerCard extends MovableCard {
 				<div class="editor-sheet">
 				<div class="editor-head">
 					<span class="editor-title">Edit joker</span>
+					<button class="button --danger" type="button" @click="${() => this.remove()}">
+						<svg class="icon"><use xlink:href="#trash-icon"></use></svg>
+						<span>Delete</span>
+					</button>
 					<button class="button --primary" type="button" @click="${() => this.classList.remove('--editing')}">Done</button>
 				</div>
 				<label>
