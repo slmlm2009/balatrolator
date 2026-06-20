@@ -193,16 +193,21 @@ img[class*='card-'],
 }
 
 .stat-input {
-	inline-size: 3.2rem;
-	min-block-size: 1.9rem;
+	inline-size: 3.4rem;
+	min-block-size: 38px;
 	padding: 0 0.35rem;
 	border: 2px solid var(--surface-line);
 	border-radius: 0.4rem;
 	background: hsl(208 40% 11%);
 	color: var(--ink);
 	font-weight: 700;
+	font-size: 16px;
 	text-align: end;
 }
+
+/* 16px font on round-bar controls prevents iOS zoom-on-focus; taller for touch. */
+.round-bar combo-box { block-size: auto; }
+.round-bar .cb-button { min-block-size: 38px; font-size: 15px; }
 
 .stat-input.--text { inline-size: 100%; text-align: start; }
 .stat-pill.--grow .stat-input { flex: 1; }
@@ -297,18 +302,18 @@ img[class*='card-'],
 	max-inline-size: none;
 }
 
-.tray > .card.--editing {
-	inline-size: min(16rem, 82vw);
-}
+/* Cards keep their compact tray size while editing — the editor opens as a separate bottom sheet. */
 
 /* ============ CARD ART ============ */
 
 joker-card,
 playing-card {
-	perspective: 700px;
 	color: var(--ink);
 }
 
+/* Perspective is applied via the transform function (not the `perspective` property) so the host
+   does NOT establish a containing block — that lets the editor sheet use position:fixed against the
+   viewport rather than the card. */
 .card-art {
 	position: relative;
 	display: block;
@@ -321,7 +326,7 @@ playing-card {
 		0 0 0 2px var(--c-border, hsl(255 40% 45%)),
 		0 5px 12px hsl(206 60% 4% / 0.6);
 	cursor: grab;
-	transform: rotateX(var(--tilt-rx, 0deg)) rotateY(var(--tilt-ry, 0deg));
+	transform: perspective(700px) rotateX(var(--tilt-rx, 0deg)) rotateY(var(--tilt-ry, 0deg));
 	transform-style: preserve-3d;
 	transition: transform 0.16s ease-out, box-shadow 0.2s ease;
 	will-change: transform;
@@ -396,7 +401,7 @@ playing-card.--is-debuffed .card-art::after {
 
 playing-card:not(.--is-played) .card-art {
 	filter: brightness(0.74) saturate(0.8);
-	transform: translateY(10px) rotateX(var(--tilt-rx, 0deg)) rotateY(var(--tilt-ry, 0deg));
+	transform: perspective(700px) translateY(10px) rotateX(var(--tilt-rx, 0deg)) rotateY(var(--tilt-ry, 0deg));
 }
 
 playing-card.--is-played .card-art {
@@ -440,27 +445,128 @@ playing-card .button.--icon {
 joker-card .button.--icon:hover,
 playing-card .button.--icon:hover { background: var(--surface-2); }
 
-/* Editor is collapsed until the card is tapped into edit mode. */
+/* The editor opens as a bottom sheet: a fixed full-screen scrim (.card-editor) holding a sliding
+   panel (.editor-sheet). Collapsed (display:none) until --editing. Roomy, touch-friendly controls. */
 .card-editor {
 	display: none;
-	flex-direction: column;
-	gap: 0.4rem;
 	--c-text: var(--ink);
 	--c-background-lighter: hsl(208 40% 11%);
 	--c-background-light: var(--surface-2);
 	--c-border: var(--surface-line);
-	padding-block-start: 0.35rem;
-	border-block-start: 1px dashed var(--surface-line);
 }
 
-.card.--editing .card-editor { display: flex; }
+.card.--editing .card-editor {
+	display: flex;
+	position: fixed;
+	inset: 0;
+	z-index: 60;
+	align-items: flex-end;
+	justify-content: center;
+	background: hsl(206 60% 4% / 0.55);
+	animation: editor-fade 0.15s ease;
+}
 
-.card-editor .text-input,
-.card-editor select,
-.card-editor .cb-button {
+@keyframes editor-fade { from { opacity: 0; } to { opacity: 1; } }
+
+.editor-sheet {
 	inline-size: 100%;
-	max-inline-size: 100%;
+	max-inline-size: 34rem;
+	max-block-size: 86dvh;
+	overflow-y: auto;
+	overscroll-behavior: contain;
+	display: flex;
+	flex-direction: column;
+	gap: 0.55rem;
+	padding: 0.85rem;
+	padding-block-end: max(1rem, env(safe-area-inset-bottom));
+	background: linear-gradient(hsl(208 40% 15%), hsl(208 42% 12%));
+	border: 2px solid var(--surface-line);
+	border-block-end: none;
+	border-start-start-radius: 1.1rem;
+	border-start-end-radius: 1.1rem;
+	box-shadow: 0 -10px 30px hsl(206 60% 4% / 0.6);
+	animation: editor-slide 0.22s cubic-bezier(0.2, 0, 0, 1);
 }
+
+@keyframes editor-slide { from { transform: translateY(100%); } to { transform: translateY(0); } }
+
+.editor-head {
+	position: sticky;
+	inset-block-start: -0.85rem;
+	margin: -0.85rem -0.85rem 0;
+	padding: 0.7rem 0.85rem;
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+	background: hsl(208 45% 11% / 0.97);
+	border-block-end: 1px solid var(--surface-line);
+	z-index: 1;
+}
+
+.editor-title { font-weight: 800; font-size: 16px; color: var(--gold); }
+.editor-head .button { margin-inline-start: auto; min-block-size: 44px; padding-inline: 1.5rem; font-size: 15px; }
+
+/* Every attribute becomes a full-width, labeled, tall field — unambiguous and touch-friendly.
+   !important overrides the components' fixed control widths/heights (set in adopted stylesheets). */
+.editor-sheet > label,
+.editor-sheet .control-box,
+.editor-sheet .input-list,
+.editor-sheet .action-list,
+.editor-sheet .jc-effects { inline-size: 100%; }
+
+.editor-sheet .control-box {
+	display: flex;
+	flex-direction: column;
+	align-items: stretch;
+	gap: 0.3rem;
+	padding: 0.5rem 0.65rem;
+	background: var(--surface);
+	border: 2px solid var(--surface-line);
+	border-radius: 0.6rem;
+}
+
+.editor-sheet .control-box > .label {
+	font-weight: 700;
+	font-size: 0.78rem;
+	letter-spacing: 0.02em;
+	text-transform: uppercase;
+	color: var(--ink-dim);
+}
+
+/* Rank & suit stack into their own full-width rows; the connecting "of" is dropped. */
+.editor-sheet .input-list { flex-direction: column; gap: 0.5rem; }
+.editor-sheet .input-list > * { flex: none; inline-size: 100%; }
+.editor-sheet .pc-card-of,
+.editor-sheet .jc-card-of { display: none; }
+
+/* Pixel sizing here (not rem): the app's root font-size is 0.75em, so rem-based targets would be
+   ~25% too small. 44px = proper touch target; 16px font prevents iOS zoom-on-focus. */
+.editor-sheet select,
+.editor-sheet .text-input,
+.editor-sheet .cb-button {
+	inline-size: 100% !important;
+	max-inline-size: 100%;
+	min-block-size: 44px !important;
+	font-size: 16px !important;
+}
+
+.editor-sheet combo-box { inline-size: 100% !important; block-size: auto !important; }
+.editor-sheet combo-box .cb-button { min-block-size: 44px !important; }
+
+.editor-sheet .action-list { display: flex; gap: 0.5rem; align-items: stretch; }
+.editor-sheet .action-list > .control-box { flex: 1; }
+
+.editor-sheet .checkbox-control {
+	min-block-size: 44px;
+	padding: 0.5rem 0.65rem;
+	background: var(--surface);
+	border: 2px solid var(--surface-line);
+	border-radius: 0.6rem;
+	font-weight: 700;
+	font-size: 15px;
+}
+
+.editor-sheet .checkbox-control input { inline-size: 1.4rem; block-size: 1.4rem; accent-color: var(--gold); }
 
 /* The play toggle stays on the compact face for quick access. */
 playing-card .checkbox-control {

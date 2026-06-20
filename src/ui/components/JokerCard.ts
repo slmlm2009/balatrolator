@@ -448,7 +448,7 @@ export class JokerCard extends MovableCard {
 					<button
 						class="button --icon push-inline-start"
 						type="button"
-						@click="${() => this.classList.toggle('--editing')}"
+						@click="${this.toggleEditor}"
 					>
 						<span class="visually-hidden">Edit joker</span>
 
@@ -485,7 +485,12 @@ export class JokerCard extends MovableCard {
 
 				<span id="${this.tagName.toLowerCase()}-${this.uniqueId}-title" class="visually-hidden">${this.toString()}</span>
 
-				<div class="card-editor">
+				<div class="card-editor" @click="${(event: Event) => { if (event.target === event.currentTarget) this.classList.remove('--editing') }}">
+				<div class="editor-sheet">
+				<div class="editor-head">
+					<span class="editor-title">Edit joker</span>
+					<button class="button --primary" type="button" @click="${() => this.classList.remove('--editing')}">Done</button>
+				</div>
 				<label>
 					<span class="visually-hidden">Joker name</span>
 
@@ -702,6 +707,7 @@ export class JokerCard extends MovableCard {
 					</div>
 				</div>
 				</div>
+				</div>
 
 				${this.contribution !== null ? html`
 					<div class="jc-contribution">
@@ -711,6 +717,17 @@ export class JokerCard extends MovableCard {
 				` : ''}
 			</div>
 		`
+	}
+
+	// Opens this joker's editor sheet, closing any other card's open editor first (one at a time).
+	toggleEditor = () => {
+		const willOpen = !this.classList.contains('--editing')
+		if (willOpen) {
+			for (const el of document.querySelectorAll('.card.--editing')) {
+				el.classList.remove('--editing')
+			}
+		}
+		this.classList.toggle('--editing', willOpen)
 	}
 
 	showDuplicateModal = (event: Event) => {

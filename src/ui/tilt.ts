@@ -12,15 +12,19 @@ This module is purely visual and does not interact with the scoring engine.
 
 const MAX_TILT_DEGREES = 10
 
-const prefersReducedMotion = typeof window.matchMedia === 'function'
-	&& window.matchMedia('(prefers-reduced-motion: reduce)').matches
+// Tilt is a hover affordance for fine pointers (mouse/trackpad) only. On touch devices it has no
+// hover state, `pointerleave` doesn't fire reliably (leaving the glare/tilt stuck), and the
+// per-move work fights with tray scrolling — so it's disabled there entirely.
+const canTilt = typeof window.matchMedia === 'function'
+	&& window.matchMedia('(hover: hover) and (pointer: fine)').matches
+	&& !window.matchMedia('(prefers-reduced-motion: reduce)').matches
 
 /**
  * Wires pointer-driven 3D tilt onto `element`. Returns a cleanup function that removes the
  * listeners. No-ops (returns a cleanup that does nothing) when reduced motion is preferred.
  */
 export function applyTilt (element: HTMLElement): () => void {
-	if (prefersReducedMotion) {
+	if (!canTilt) {
 		return () => {}
 	}
 
@@ -75,12 +79,14 @@ export function applyTilt (element: HTMLElement): () => void {
 	element.addEventListener('pointermove', handlePointerMove)
 	element.addEventListener('pointerleave', handlePointerLeave)
 	element.addEventListener('pointercancel', handlePointerLeave)
+	element.addEventListener('pointerup', handlePointerLeave)
 
 	return () => {
 		element.removeEventListener('pointerenter', handlePointerEnter)
 		element.removeEventListener('pointermove', handlePointerMove)
 		element.removeEventListener('pointerleave', handlePointerLeave)
 		element.removeEventListener('pointercancel', handlePointerLeave)
+		element.removeEventListener('pointerup', handlePointerLeave)
 	}
 }
 

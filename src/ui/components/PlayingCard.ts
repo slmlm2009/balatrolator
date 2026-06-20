@@ -351,7 +351,7 @@ export class PlayingCard extends MovableCard {
 					<button
 						class="button --icon push-inline-start"
 						type="button"
-						@click="${() => this.classList.toggle('--editing')}"
+						@click="${this.toggleEditor}"
 					>
 						<span class="visually-hidden">Edit card</span>
 
@@ -386,7 +386,12 @@ export class PlayingCard extends MovableCard {
 					</button>
 				</div>
 
-				<div class="card-editor">
+				<div class="card-editor" @click="${(event: Event) => { if (event.target === event.currentTarget) this.classList.remove('--editing') }}">
+				<div class="editor-sheet">
+				<div class="editor-head">
+					<span class="editor-title">Edit card</span>
+					<button class="button --primary" type="button" @click="${() => this.classList.remove('--editing')}">Done</button>
+				</div>
 				<div class="input-list">
 					<span id="${this.tagName.toLowerCase()}-${this.uniqueId}-title" class="visually-hidden">${this.toString()}</span>
 
@@ -593,8 +598,20 @@ export class PlayingCard extends MovableCard {
 					</select>
 				</label>
 				</div>
+				</div>
 			</div>
 		`
+	}
+
+	// Opens this card's editor sheet, closing any other card's open editor first (one at a time).
+	toggleEditor = () => {
+		const willOpen = !this.classList.contains('--editing')
+		if (willOpen) {
+			for (const el of document.querySelectorAll('.card.--editing')) {
+				el.classList.remove('--editing')
+			}
+		}
+		this.classList.toggle('--editing', willOpen)
 	}
 
 	toggleBlindEffects (blindName: BlindName, isActive: boolean) {

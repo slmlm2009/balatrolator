@@ -1,10 +1,9 @@
 import { init } from './UiState.ts'
 import { initAnimations } from './animations.ts'
-import { loadTailwind } from './vendor.ts'
 
-// Kick off the additive runtime libraries. None of these block the calculator: if a CDN is
-// unreachable the core app still works, just without the animation/utility-class flourishes.
+// Kick off GSAP loading (fire-and-forget; the calculator works even if it never loads). The arcade
+// theme is entirely hand-written CSS, so no utility-class framework is loaded at runtime — that
+// keeps interaction snappy (no global DOM-mutation observer re-scanning the page on every edit).
 initAnimations()
-void loadTailwind()
 
 init()
