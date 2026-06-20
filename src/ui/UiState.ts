@@ -298,17 +298,24 @@ function handleImportSubmit (event: SubmitEvent) {
 	fileReader.readAsText(file)
 }
 
-// Persisting (URL + localStorage + saves-table rebuild + log) is the heavy part of a recalc, so it's
-// debounced — the scoreboard updates immediately while rapid edits stay snappy. The pending result is
-// flushed on page hide/visibility change so nothing is lost if the user leaves within the window.
-let pendingPersist: { state: State, hand: HandName, results: Result[] } | null = null
+// The interaction path is kept cheap: the scoreboard updates immediately from a score-only recalc
+// (no per-joker contributions — those need ~N+2 extra full scorings per luck and would freeze the
+// page on every keystroke). The expensive work — contributions, persistence (URL + localStorage +
+// saves-table rebuild + log) — is debounced and runs once the user pauses. It's also flushed on page
+// hide/visibility change so nothing is lost if the user leaves within the window.
+let pendingPersist: State | null = null
 
 function flushPersist () {
 	if (!pendingPersist) {
 		return
 	}
-	const { state, hand, results } = pendingPersist
+	const state = pendingPersist
 	pendingPersist = null
+
+	// Full recompute including per-joker contributions — debounced, off the interaction path.
+	const { hand, results } = calculateScore(state)
+	updateJokerContributions(results)
+
 	saveStateToUrl(state)
 	// Save the current state as a special auto save overwriting the previous auto save.
 	saveManager.autoSave(state, hand, results)
@@ -326,12 +333,29 @@ document.addEventListener('visibilitychange', () => {
 })
 
 function applyState (state: State) {
-	const { hand, results } = calculateScore(state)
+	// Fast, contribution-free recalc for the immediate scoreboard update.
+	const { hand, results } = calculateScore(state, { includeContributions: false })
 	const level = state.handLevels[hand]?.level ?? 1
 	updateScore(hand, results, level)
 
-	pendingPersist = { state, hand, results }
+	pendingPersist = state
 	schedulePersist()
+}
+
+function updateJokerContributions (results: Result[]) {
+	const contributionMap = new Map<number, JokerContribution>()
+	for (const result of results) {
+		for (const contrib of result.jokerContributions ?? []) {
+			contributionMap.set(contrib.jokerIndex, contrib)
+		}
+	}
+
+	for (const jokerCard of jokerContainer.children) {
+		if (!(jokerCard instanceof JokerCard)) {
+			continue
+		}
+		jokerCard.contribution = contributionMap.get(jokerCard.index) ?? null
+	}
 }
 
 function updateLog (results: Result[]) {
@@ -376,20 +400,6 @@ function updateScore (hand: HandName, results: Result[], level: number) {
 		scoreAnnouncement = `${hand} scoring ${resultArray.at(0)!.formattedScore}.`
 	}
 	debouncedAriaNotify(scoreAnnouncement)
-
-	const contributionMap = new Map<number, JokerContribution>()
-	for (const result of resultArray) {
-		for (const contrib of result.jokerContributions ?? []) {
-			contributionMap.set(contrib.jokerIndex, contrib)
-		}
-	}
-
-	for (const jokerCard of jokerContainer.children) {
-		if (!(jokerCard instanceof JokerCard)) continue
-
-		const contrib = contributionMap.get(jokerCard.index)
-		jokerCard.contribution = contrib ?? null
-	}
 }
 
 /**

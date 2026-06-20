@@ -7,11 +7,15 @@ import { doBigMath } from './doBigMath.ts'
 import { getHand } from './getHand.ts'
 import type { Card, HandName, Joker, Luck, Result, ScoreValue, State, JokerContribution } from './types.ts'
 
-export function calculateScore (unresolvedState: State): {
+export function calculateScore (unresolvedState: State, options: { includeContributions?: boolean } = {}): {
 	hand: HandName
 	scoringCards: Card[]
 	results: Result[]
 } {
+	// Per-joker contributions require a leave-one-out re-scoring of every joker (≈ N+2 full scoring
+	// passes per luck mode), which is far more expensive than the score itself. Callers that only need
+	// the score (e.g. the live UI on every keystroke) can skip it and compute it separately/later.
+	const includeContributions = options.includeContributions ?? true
 	// Create copies of jokers and cards based on their count.
 	const state = {
 		...unresolvedState,
@@ -31,7 +35,7 @@ export function calculateScore (unresolvedState: State): {
 		const scoreValues = getScore(state, playedHand, scoringCards, luck)
 		const { chips, multiplier, score, log } = doBigMath(scoreValues, state.deck)
 
-		const jokerContributions = calculateJokerContributions(state, playedHand, scoringCards, luck)
+		const jokerContributions = includeContributions ? calculateJokerContributions(state, playedHand, scoringCards, luck) : []
 
 		return {
 			chips,
