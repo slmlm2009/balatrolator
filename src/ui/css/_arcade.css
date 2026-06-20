@@ -40,7 +40,10 @@ html {
 }
 
 body {
-	min-block-size: 100dvh;
+	/* Use vh (stable), NOT dvh: dvh re-resolves every frame as the mobile URL bar slides during
+	   scroll, forcing continuous full-page reflow ("resizing is slow"). The felt background lives on
+	   <html> and always covers the canvas regardless, so a stable min-height is all we need. */
+	min-block-size: 100vh;
 	margin: 0;
 	padding-block-end: env(safe-area-inset-bottom);
 	overflow-x: hidden;
@@ -268,6 +271,7 @@ img[class*='card-'],
 .tray {
 	display: flex;
 	gap: 0.55rem;
+	position: relative; /* contain absolutely-positioned descendants (e.g. visually-hidden labels) within the scroll area */
 	overflow-x: auto;
 	overflow-y: hidden;
 	padding: 0.35rem 0.15rem 0.6rem;
@@ -327,9 +331,9 @@ playing-card {
 		0 5px 12px hsl(206 60% 4% / 0.6);
 	cursor: grab;
 	transform: perspective(700px) rotateX(var(--tilt-rx, 0deg)) rotateY(var(--tilt-ry, 0deg));
-	transform-style: preserve-3d;
 	transition: transform 0.16s ease-out, box-shadow 0.2s ease;
-	will-change: transform;
+	/* No will-change / preserve-3d: keeping every card on its own permanent compositor layer caused
+	   GPU memory pressure and full re-rasterization on every viewport change (slow phone resize). */
 }
 
 .card-art:active { cursor: grabbing; }
@@ -471,7 +475,7 @@ playing-card .button.--icon:hover { background: var(--surface-2); }
 .editor-sheet {
 	inline-size: 100%;
 	max-inline-size: 34rem;
-	max-block-size: 86dvh;
+	max-block-size: 86svh;
 	overflow-y: auto;
 	overscroll-behavior: contain;
 	display: flex;
@@ -741,7 +745,7 @@ playing-card .checkbox-control input { inline-size: 1.05rem; block-size: 1.05rem
 
 	color: var(--ink);
 	inline-size: min(34rem, 96vw);
-	max-block-size: 86dvh;
+	max-block-size: 86svh;
 	margin: auto;
 	padding: 0;
 	border: 2px solid var(--surface-line);
@@ -859,7 +863,7 @@ a:hover { color: hsl(43 96% 75%); }
 	padding: 0.5rem;
 	font-size: 0.78rem;
 	color: hsl(150 45% 75%);
-	max-block-size: 60dvh;
+	max-block-size: 60svh;
 	overflow: auto;
 	white-space: pre-wrap;
 	word-break: break-word;
