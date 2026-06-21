@@ -322,6 +322,16 @@ export class PlayingCard extends MovableCard {
 						<svg class="icon"><use xlink:href="#arrow-left-icon"></use></svg>
 					</button>
 
+					<button
+						class="face-btn"
+						?disabled="${this.nextElementSibling === null}"
+						type="button"
+						@click="${this.swapRight}"
+					>
+						<span class="visually-hidden">Move card right</span>
+						<svg class="icon"><use xlink:href="#arrow-right-icon"></use></svg>
+					</button>
+
 					<label class="card-toggle ${this.played ? '--on' : ''}" title="Played">
 						<input
 							type="checkbox"
@@ -336,13 +346,12 @@ export class PlayingCard extends MovableCard {
 					</label>
 
 					<button
-						class="face-btn"
-						?disabled="${this.nextElementSibling === null}"
+						class="face-btn --danger"
 						type="button"
-						@click="${this.swapRight}"
+						@click="${() => this.remove()}"
 					>
-						<span class="visually-hidden">Move card right</span>
-						<svg class="icon"><use xlink:href="#arrow-right-icon"></use></svg>
+						<span class="visually-hidden">Delete card</span>
+						<svg class="icon"><use xlink:href="#trash-icon"></use></svg>
 					</button>
 				</div>
 
@@ -350,10 +359,6 @@ export class PlayingCard extends MovableCard {
 				<div class="editor-sheet">
 				<div class="editor-head">
 					<span class="editor-title">Edit card</span>
-					<button class="button --danger" type="button" @click="${() => this.remove()}">
-						<svg class="icon"><use xlink:href="#trash-icon"></use></svg>
-						<span>Delete</span>
-					</button>
 					<button class="button --primary" type="button" @click="${() => this.classList.remove('--editing')}">Done</button>
 				</div>
 				<div class="input-list">

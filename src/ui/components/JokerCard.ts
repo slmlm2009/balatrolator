@@ -7,6 +7,7 @@ import { getShortcutKey } from '../getShortcutKey.ts'
 import { getJokerSprite, getEditionOverlay } from '../sprites.ts'
 import { applyTilt } from '../tilt.ts'
 import { animateCardEntrance } from '../animations.ts'
+import { getJokerInfo, whenJokerInfoReady } from '../jokerInfo.ts'
 
 function formatNumberWithCommas (value: number): string {
 	return Math.round(value).toLocaleString('en-US')
@@ -405,6 +406,9 @@ export class JokerCard extends MovableCard {
 			this.#tiltCleanup = applyTilt(this)
 			animateCardEntrance(this)
 		}
+
+		// Re-render once the joker reference data has loaded so the info panel/tooltip populate.
+		whenJokerInfoReady(() => this.queueRender())
 	}
 
 	disconnectedCallback () {
@@ -416,12 +420,32 @@ export class JokerCard extends MovableCard {
 	#artTemplate () {
 		const sprite = getJokerSprite(this.jokerName)
 		const editionOverlay = getEditionOverlay(this.edition)
+		const info = getJokerInfo(this.jokerName)
+		const tooltip = info ? `${info.name} — ${info.effect}` : this.jokerName
 
 		return html`
-			<div class="card-art ${this.active ? '' : '--inactive'}" aria-hidden="true" @click="${this.toggleEditor}">
+			<div class="card-art ${this.active ? '' : '--inactive'}" aria-hidden="true" title="${tooltip}" @click="${this.toggleEditor}">
 				<img class="card-art-img" src="${sprite}" alt="" draggable="false" decoding="async">
 				${editionOverlay !== null ? html`<div class="card-edition" style="background:${editionOverlay}"></div>` : ''}
 				<div class="card-glare"></div>
+			</div>
+		`
+	}
+
+	// Balatro-style reference panel (rarity / cost / effect) shown at the top of the editor sheet.
+	#infoTemplate () {
+		const info = getJokerInfo(this.jokerName)
+		if (!info) {
+			return ''
+		}
+
+		return html`
+			<div class="joker-info">
+				<div class="joker-info-meta">
+					${info.rarity ? html`<span class="joker-rarity --${info.rarity.toLowerCase()}">${info.rarity}</span>` : ''}
+					${info.cost ? html`<span class="joker-cost">${info.cost}</span>` : ''}
+				</div>
+				${info.effect ? html`<p class="joker-info-effect">${info.effect}</p>` : ''}
 			</div>
 		`
 	}
@@ -442,6 +466,16 @@ export class JokerCard extends MovableCard {
 						<svg class="icon"><use xlink:href="#arrow-left-icon"></use></svg>
 					</button>
 
+					<button
+						class="face-btn"
+						?disabled="${this.nextElementSibling === null}"
+						type="button"
+						@click="${this.swapRight}"
+					>
+						<span class="visually-hidden">Move joker right</span>
+						<svg class="icon"><use xlink:href="#arrow-right-icon"></use></svg>
+					</button>
+
 					<label class="card-toggle ${this.active ? '--on' : ''}" title="Active">
 						<input
 							type="checkbox"
@@ -456,13 +490,12 @@ export class JokerCard extends MovableCard {
 					</label>
 
 					<button
-						class="face-btn"
-						?disabled="${this.nextElementSibling === null}"
+						class="face-btn --danger"
 						type="button"
-						@click="${this.swapRight}"
+						@click="${() => this.remove()}"
 					>
-						<span class="visually-hidden">Move joker right</span>
-						<svg class="icon"><use xlink:href="#arrow-right-icon"></use></svg>
+						<span class="visually-hidden">Delete joker</span>
+						<svg class="icon"><use xlink:href="#trash-icon"></use></svg>
 					</button>
 				</div>
 
@@ -472,12 +505,10 @@ export class JokerCard extends MovableCard {
 				<div class="editor-sheet">
 				<div class="editor-head">
 					<span class="editor-title">Edit joker</span>
-					<button class="button --danger" type="button" @click="${() => this.remove()}">
-						<svg class="icon"><use xlink:href="#trash-icon"></use></svg>
-						<span>Delete</span>
-					</button>
 					<button class="button --primary" type="button" @click="${() => this.classList.remove('--editing')}">Done</button>
 				</div>
+
+				${this.#infoTemplate()}
 				<label>
 					<span class="visually-hidden">Joker name</span>
 
