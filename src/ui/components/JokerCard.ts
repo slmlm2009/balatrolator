@@ -730,7 +730,7 @@ export class JokerCard extends MovableCard {
 				${this.contribution !== null ? html`
 					<div class="jc-contribution">
 						<span class="jc-contribution-value">${formatNumberWithCommas(this.contribution.totalContribution)}</span>
-						<span class="jc-contribution-percent"> (${this.contribution.percentage.toFixed(1)}%)</span>
+						<span class="jc-contribution-percent">${this.contribution.percentage.toFixed(1)}%</span>
 					</div>
 				` : ''}
 			</div>

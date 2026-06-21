@@ -285,6 +285,7 @@ img[class*='card-'],
 	place-items: center;
 	inline-size: 2.3rem;
 	block-size: 2.3rem;
+	padding: 0; /* clear the UA button padding that was pushing the + icon off-centre */
 	border: 2px solid var(--gold-dark);
 	border-radius: 0.55rem;
 	background: linear-gradient(var(--gold), var(--gold-dark));
@@ -305,12 +306,31 @@ img[class*='card-'],
 	position: relative; /* contain absolutely-positioned descendants (e.g. visually-hidden labels) within the scroll area */
 	overflow-x: auto;
 	overflow-y: hidden;
-	padding: 0.35rem 0 0.5rem;
+	padding: 0.35rem 0 0.4rem;
 	min-block-size: 6.5rem;
 	scroll-snap-type: x proximity;
-	scrollbar-width: thin;
-	scrollbar-color: var(--surface-line) transparent;
+	/* Native scrollbar hidden; a custom always-visible one is rendered under the tray (tray-scroll). */
+	scrollbar-width: none;
 	-webkit-overflow-scrolling: touch;
+}
+
+.tray::-webkit-scrollbar { display: none; }
+
+/* Custom scroll indicator — always visible when the tray overflows (i.e. more than 5 cards). */
+.tray-scroll {
+	display: none;
+	block-size: 5px;
+	margin: 0.1rem 0.1rem 0.2rem;
+	border-radius: 999px;
+	background: hsl(208 45% 9%);
+	border: 1px solid var(--surface-line);
+	overflow: hidden;
+}
+
+.tray-scroll-thumb {
+	block-size: 100%;
+	border-radius: 999px;
+	background: linear-gradient(var(--gold), var(--gold-dark));
 }
 
 .tray:empty::after {
@@ -322,8 +342,6 @@ img[class*='card-'],
 	font-style: italic;
 }
 
-.tray::-webkit-scrollbar { block-size: 0.5rem; }
-.tray::-webkit-scrollbar-thumb { background: var(--surface-line); border-radius: 999px; }
 
 /* Cards inside a tray: sized so exactly 5 fit the row (the normal count) with no horizontal scroll.
    A 6th+ card overflows and the tray scrolls. max-inline-size keeps them sane on wide screens. */
@@ -647,23 +665,29 @@ playing-card .checkbox-control {
 
 playing-card .checkbox-control input { inline-size: 1.05rem; block-size: 1.05rem; accent-color: var(--gold); }
 
-/* Joker contribution badge sits on the face — compact so it fits a ~64px card without overflow. */
+/* Joker contribution badge sits on the face. The contribution value is the key number, so it must
+   show in full — value and percentage stack on their own lines and wrap rather than getting cut. */
 .jc-contribution {
-	padding: 0.1rem 0.2rem;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 0.05rem;
+	padding: 0.15rem 0.15rem;
 	text-align: center;
-	font-size: 0.66rem;
-	font-weight: 800;
-	line-height: 1.2;
-	white-space: nowrap;
-	overflow: hidden;
-	text-overflow: ellipsis;
-	background: hsl(206 60% 6% / 0.7) !important;
+	line-height: 1.1;
+	background: hsl(206 60% 6% / 0.75) !important;
 	border: 1px solid var(--mult-dark);
 	border-radius: 0.35rem;
-	color: var(--mult);
 }
 
-.jc-contribution-percent { color: var(--ink-dim); font-weight: 600; }
+.jc-contribution-value {
+	font-size: 0.72rem;
+	font-weight: 800;
+	color: var(--mult);
+	overflow-wrap: anywhere;
+}
+
+.jc-contribution-percent { font-size: 0.64rem; color: var(--ink-dim); font-weight: 700; }
 
 /* Balatro-style joker reference panel (rarity / cost / effect) in the editor sheet. */
 .joker-info {

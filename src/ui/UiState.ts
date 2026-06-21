@@ -139,6 +139,39 @@ export function init () {
 	populateSavesUi()
 
 	setupDragAndDrop()
+	setupTrayScrollbars()
+}
+
+/**
+ * Adds an always-visible custom scrollbar under each tray so it's clear when there are more than 5
+ * cards/jokers (native overlay scrollbars are hidden until scrolling on mobile). The thumb tracks
+ * scroll position and the bar hides itself when there's nothing to scroll.
+ */
+function setupTrayScrollbars () {
+	for (const tray of document.querySelectorAll<HTMLElement>('.tray')) {
+		const bar = document.createElement('div')
+		bar.className = 'tray-scroll'
+		const thumb = document.createElement('div')
+		thumb.className = 'tray-scroll-thumb'
+		bar.append(thumb)
+		tray.after(bar)
+
+		const update = () => {
+			const { clientWidth, scrollWidth, scrollLeft } = tray
+			if (scrollWidth - clientWidth <= 1) {
+				bar.style.display = 'none'
+				return
+			}
+			bar.style.display = 'block'
+			thumb.style.inlineSize = `${(clientWidth / scrollWidth) * 100}%`
+			thumb.style.marginInlineStart = `${(scrollLeft / scrollWidth) * 100}%`
+		}
+
+		tray.addEventListener('scroll', update, { passive: true })
+		new ResizeObserver(update).observe(tray)
+		new MutationObserver(update).observe(tray, { childList: true })
+		update()
+	}
 }
 
 /**
