@@ -4,6 +4,8 @@ node_modules/
 .vscode/
 Thumbs.db
 ecosystem.config.cjs
+assets/drive-download-20260620T035339Z-3-001.zip
+docs/assets/drive-download-20260620T035339Z-3-001.zip
 
 # Playwright
 /test-results/
