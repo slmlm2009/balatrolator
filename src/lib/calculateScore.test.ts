@@ -60,6 +60,10 @@ describe('calculateScore', async () => {
 		(await import('./test-files/043.ts')).default('Regression test for #30'),
 		(await import('./test-files/044.ts')).default('Regression test for #32'),
 		(await import('./test-files/045.ts')).default('Regression test for #33'),
+		(await import('./test-files/046.ts')).default('Three of a Kind, Zany Joker (+12 Mult)'),
+		(await import('./test-files/047.ts')).default('Two Pair, Mad Joker (+10 Mult)'),
+		(await import('./test-files/048.ts')).default('Two Pair, Clever Joker (+80 Chips)'),
+		(await import('./test-files/049.ts')).default('Two Pair, Bootstraps + Baseball Card (Uncommon X1.5)'),
 	])('$message', ({ initialState, expected }) => {
 		const score = calculateScore(getState(initialState))
 

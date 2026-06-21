@@ -159,7 +159,7 @@ export const JOKER_DEFINITIONS: Record<JokerName, JokerDefinition> = {
 		effect ({ state, score, trigger }) {
 			const cards = nOfAKind(state.cards.filter(({ played }) => played), 3)
 			score.push({
-				multiplier: ['+', cards.length > 0 ? 8 : 0],
+				multiplier: ['+', cards.length > 0 ? 12 : 0],
 				phase: 'jokers',
 				joker: this,
 				trigger,
@@ -171,7 +171,7 @@ export const JOKER_DEFINITIONS: Record<JokerName, JokerDefinition> = {
 		effect ({ state, score, trigger }) {
 			const cards = twoPair(state.cards.filter(({ played }) => played))
 			score.push({
-				multiplier: ['+', cards.length > 0 ? 8 : 0],
+				multiplier: ['+', cards.length > 0 ? 10 : 0],
 				phase: 'jokers',
 				joker: this,
 				trigger,
@@ -231,7 +231,7 @@ export const JOKER_DEFINITIONS: Record<JokerName, JokerDefinition> = {
 		effect ({ state, score, trigger }) {
 			const cards = twoPair(state.cards.filter(({ played }) => played))
 			score.push({
-				chips: ['+', cards.length > 0 ? 150 : 0],
+				chips: ['+', cards.length > 0 ? 80 : 0],
 				phase: 'jokers',
 				joker: this,
 				trigger,
@@ -607,7 +607,7 @@ export const JOKER_DEFINITIONS: Record<JokerName, JokerDefinition> = {
 		},
 	},
 	'Hiker': {
-		rarity: 'common',
+		rarity: 'uncommon',
 		hasPlusChipsInput: true,
 		effect ({ score, trigger }) {
 			score.push({
@@ -705,7 +705,7 @@ export const JOKER_DEFINITIONS: Record<JokerName, JokerDefinition> = {
 		rarity: 'common',
 	},
 	'Vampire': {
-		rarity: 'rare',
+		rarity: 'uncommon',
 		hasTimesMultiplierInput: true,
 		effect ({ score, trigger }) {
 			score.push({
@@ -717,7 +717,7 @@ export const JOKER_DEFINITIONS: Record<JokerName, JokerDefinition> = {
 		},
 	},
 	'Shortcut': {
-		rarity: 'common',
+		rarity: 'uncommon',
 	},
 	'Hologram': {
 		rarity: 'uncommon',
@@ -1066,7 +1066,7 @@ export const JOKER_DEFINITIONS: Record<JokerName, JokerDefinition> = {
 		playedCardEffect ({ state, score, card, luck, trigger }) {
 			if (isSuit(card, 'Hearts', state.jokerSet)) {
 				const denominator = 2
-				const xMult = 2
+				const xMult = 1.5
 				const oopses = state.jokers.filter(({ name }) => name === 'Oops! All 6s')
 				const mult = balanceMultWithLuck(xMult, oopses.length, denominator, luck, 'times')
 
@@ -1269,7 +1269,7 @@ export const JOKER_DEFINITIONS: Record<JokerName, JokerDefinition> = {
 		},
 	},
 	'The Order': {
-		rarity: 'common',
+		rarity: 'rare',
 		effect ({ state, score, trigger }) {
 			const cards = straight(state.cards.filter(({ played }) => played), state.jokerSet)
 			score.push({
@@ -1360,7 +1360,7 @@ export const JOKER_DEFINITIONS: Record<JokerName, JokerDefinition> = {
 		rarity: 'rare',
 	},
 	'Bootstraps': {
-		rarity: 'common',
+		rarity: 'uncommon',
 		effect ({ state, score, trigger }) {
 			// Note: I'm assuming here that this can't *subtract* multiplier if money is negative.
 			const factor = Math.max(0, Math.floor(state.money / 5))
