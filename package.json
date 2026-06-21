@@ -38,7 +38,7 @@
 		"lint:knip": "knip",
 		"fix": "run-s fix:*",
 		"fix:code-quality": "npm run lint:code-quality -- --fix",
-		"build": "vite build",
+		"build": "vite build && node -e \"import { cpSync } from 'node:fs'; cpSync('assets', 'docs/assets', { recursive: true })\"",
 		"preview": "vite preview",
 		"prepare": "husky"
 	},

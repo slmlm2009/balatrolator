@@ -1,0 +1,65 @@
+[2m2:52:53 pm[22m [33m[1m[vite][22m[39m [33m[2m(client)[22m[39m [2m[console.warn] [22mLit is in dev mode. Not recommended for production! See https://lit.dev/msg/dev-mode for more information.
+[2m2:52:53 pm[22m [33m[1m[vite][22m[39m [33m[2m(client)[22m[39m [2m[console.warn] [22mcdn.tailwindcss.com should not be used in production. To use Tailwind CSS in production, install it as a PostCSS plugin or use the Tailwind CLI: https://tailwindcss.com/docs/installation
+[2m2:54:07 pm[22m [33m[1m[vite][22m[39m [33m[2m(client)[22m[39m [2m[console.warn] [22mLit is in dev mode. Not recommended for production! See https://lit.dev/msg/dev-mode for more information.
+[2m2:54:08 pm[22m [33m[1m[vite][22m[39m [33m[2m(client)[22m[39m [2m[console.warn] [22mcdn.tailwindcss.com should not be used in production. To use Tailwind CSS in production, install it as a PostCSS plugin or use the Tailwind CLI: https://tailwindcss.com/docs/installation
+[2m4:04:10 pm[22m [33m[1m[vite][22m[39m [33m[2m(client)[22m[39m [2m[console.warn] [22mLit is in dev mode. Not recommended for production! See https://lit.dev/msg/dev-mode for more information.
+[2m4:04:10 pm[22m [33m[1m[vite][22m[39m [33m[2m(client)[22m[39m [2m[console.warn] [22mcdn.tailwindcss.com should not be used in production. To use Tailwind CSS in production, install it as a PostCSS plugin or use the Tailwind CLI: https://tailwindcss.com/docs/installation
+[2m4:16:31 pm[22m [33m[1m[vite][22m[39m [33m[2m(client)[22m[39m [2m[console.warn] [22mLit is in dev mode. Not recommended for production! See https://lit.dev/msg/dev-mode for more information.
+[2m4:16:32 pm[22m [33m[1m[vite][22m[39m [33m[2m(client)[22m[39m [2m[console.warn] [22mcdn.tailwindcss.com should not be used in production. To use Tailwind CSS in production, install it as a PostCSS plugin or use the Tailwind CLI: https://tailwindcss.com/docs/installation
+[2m6:26:17 pm[22m [33m[1m[vite][22m[39m [33m[2m(client)[22m[39m [2m[console.warn] [22mLit is in dev mode. Not recommended for production! See https://lit.dev/msg/dev-mode for more information.
+[2m6:26:17 pm[22m [31m[1m[vite][22m[39m [31m[2m(client)[22m[39m [31m[Unhandled error] [1mReferenceError[22m: prefersReducedMotion is not defined
+[39m > applyTilt src/ui/tilt.ts:27:1
+    25 |   */
+    26 |  export function applyTilt (element: HTMLElement): () => void {
+    27 |  	if (prefersReducedMotion) {
+       |   ^
+    28 |  		return () => {}
+    29 |  	}
+ > JokerCard.connectedCallback src/ui/components/JokerCard.ts:405:23
+ > addJoker src/ui/UiState.ts:515:16
+ > populateUiWithState src/ui/UiState.ts:502:2
+ > init src/ui/UiState.ts:137:1
+ > src/ui/main.ts:10:0
+
+[2m6:26:17 pm[22m [31m[1m[vite][22m[39m [31m[2m(client)[22m[39m [31m[Unhandled error] [1mReferenceError[22m: prefersReducedMotion is not defined
+[39m > applyTilt src/ui/tilt.ts:27:1
+    25 |   */
+    26 |  export function applyTilt (element: HTMLElement): () => void {
+    27 |  	if (prefersReducedMotion) {
+       |   ^
+    28 |  		return () => {}
+    29 |  	}
+ > JokerCard.connectedCallback src/ui/components/JokerCard.ts:405:23
+ > addJoker src/ui/UiState.ts:515:16
+ > populateUiWithState src/ui/UiState.ts:502:2
+ > init src/ui/UiState.ts:137:1
+ > src/ui/main.ts:10:0
+
+[2m6:26:17 pm[22m [31m[1m[vite][22m[39m [31m[2m(client)[22m[39m [31m[Unhandled error] [1mReferenceError[22m: prefersReducedMotion is not defined
+[39m > applyTilt src/ui/tilt.ts:27:1
+    25 |   */
+    26 |  export function applyTilt (element: HTMLElement): () => void {
+    27 |  	if (prefersReducedMotion) {
+       |   ^
+    28 |  		return () => {}
+    29 |  	}
+ > PlayingCard.connectedCallback src/ui/components/PlayingCard.ts:289:23
+ > addPlayingCard src/ui/UiState.ts:520:22
+ > populateUiWithState src/ui/UiState.ts:507:2
+ > init src/ui/UiState.ts:137:1
+ > src/ui/main.ts:10:0
+
+[2m6:26:17 pm[22m [33m[1m[vite][22m[39m [33m[2m(client)[22m[39m [2m[console.warn] [22mcdn.tailwindcss.com should not be used in production. To use Tailwind CSS in production, install it as a PostCSS plugin or use the Tailwind CLI: https://tailwindcss.com/docs/installation
+[2m6:26:25 pm[22m [33m[1m[vite][22m[39m [33m[2m(client)[22m[39m [2m[console.warn] [22mLit is in dev mode. Not recommended for production! See https://lit.dev/msg/dev-mode for more information.
+[2m6:26:25 pm[22m [33m[1m[vite][22m[39m [33m[2m(client)[22m[39m [2m[console.warn] [22mcdn.tailwindcss.com should not be used in production. To use Tailwind CSS in production, install it as a PostCSS plugin or use the Tailwind CLI: https://tailwindcss.com/docs/installation
+[2m6:26:37 pm[22m [33m[1m[vite][22m[39m [33m[2m(client)[22m[39m [2m[console.warn] [22mLit is in dev mode. Not recommended for production! See https://lit.dev/msg/dev-mode for more information.
+[2m6:26:37 pm[22m [33m[1m[vite][22m[39m [33m[2m(client)[22m[39m [2m[console.warn] [22mcdn.tailwindcss.com should not be used in production. To use Tailwind CSS in production, install it as a PostCSS plugin or use the Tailwind CLI: https://tailwindcss.com/docs/installation
+[2m6:26:46 pm[22m [33m[1m[vite][22m[39m [33m[2m(client)[22m[39m [2m[console.warn] [22mLit is in dev mode. Not recommended for production! See https://lit.dev/msg/dev-mode for more information.
+[2m6:28:06 pm[22m [33m[1m[vite][22m[39m [33m[2m(client)[22m[39m [2m[console.warn] [22mLit is in dev mode. Not recommended for production! See https://lit.dev/msg/dev-mode for more information.
+[2m6:28:25 pm[22m [33m[1m[vite][22m[39m [33m[2m(client)[22m[39m [2m[console.warn] [22mLit is in dev mode. Not recommended for production! See https://lit.dev/msg/dev-mode for more information.
+[2m6:28:48 pm[22m [33m[1m[vite][22m[39m [33m[2m(client)[22m[39m [2m[console.warn] [22mLit is in dev mode. Not recommended for production! See https://lit.dev/msg/dev-mode for more information.
+[2m6:28:57 pm[22m [33m[1m[vite][22m[39m [33m[2m(client)[22m[39m [2m[console.warn] [22mLit is in dev mode. Not recommended for production! See https://lit.dev/msg/dev-mode for more information.
+[2m6:29:35 pm[22m [33m[1m[vite][22m[39m [33m[2m(client)[22m[39m [2m[console.warn] [22mLit is in dev mode. Not recommended for production! See https://lit.dev/msg/dev-mode for more information.
+[2m6:29:41 pm[22m [33m[1m[vite][22m[39m [33m[2m(client)[22m[39m [2m[console.warn] [22mLit is in dev mode. Not recommended for production! See https://lit.dev/msg/dev-mode for more information.
+[2m6:29:48 pm[22m [33m[1m[vite][22m[39m [33m[2m(client)[22m[39m [2m[console.warn] [22mLit is in dev mode. Not recommended for production! See https://lit.dev/msg/dev-mode for more information.
+[2m6:29:58 pm[22m [33m[1m[vite][22m[39m [33m[2m(client)[22m[39m [2m[console.warn] [22mLit is in dev mode. Not recommended for production! See https://lit.dev/msg/dev-mode for more information.

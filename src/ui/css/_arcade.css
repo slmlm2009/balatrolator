@@ -904,9 +904,30 @@ playing-card .checkbox-control input { inline-size: 1.05rem; block-size: 1.05rem
 .drawer-header .button { margin-inline-start: auto; }
 .drawer-hint { font-size: 0.82rem; color: var(--ink-dim); }
 
-.level-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(8.5rem, 1fr)); gap: 0.4rem; }
-.level-grid hand-level-card fieldset { padding: 0.4rem; border: 2px solid var(--surface-line); border-radius: 0.5rem; background: var(--surface); }
-.level-grid legend { font-size: 0.78rem; font-weight: 800; color: var(--gold); }
+.level-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(10.5rem, 1fr)); gap: 0.4rem; }
+.level-grid hand-level-card { display: block; }
+.level-grid hand-level-card fieldset { padding: 0.45rem 0.55rem; border: 2px solid var(--surface-line); border-radius: 0.5rem; background: var(--surface); }
+.level-grid legend { display: block; inline-size: 100%; margin-block-end: 0.35rem; font-size: 0.82rem; font-weight: 800; color: var(--gold); }
+
+/* Two clean aligned rows per hand: "lvl [n]" and "# [n]" (label left, input right). */
+.level-grid .input-list { display: flex; flex-direction: column; align-items: stretch; gap: 0.3rem; }
+.level-grid .input-list > * { flex: none; }
+.level-grid .control-box {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	justify-content: space-between;
+	flex-wrap: nowrap;
+	gap: 0.4rem;
+}
+.level-grid .control-box .label { font-size: 0.82rem; font-weight: 700; color: var(--ink-dim); }
+.level-grid .text-input {
+	flex: 0 0 auto;
+	inline-size: 3.4rem;
+	min-block-size: 34px;
+	font-size: 16px;
+	text-align: center;
+}
 
 .planet-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(7rem, 1fr)); gap: 0.4rem; }
 .planet-cell {

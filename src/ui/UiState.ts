@@ -33,6 +33,16 @@ form.addEventListener('submit', (event) => {
 })
 form.addEventListener('change', () => calculate())
 
+// Focusing a number field selects its value so you can immediately type a replacement.
+// Delegated on the document so it covers every number input, including ones added later.
+document.addEventListener('focusin', (event) => {
+	const el = event.target
+	if (el instanceof HTMLInputElement && el.type === 'number') {
+		// Defer so the browser's own focus/caret placement doesn't clear the selection (mobile).
+		setTimeout(() => el.select(), 0)
+	}
+})
+
 const liveRegion = document.querySelector<HTMLElement>('[aria-live="polite"]')!
 function ariaNotify (message: string) {
 	liveRegion.innerText = message
