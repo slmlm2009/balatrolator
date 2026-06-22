@@ -118,9 +118,12 @@ document.querySelector<HTMLButtonElement>('[data-sc-reset-button]')!.addEventLis
 	const stateSnapshot = readStateFromUi()
 	skipUndoCapture = true
 	populateUiWithState(getState({}))
-	skipUndoCapture = false
 	undoState = { kind: 'full-state', state: stateSnapshot }
 	updateUndoButton()
+	// MutationObserver callbacks are microtasks queued when the DOM mutations happened (inside
+	// populateUiWithState above).  Our queueMicrotask fires AFTER them, so the observer sees
+	// skipUndoCapture=true and won't overwrite the full-state entry we just stored.
+	queueMicrotask(() => { skipUndoCapture = false })
 })
 
 // Scoreboard (Balatro-style chips × mult = score) elements.
@@ -186,7 +189,7 @@ undoButton?.addEventListener('click', () => {
 	if (snapshot.kind === 'full-state') {
 		skipUndoCapture = true
 		populateUiWithState(snapshot.state)
-		skipUndoCapture = false
+		queueMicrotask(() => { skipUndoCapture = false })
 	} else {
 		for (const el of snapshot.elements) {
 			snapshot.container.insertBefore(el, snapshot.nextSibling)
