@@ -11,7 +11,9 @@ export function resolveJoker<Joker extends { name: JokerName, index: number }> (
 		return target
 	}
 
-	const copyTarget = jokers.at(target.name === 'Blueprint' ? target.index + 1 : 0)
+	const copyTarget = target.name === 'Blueprint'
+		? jokers.find((j) => j.index === target.index + 1)
+		: jokers.find((j) => j.index === 0)
 	if (copyTarget === undefined) {
 		return undefined
 	}

@@ -46,7 +46,9 @@ body {
 	min-block-size: 100vh;
 	margin: 0;
 	padding-block-end: env(safe-area-inset-bottom);
-	overflow-x: hidden;
+	/* overflow: clip (not hidden) so we don't create a scroll container that leaves empty space on the
+	   right when absolutely-positioned elements extend slightly beyond the viewport. */
+	overflow-x: clip;
 }
 
 img[class*='card-'],
@@ -224,7 +226,7 @@ img[class*='card-'],
 
 /* Prevent long blind/deck names from wrapping to two lines. */
 .round-bar-select-group .cb-button {
-	font-size: 12px;
+	font-size: 11px;
 	white-space: nowrap;
 	overflow: hidden;
 	text-overflow: ellipsis;
@@ -268,8 +270,9 @@ img[class*='card-'],
 .info-tip-popup {
 	position: absolute;
 	inset-block-end: calc(100% + 0.5rem);
-	inset-inline-start: 50%;
-	transform: translateX(-50%);
+	/* Right-pin so the tooltip extends leftward and never overshoots the right edge of the screen. */
+	inset-inline-start: auto;
+	inset-inline-end: 0;
 	inline-size: 14rem;
 	max-inline-size: calc(100vw - 2rem);
 	padding: 0.5rem 0.7rem;
@@ -280,15 +283,23 @@ img[class*='card-'],
 	line-height: 1.45;
 	color: var(--ink);
 	z-index: 100;
-	pointer-events: none;
+	/* Use visibility+opacity so the hidden element is still clipped by overflow:clip on <body>
+	   without creating unwanted horizontal scroll area. */
+	visibility: hidden;
 	opacity: 0;
-	transition: opacity 0.15s ease;
+	transition: opacity 0.15s ease, visibility 0s 0.15s;
 	white-space: normal;
+	pointer-events: none;
 }
 
 .info-tip:hover .info-tip-popup,
 .info-tip:focus-within .info-tip-popup,
-.info-tip.--open .info-tip-popup { opacity: 1; pointer-events: auto; }
+.info-tip.--open .info-tip-popup {
+	visibility: visible;
+	opacity: 1;
+	transition: opacity 0.15s ease, visibility 0s 0s;
+	pointer-events: auto;
+}
 
 /* Stats: $ on left spans both rows, HANDS/DISCARDS stacked in middle, JOKER SLOTS on right spans both rows. */
 .round-bar-stats {
@@ -305,7 +316,11 @@ img[class*='card-'],
 .round-bar-stats .stat-pill.--discards { grid-area: discards; }
 .round-bar-stats .stat-pill.--slots    { grid-area: slots; }
 .round-bar-stats .stat-pill { inline-size: 100%; box-sizing: border-box; }
-.round-bar-stats .stat-input { flex: 1; min-inline-size: 2rem; }
+.round-bar-stats .stat-input { flex: 1; min-inline-size: 0; }
+
+/* Force HANDS and DISCARDS labels to the same width so both inputs fill equal remaining space. */
+.round-bar-stats .stat-pill.--hands .stat-label,
+.round-bar-stats .stat-pill.--discards .stat-label { flex: 0 0 4rem; }
 
 .stat-pill {
 	display: inline-flex;

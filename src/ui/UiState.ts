@@ -115,7 +115,12 @@ duplicateCardButton.addEventListener('click', (event) => duplicate(event))
 const playedHandEl = form.querySelector<HTMLElement>('[data-sc-played-hand]')!
 // The reset button lives in the top bar, outside the form.
 document.querySelector<HTMLButtonElement>('[data-sc-reset-button]')!.addEventListener('click', () => {
+	const stateSnapshot = readStateFromUi()
+	skipUndoCapture = true
 	populateUiWithState(getState({}))
+	skipUndoCapture = false
+	undoState = { kind: 'full-state', state: stateSnapshot }
+	updateUndoButton()
 })
 
 // Scoreboard (Balatro-style chips × mult = score) elements.
@@ -157,14 +162,15 @@ for (const dialog of document.querySelectorAll('dialog')) {
 	}
 }
 
-// --- Undo last delete ---
-interface UndoState {
-	container: HTMLElement
-	elements: HTMLElement[]
-	nextSibling: ChildNode | null
-}
+// --- Undo last delete / reset ---
+type UndoState =
+	| { kind: 'elements'; container: HTMLElement; elements: HTMLElement[]; nextSibling: ChildNode | null }
+	| { kind: 'full-state'; state: State }
 
 let undoState: UndoState | null = null
+// When true, MutationObserver removals are not captured so programmatic DOM rebuilds
+// (populateUiWithState) don't clobber a pending full-state undo entry.
+let skipUndoCapture = false
 const undoButton = document.querySelector<HTMLButtonElement>('[data-undo-button]')
 if (undoButton) undoButton.disabled = true
 
@@ -174,21 +180,27 @@ function updateUndoButton () {
 
 undoButton?.addEventListener('click', () => {
 	if (!undoState) return
-	const { container, elements, nextSibling } = undoState
+	const snapshot = undoState
 	undoState = null
 	updateUndoButton()
-	for (const el of elements) {
-		container.insertBefore(el, nextSibling)
+	if (snapshot.kind === 'full-state') {
+		skipUndoCapture = true
+		populateUiWithState(snapshot.state)
+		skipUndoCapture = false
+	} else {
+		for (const el of snapshot.elements) {
+			snapshot.container.insertBefore(el, snapshot.nextSibling)
+		}
 	}
 })
 
 // Re-calculate score after re-ordering / adding / removing cards; also capture removals for undo.
 const handleMutation: MutationCallback = (mutationList) => {
 	for (const record of mutationList) {
-		if (record.type === 'childList' && record.removedNodes.length > 0) {
+		if (!skipUndoCapture && record.type === 'childList' && record.removedNodes.length > 0) {
 			const elements = Array.from(record.removedNodes).filter((n): n is HTMLElement => n instanceof HTMLElement)
 			if (elements.length > 0) {
-				undoState = { container: record.target as HTMLElement, elements, nextSibling: record.nextSibling }
+				undoState = { kind: 'elements', container: record.target as HTMLElement, elements, nextSibling: record.nextSibling }
 				updateUndoButton()
 			}
 		}
