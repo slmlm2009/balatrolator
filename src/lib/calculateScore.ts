@@ -81,16 +81,19 @@ function calculateJokerContributions (state: State, playedHand: HandName, scorin
 	const scoreWith = (jokers: Joker[]) => new Decimal(doBigMath(getScore({ ...state, jokers }, playedHand, scoringCards, luck), state.deck).score)
 
 	const totalScore = scoreWith(activeJokers)
-	const deltas = distinctJokers.map((joker) => ({
-		joker,
-		scoreDelta: totalScore.minus(scoreWith(activeJokers.filter((j) => j.index !== joker.index))),
-	}))
-	const totalDelta = deltas.reduce((sum, d) => sum.plus(d.scoreDelta), new Decimal(0))
+	const entries = distinctJokers.map((joker) => {
+		const without = scoreWith(activeJokers.filter((j) => j.index !== joker.index))
+		return { joker, without, scoreDelta: totalScore.minus(without) }
+	})
+	const totalDelta = entries.reduce((sum, e) => sum.plus(e.scoreDelta), new Decimal(0))
 
-	const contributions: JokerContribution[] = deltas.map(({ joker, scoreDelta }) => ({
+	const contributions: JokerContribution[] = entries.map(({ joker, without, scoreDelta }) => ({
 		jokerIndex: joker.index,
 		jokerName: joker.name,
-		dropPercentage: totalScore.isZero() ? 0 : scoreDelta.div(totalScore).times(100).toNumber(),
+		// v(N) / v(N\{i}): "this joker is ×-ing your score by this much" (equivalently, disabling it
+		// would divide the score by this). Computed in Decimal — scores overflow floats — then reduced
+		// to a Number, which the ratio fits well within for any real build.
+		multiplier: without.lessThanOrEqualTo(0) ? Infinity : totalScore.div(without).toNumber(),
 		// scoreDelta / Σ scoreDelta sums to 1, so the shares sum to ~100 (modulo per-value display
 		// rounding) without any rescaling pass.
 		sharePercentage: totalDelta.lessThanOrEqualTo(0) ? 0 : scoreDelta.div(totalDelta).times(100).toNumber(),

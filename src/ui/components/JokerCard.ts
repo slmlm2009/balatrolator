@@ -9,12 +9,16 @@ import { applyTilt } from '../tilt.ts'
 import { animateCardEntrance } from '../animations.ts'
 import { getJokerInfo, whenJokerInfoReady } from '../jokerInfo.ts'
 
-function formatDrop (dropPercentage: number): string {
-	if (!isFinite(dropPercentage)) return '—'
-	// Positive drop = the score falls when this joker is disabled (shown as −X%). Negative = the joker
-	// is a net drag and disabling it would raise the score (shown as +X%).
-	const sign = dropPercentage >= 0 ? '−' : '+'
-	return `${sign}${Math.abs(dropPercentage).toFixed(1)}%`
+function formatMultiplier (multiplier: number): string {
+	if (!isFinite(multiplier)) return '×∞'
+	if (multiplier <= 0) return '×0'
+	// Under ×10 the decimals carry the signal (×1.60 vs ×3.20); up to ×10,000 show a rounded integer;
+	// beyond that (endless multipliers reach ×1e7+) switch to scientific so the badge stays short.
+	if (multiplier < 10) return `×${multiplier.toFixed(2)}`
+	if (multiplier < 10_000) return `×${Math.round(multiplier).toLocaleString('en-US')}`
+	const exp = Math.floor(Math.log10(multiplier))
+	const mantissa = multiplier / Math.pow(10, exp)
+	return `×${mantissa.toFixed(2)}e${exp}`
 }
 
 const lightCss = /*css*/`
@@ -733,7 +737,7 @@ export class JokerCard extends MovableCard {
 
 				${this.contribution !== null ? html`
 					<div class="jc-contribution">
-						<span class="jc-contribution-value">${formatDrop(this.contribution.dropPercentage)}</span>
+						<span class="jc-contribution-value">${formatMultiplier(this.contribution.multiplier)}</span>
 						<span class="jc-contribution-percent">${this.contribution.sharePercentage.toFixed(1)}% share</span>
 					</div>
 				` : ''}
