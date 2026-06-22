@@ -490,11 +490,12 @@ function applyState (state: State) {
 }
 
 function updateJokerContributions (results: Result[]) {
+	// Contributions are computed per luck mode; show the 'average' (expected-value) board rather than
+	// letting the last result ('all', the lucky upper bound) silently win the map.
+	const result = results.find((r) => r.luck === 'average') ?? results[0]
 	const contributionMap = new Map<number, JokerContribution>()
-	for (const result of results) {
-		for (const contrib of result.jokerContributions ?? []) {
-			contributionMap.set(contrib.jokerIndex, contrib)
-		}
+	for (const contrib of result?.jokerContributions ?? []) {
+		contributionMap.set(contrib.jokerIndex, contrib)
 	}
 
 	for (const jokerCard of jokerContainer.children) {

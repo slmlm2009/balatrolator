@@ -162,10 +162,12 @@ export type Luck = 'none' | 'average' | 'all'
 export interface JokerContribution {
 	jokerIndex: number
 	jokerName: JokerName
-	chipsContribution: number
-	multiplierContribution: number
-	totalContribution: number
-	percentage: number
+	// Raw leave-one-out: how far the total score drops (as a % of that score) when this joker is
+	// disabled. These don't sum to 100 across jokers because joker effects overlap and compound.
+	dropPercentage: number
+	// `dropPercentage` rescaled so the active jokers sum to 100 — each joker's share of the pooled
+	// leave-one-out drops, for ranking relative importance at a glance.
+	sharePercentage: number
 }
 
 export interface Result {

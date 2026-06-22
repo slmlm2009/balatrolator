@@ -9,13 +9,12 @@ import { applyTilt } from '../tilt.ts'
 import { animateCardEntrance } from '../animations.ts'
 import { getJokerInfo, whenJokerInfoReady } from '../jokerInfo.ts'
 
-function formatContribution (value: number): string {
-	if (!isFinite(value)) return String(value)
-	const abs = Math.abs(value)
-	if (abs < 1_000_000) return Math.round(value).toLocaleString('en-US')
-	const exp = Math.floor(Math.log10(abs))
-	const mantissa = value / Math.pow(10, exp)
-	return `${mantissa.toFixed(3)}e${exp}`
+function formatDrop (dropPercentage: number): string {
+	if (!isFinite(dropPercentage)) return '—'
+	// Positive drop = the score falls when this joker is disabled (shown as −X%). Negative = the joker
+	// is a net drag and disabling it would raise the score (shown as +X%).
+	const sign = dropPercentage >= 0 ? '−' : '+'
+	return `${sign}${Math.abs(dropPercentage).toFixed(1)}%`
 }
 
 const lightCss = /*css*/`
@@ -734,8 +733,8 @@ export class JokerCard extends MovableCard {
 
 				${this.contribution !== null ? html`
 					<div class="jc-contribution">
-						<span class="jc-contribution-value">${formatContribution(this.contribution.totalContribution)}</span>
-						<span class="jc-contribution-percent">${this.contribution.percentage.toFixed(1)}%</span>
+						<span class="jc-contribution-value">${formatDrop(this.contribution.dropPercentage)}</span>
+						<span class="jc-contribution-percent">${this.contribution.sharePercentage.toFixed(1)}% share</span>
 					</div>
 				` : ''}
 			</div>

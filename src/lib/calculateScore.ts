@@ -1,3 +1,5 @@
+import { Decimal } from 'decimal.js'
+
 import { RANK_TO_CHIP_MAP, LUCKS } from './data.ts'
 import { balanceMultWithLuck } from './balanceMultWithLuck.ts'
 import { formatScore } from './formatScore.ts'
@@ -61,69 +63,40 @@ function calculateJokerContributions (state: State, playedHand: HandName, scorin
 		return []
 	}
 
-	const stateWithAllJokers = { ...state, jokers: activeJokers }
-	const scoreValuesWithAll = getScore(stateWithAllJokers, playedHand, scoringCards, luck)
-	const { score: totalScoreStr, chips: totalChipsStr } = doBigMath(scoreValuesWithAll, state.deck)
-	const totalScore = parseFloat(totalScoreStr)
-	const totalChips = parseFloat(totalChipsStr)
-
-	const stateWithoutAllJokers = { ...state, jokers: [] }
-	const scoreValuesWithoutAll = getScore(stateWithoutAllJokers, playedHand, scoringCards, luck)
-	const { chips: baseChipsStr } = doBigMath(scoreValuesWithoutAll, state.deck)
-	const baseChips = parseFloat(baseChipsStr)
-
-	const contributions: { joker: typeof activeJokers[0], contribution: number, chipsDelta: number }[] = []
-
-	for (const joker of activeJokers) {
-		const remainingJokers = activeJokers.filter((j) => j !== joker)
-		const stateWithoutJoker = { ...state, jokers: remainingJokers }
-
-		const scoreValuesWithoutJoker = getScore(stateWithoutJoker, playedHand, scoringCards, luck)
-		const { score: scoreWithoutStr, chips: chipsWithoutStr } = doBigMath(scoreValuesWithoutJoker, state.deck)
-		const scoreWithout = parseFloat(scoreWithoutStr)
-		const chipsWithout = parseFloat(chipsWithoutStr)
-
-		const contribution = totalScore - scoreWithout
-		const chipsDelta = Math.max(0, chipsWithout - baseChips)
-
-		contributions.push({
-			joker,
-			contribution,
-			chipsDelta,
-		})
-	}
-
-	const totalJokerContribution = contributions.reduce((sum, c) => sum + c.contribution, 0)
-
-	const normalizedContributions: JokerContribution[] = contributions.map((c) => {
-		const percentage = totalScore > 0 ? (c.contribution / totalScore) * 100 : 0
-		const chipsRatio = c.contribution > 0 ? c.chipsDelta / c.contribution : 0
-
-		return {
-			jokerIndex: c.joker.index,
-			jokerName: c.joker.name,
-			chipsContribution: c.chipsDelta,
-			multiplierContribution: c.contribution - c.chipsDelta,
-			totalContribution: c.contribution,
-			percentage,
-		}
+	// `state.jokers` is already expanded by `count`, so a stacked joker shows up as several entries
+	// sharing one `index`. Attribute the whole stack to a single distinct joker — removing it by index
+	// drops every copy at once. Otherwise the stack would be counted once per copy and skew the shares.
+	const seenIndices = new Set<number>()
+	const distinctJokers = activeJokers.filter((joker) => {
+		if (seenIndices.has(joker.index)) return false
+		seenIndices.add(joker.index)
+		return true
 	})
 
-	const sumPercentages = normalizedContributions.reduce((sum, c) => sum + c.percentage, 0)
+	// All arithmetic stays in Decimal: endless-mode scores overflow JS floats, so a `parseFloat` on the
+	// score strings would yield Infinity and the leave-one-out deltas would collapse to NaN. Only the
+	// bounded 0–100 percentages are converted to Number.
+	// playedHand/scoringCards are held fixed (computed with the full board), so a joker that changes
+	// hand shape — Four Fingers, Splash — is measured only through its direct score effects.
+	const scoreWith = (jokers: Joker[]) => new Decimal(doBigMath(getScore({ ...state, jokers }, playedHand, scoringCards, luck), state.deck).score)
 
-	if (sumPercentages > 0 && sumPercentages !== 100) {
-		const scale = 100 / sumPercentages
-		let scaledTotal = 0
-		for (const c of normalizedContributions) {
-			c.totalContribution = c.totalContribution * scale
-			c.percentage = c.percentage * scale
-			scaledTotal += c.totalContribution
-		}
-		normalizedContributions[0].totalContribution += totalScore - scaledTotal
-		normalizedContributions[0].percentage = (normalizedContributions[0].totalContribution / totalScore) * 100
-	}
+	const totalScore = scoreWith(activeJokers)
+	const deltas = distinctJokers.map((joker) => ({
+		joker,
+		scoreDelta: totalScore.minus(scoreWith(activeJokers.filter((j) => j.index !== joker.index))),
+	}))
+	const totalDelta = deltas.reduce((sum, d) => sum.plus(d.scoreDelta), new Decimal(0))
 
-	return normalizedContributions.sort((a, b) => b.percentage - a.percentage)
+	const contributions: JokerContribution[] = deltas.map(({ joker, scoreDelta }) => ({
+		jokerIndex: joker.index,
+		jokerName: joker.name,
+		dropPercentage: totalScore.isZero() ? 0 : scoreDelta.div(totalScore).times(100).toNumber(),
+		// scoreDelta / Σ scoreDelta sums to 1, so the shares sum to ~100 (modulo per-value display
+		// rounding) without any rescaling pass.
+		sharePercentage: totalDelta.lessThanOrEqualTo(0) ? 0 : scoreDelta.div(totalDelta).times(100).toNumber(),
+	}))
+
+	return contributions.sort((a, b) => b.sharePercentage - a.sharePercentage)
 }
 
 function getScore (state: State, playedHand: HandName, scoringCards: Card[], luck: Luck): ScoreValue[] {
