@@ -208,7 +208,7 @@ img[class*='card-'],
 
 .round-bar-select-group {
 	flex: 1;
-	min-inline-size: 10rem;
+	min-inline-size: 9rem;
 	display: flex;
 	flex-direction: column;
 	gap: 0.25rem;
@@ -216,26 +216,54 @@ img[class*='card-'],
 
 .round-bar-select-group .stat-pill {
 	inline-size: 100%;
+	box-sizing: border-box;
+}
+
+/* Let the combo-box fill the remaining pill width instead of using a fixed size. */
+.round-bar-select-group .stat-combo {
+	inline-size: auto;
+	flex: 1;
+	min-inline-size: 0;
+}
+
+/* Prevent long blind/deck names from wrapping to two lines. */
+.round-bar-select-group .cb-button {
+	font-size: 13px;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
 }
 
 .round-bar-stats {
-	display: flex;
-	flex-wrap: wrap;
+	display: grid;
+	grid-template-columns: 1fr 1fr;
 	gap: 0.4rem;
 }
 
+.round-bar-stats .stat-pill {
+	inline-size: 100%;
+	box-sizing: border-box;
+}
+
+/* Let the number input fill the pill so all four cells look balanced. */
+.round-bar-stats .stat-input {
+	flex: 1;
+	min-inline-size: 2rem;
+}
+
 .info-desc {
-	font-size: 0.72rem;
+	font-size: 0.7rem;
 	color: var(--ink);
 	opacity: 0.85;
-	padding: 0.3rem 0.6rem;
+	padding: 0.25rem 0.6rem;
 	background: hsl(208 40% 9% / 0.7);
 	border: 1px solid var(--surface-line);
 	border-radius: 0.4rem;
-	min-block-size: 2rem;
-	display: flex;
-	align-items: center;
-	line-height: 1.4;
+	line-height: 1.35;
+	display: -webkit-box;
+	-webkit-line-clamp: 2;
+	-webkit-box-orient: vertical;
+	overflow: hidden;
 }
 
 .stat-pill {
@@ -337,6 +365,13 @@ img[class*='card-'],
 .round-add-button:hover { filter: brightness(1.1); }
 .round-add-button:active { transform: translateY(1px); box-shadow: inset 0 1px 0 hsl(0 0% 100% / 0.25); }
 .round-add-button .icon { inline-size: 1.3rem; block-size: 1.3rem; }
+
+.round-add-button.--clear {
+	background: linear-gradient(hsl(5 60% 42%), hsl(5 60% 28%));
+	border-color: hsl(5 60% 28%);
+	color: hsl(5 100% 93%);
+	margin-inline-start: 0.3rem;
+}
 
 .tray {
 	--tray-gap: 0.4rem;
@@ -1064,6 +1099,14 @@ a:hover { color: hsl(43 96% 75%); }
 	.sb-hand-name { font-size: 1.7rem; }
 }
 
+
+/* On narrow screens, collapse toolbar labels to icons-only so all buttons fit without scrolling.
+   The About/Info button is less critical than the others, so hide it entirely to save space. */
+@media (max-width: 30rem) {
+	.chip-button span:not(.visually-hidden) { display: none; }
+	.chip-button { padding: 0 0.6rem; }
+	.chip-button[popovertarget="drawer-info"] { display: none; }
+}
 
 @media (prefers-reduced-motion: reduce) {
 	.card-art { transition: none; transform: none; }

@@ -97,12 +97,18 @@ for (const observatoryInput of observatoryInputs) {
 const jokerContainer = form.querySelector<HTMLElement>('[data-j-container]')!
 const addJokerButton = form.querySelector<HTMLButtonElement>('[data-j-add-button]')!
 addJokerButton.addEventListener('click', () => addJoker())
+form.querySelector<HTMLButtonElement>('[data-j-clear-button]')?.addEventListener('click', () => {
+	jokerContainer.innerHTML = ''
+})
 const duplicateJokerButton = document.querySelector<HTMLButtonElement>('[data-j-duplicate-button]')!
 duplicateJokerButton.addEventListener('click', (event) => duplicate(event))
 
 const playingCardContainer = form.querySelector<HTMLElement>('[data-c-container]')!
 const addCardButton = form.querySelector<HTMLButtonElement>('[data-c-add-button]')!
 addCardButton.addEventListener('click', () => addPlayingCard())
+form.querySelector<HTMLButtonElement>('[data-c-clear-button]')?.addEventListener('click', () => {
+	playingCardContainer.innerHTML = ''
+})
 const duplicateCardButton = document.querySelector<HTMLButtonElement>('[data-c-duplicate-button]')!
 duplicateCardButton.addEventListener('click', (event) => duplicate(event))
 
