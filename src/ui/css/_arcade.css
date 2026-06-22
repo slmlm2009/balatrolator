@@ -192,12 +192,50 @@ img[class*='card-'],
 	--c-border: var(--surface-line);
 
 	display: flex;
-	flex-wrap: wrap;
-	gap: 0.4rem;
+	flex-direction: column;
+	gap: 0.5rem;
 	padding: 0.5rem;
 	background: hsl(209 38% 16% / 0.6);
 	border: 1px solid var(--surface-line);
 	border-radius: var(--radius);
+}
+
+.round-bar-selectors {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.4rem;
+}
+
+.round-bar-select-group {
+	flex: 1;
+	min-inline-size: 10rem;
+	display: flex;
+	flex-direction: column;
+	gap: 0.25rem;
+}
+
+.round-bar-select-group .stat-pill {
+	inline-size: 100%;
+}
+
+.round-bar-stats {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.4rem;
+}
+
+.info-desc {
+	font-size: 0.72rem;
+	color: var(--ink);
+	opacity: 0.85;
+	padding: 0.3rem 0.6rem;
+	background: hsl(208 40% 9% / 0.7);
+	border: 1px solid var(--surface-line);
+	border-radius: 0.4rem;
+	min-block-size: 2rem;
+	display: flex;
+	align-items: center;
+	line-height: 1.4;
 }
 
 .stat-pill {
@@ -214,6 +252,7 @@ img[class*='card-'],
 .stat-pill.--grow { flex: 1; }
 .stat-pill.--money { border-color: var(--gold-dark); }
 .stat-pill.--money .stat-label { color: var(--gold); font-weight: 900; }
+.stat-pill.--money .stat-input { inline-size: 4.5rem; }
 
 .stat-label {
 	font-size: 0.72rem;
@@ -1025,10 +1064,6 @@ a:hover { color: hsl(43 96% 75%); }
 	.sb-hand-name { font-size: 1.7rem; }
 }
 
-@media (max-width: 30rem) {
-	.chip-button span:not(.visually-hidden) { display: none; }
-	.chip-button { padding: 0 0.6rem; }
-}
 
 @media (prefers-reduced-motion: reduce) {
 	.card-art { transition: none; transform: none; }

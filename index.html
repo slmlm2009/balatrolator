@@ -42,22 +42,22 @@
 		</div>
 
 		<nav class="toolbar" aria-label="Panels">
-			<button class="chip-button" type="button" popovertarget="drawer-levels">
-				<svg class="icon"><use xlink:href="#chart-icon"></use></svg><span>Levels</span>
+			<button class="chip-button" type="button" popovertarget="drawer-levels" title="Set the level and play count for each hand type">
+				<svg class="icon"><use xlink:href="#chart-icon"></use></svg><span>Hand Levels</span>
 			</button>
-			<button class="chip-button" type="button" popovertarget="drawer-planets">
+			<button class="chip-button" type="button" popovertarget="drawer-planets" title="Track planet cards used to upgrade hands">
 				<svg class="icon"><use xlink:href="#planet-icon"></use></svg><span>Planets</span>
 			</button>
-			<button class="chip-button" type="button" popovertarget="drawer-saves">
-				<svg class="icon"><use xlink:href="#floppy-disk-icon"></use></svg><span>Saves</span>
+			<button class="chip-button" type="button" popovertarget="drawer-saves" title="Save and load hand configurations">
+				<svg class="icon"><use xlink:href="#floppy-disk-icon"></use></svg><span>Save / Load</span>
 			</button>
-			<button class="chip-button" type="button" popovertarget="drawer-log">
-				<svg class="icon"><use xlink:href="#list-icon"></use></svg><span>Log</span>
+			<button class="chip-button" type="button" popovertarget="drawer-log" title="View the detailed scoring breakdown">
+				<svg class="icon"><use xlink:href="#list-icon"></use></svg><span>Score Log</span>
 			</button>
-			<button class="chip-button" type="button" popovertarget="drawer-info">
-				<svg class="icon"><use xlink:href="#info-icon"></use></svg><span>Info</span>
+			<button class="chip-button" type="button" popovertarget="drawer-info" title="About Balatrolator">
+				<svg class="icon"><use xlink:href="#info-icon"></use></svg><span>About</span>
 			</button>
-			<button class="chip-button --danger" type="button" data-sc-reset-button>
+			<button class="chip-button --danger" type="button" data-sc-reset-button title="Clear all inputs and start over">
 				<svg class="icon"><use xlink:href="#broom-icon"></use></svg><span>Reset</span>
 			</button>
 		</nav>
@@ -67,57 +67,67 @@
 		<form class="game" data-form>
 			<!-- ============ ROUND DATA BAR ============ -->
 			<section class="round-bar" aria-label="Round data">
-				<label class="stat-pill --blind">
-					<span class="stat-label">Blind</span>
-					<combo-box
-						class="stat-combo"
-						id="blindName"
-						name="blindName"
-						value="Small Blind"
-						options-json="blindNamesJson"
-						button-label="Show blind options"
-						input-label="Filter blinds"
-						listbox-label="Blinds"
-					></combo-box>
-					<span class="blind-active-toggle">
-						<input class="r-blind-is-active-input" name="blindIsActive" type="checkbox" value="is-active" checked>
-						<span class="visually-hidden">Blind active</span>
-					</span>
-				</label>
+				<div class="round-bar-selectors">
+					<div class="round-bar-select-group">
+						<label class="stat-pill --blind">
+							<span class="stat-label">Blind</span>
+							<combo-box
+								class="stat-combo"
+								id="blindName"
+								name="blindName"
+								value="Small Blind"
+								options-json="blindNamesJson"
+								button-label="Show blind options"
+								input-label="Filter blinds"
+								listbox-label="Blinds"
+							></combo-box>
+							<span class="blind-active-toggle">
+								<input class="r-blind-is-active-input" name="blindIsActive" type="checkbox" value="is-active" checked>
+								<span class="visually-hidden">Blind active</span>
+							</span>
+						</label>
+						<p class="info-desc" data-blind-desc></p>
+					</div>
 
-				<label class="stat-pill --deck">
-					<span class="stat-label">Deck</span>
-					<combo-box
-						class="stat-combo"
-						id="deck"
-						name="deck"
-						value="Red Deck"
-						options-json="decksJson"
-						button-label="Show deck options"
-						input-label="Filter decks"
-						listbox-label="Decks"
-					></combo-box>
-				</label>
+					<div class="round-bar-select-group">
+						<label class="stat-pill --deck">
+							<span class="stat-label">Deck</span>
+							<combo-box
+								class="stat-combo"
+								id="deck"
+								name="deck"
+								value="Red Deck"
+								options-json="decksJson"
+								button-label="Show deck options"
+								input-label="Filter decks"
+								listbox-label="Decks"
+							></combo-box>
+						</label>
+						<p class="info-desc" data-deck-desc></p>
+					</div>
+				</div>
 
-				<label class="stat-pill --money">
-					<span class="stat-label">$</span>
-					<input class="stat-input" id="money" name="money" type="number" value="0" inputmode="numeric">
-				</label>
+				<div class="round-bar-stats">
+					<label class="stat-pill --money">
+						<span class="stat-label">$</span>
+						<input class="stat-input" id="money" name="money" type="number" value="0" inputmode="numeric">
+					</label>
 
-				<label class="stat-pill">
-					<span class="stat-label">Hands</span>
-					<input class="stat-input" id="hands" name="hands" type="number" min="0" value="0" inputmode="numeric">
-				</label>
+					<label class="stat-pill">
+						<span class="stat-label">Hands</span>
+						<input class="stat-input" id="hands" name="hands" type="number" min="0" value="0" inputmode="numeric">
+					</label>
 
-				<label class="stat-pill">
-					<span class="stat-label">Discards</span>
-					<input class="stat-input" id="discards" name="discards" type="number" min="0" value="0" inputmode="numeric">
-				</label>
+					<label class="stat-pill">
+						<span class="stat-label">Discards</span>
+						<input class="stat-input" id="discards" name="discards" type="number" min="0" value="0" inputmode="numeric">
+					</label>
 
-				<label class="stat-pill">
-					<span class="stat-label">Slots</span>
-					<input class="stat-input" id="jokerSlots" name="jokerSlots" type="number" value="5" inputmode="numeric">
-				</label>
+					<label class="stat-pill">
+						<span class="stat-label">Slots</span>
+						<input class="stat-input" id="jokerSlots" name="jokerSlots" type="number" value="5" inputmode="numeric">
+					</label>
+				</div>
 			</section>
 
 			<!-- ============ JOKER TRAY ============ -->

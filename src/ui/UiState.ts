@@ -2,6 +2,7 @@ import './components/ComboBox.ts'
 
 import { getState } from '#lib/getState.ts'
 import { calculateScore } from '#lib/calculateScore.ts'
+import { formatCompact } from '#lib/formatScore.ts'
 import type { ComboBox } from './components/ComboBox.ts'
 import { HandLevelCard } from './components/HandLevelCard.ts'
 import { JokerCard } from './components/JokerCard.ts'
@@ -11,6 +12,8 @@ import { readStateFromUrl, saveStateToUrl } from './Storage.ts'
 import { SaveManager } from './SaveManager.ts'
 import { loadSortable, type SortableOptions } from './vendor.ts'
 import { animateScoreboard } from './animations.ts'
+import { getBlindInfo, whenBlindInfoReady } from './blindInfo.ts'
+import { getDeckInfo, whenDeckInfoReady } from './deckInfo.ts'
 import type { BlindName, Card, DeckName, HandName, InitialState, Joker, State, Result, InitialJoker, InitialCard, JokerContribution } from '#lib/types.ts'
 
 const dateTimeFormat = new Intl.DateTimeFormat(document.documentElement.lang, {
@@ -58,6 +61,26 @@ const blindNameInput = form.querySelector<ComboBox>('[name="blindName"]')!
 const blindIsActiveCheckbox = form.querySelector<HTMLInputElement>('[name="blindIsActive"]')!
 
 const deckInput = form.querySelector<ComboBox>('[name="deck"]')!
+
+const blindDescEl = document.querySelector<HTMLElement>('[data-blind-desc]')
+const deckDescEl = document.querySelector<HTMLElement>('[data-deck-desc]')
+
+function updateBlindDesc () {
+	if (!blindDescEl) return
+	const info = getBlindInfo(blindNameInput.value)
+	blindDescEl.textContent = info?.effect ?? ''
+}
+
+function updateDeckDesc () {
+	if (!deckDescEl) return
+	const info = getDeckInfo(deckInput.value)
+	deckDescEl.textContent = info?.effect ?? ''
+}
+
+blindNameInput.addEventListener('change', () => updateBlindDesc())
+deckInput.addEventListener('change', () => updateDeckDesc())
+whenBlindInfoReady(() => updateBlindDesc())
+whenDeckInfoReady(() => updateDeckDesc())
 
 // The observatory inputs and hand-level cards live in drawers, outside the form.
 const observatoryInputs = document.querySelectorAll<HTMLInputElement>('[data-r-observatory-hand]')
@@ -478,8 +501,8 @@ function renderScoreboard () {
 		return
 	}
 
-	sbChipsEl.textContent = selected.chips
-	sbMultEl.textContent = selected.multiplier
+	sbChipsEl.textContent = formatCompact(selected.chips)
+	sbMultEl.textContent = formatCompact(selected.multiplier)
 	sbScoreEl.textContent = selected.formattedScore
 
 	for (const button of luckButtons) {

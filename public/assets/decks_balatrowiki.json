@@ -1,0 +1,18 @@
+[
+	{ "name": "Red Deck", "effect": "+1 discard every round" },
+	{ "name": "Blue Deck", "effect": "+1 hand every round" },
+	{ "name": "Yellow Deck", "effect": "Start with extra $10" },
+	{ "name": "Green Deck", "effect": "$2 per remaining Hand, $1 per remaining Discard at end of round. Earn no Interest" },
+	{ "name": "Black Deck", "effect": "+1 Joker slot, −1 hand every round" },
+	{ "name": "Magic Deck", "effect": "Start with Crystal Ball voucher and 2 copies of The Fool" },
+	{ "name": "Nebula Deck", "effect": "Start with Telescope voucher, −1 consumable slot" },
+	{ "name": "Ghost Deck", "effect": "Spectral cards may appear in the shop. Start with a Hex card" },
+	{ "name": "Abandoned Deck", "effect": "Start with no Face Cards in your deck" },
+	{ "name": "Checkered Deck", "effect": "Start with 26 Spades and 26 Hearts in deck" },
+	{ "name": "Zodiac Deck", "effect": "Start with Tarot Merchant, Planet Merchant, and Overstock vouchers" },
+	{ "name": "Painted Deck", "effect": "+2 hand size, −1 Joker slot" },
+	{ "name": "Anaglyph Deck", "effect": "After defeating each Boss Blind, gain a Double Tag" },
+	{ "name": "Plasma Deck", "effect": "Balances Chips and Mult when calculating score. ×2 base Blind size" },
+	{ "name": "Erratic Deck", "effect": "All Ranks and Suits in deck are randomized" },
+	{ "name": "Challenge Deck", "effect": "Special challenge run with unique modifiers, restrictions, and starting conditions" }
+]
