@@ -157,16 +157,61 @@ for (const dialog of document.querySelectorAll('dialog')) {
 	}
 }
 
-// Re-calculate score after re-ordering cards
-const handleMutation: MutationCallback = (mutationList) => {
-	if (mutationList.some(({ type }) => type === 'childList')) {
-		calculate()
+// --- Undo last delete ---
+interface UndoState {
+	container: HTMLElement
+	elements: HTMLElement[]
+	nextSibling: ChildNode | null
+}
+
+let undoState: UndoState | null = null
+const undoButton = document.querySelector<HTMLButtonElement>('[data-undo-button]')
+if (undoButton) undoButton.disabled = true
+
+function updateUndoButton () {
+	if (undoButton) undoButton.disabled = undoState === null
+}
+
+undoButton?.addEventListener('click', () => {
+	if (!undoState) return
+	const { container, elements, nextSibling } = undoState
+	undoState = null
+	updateUndoButton()
+	for (const el of elements) {
+		container.insertBefore(el, nextSibling)
 	}
+})
+
+// Re-calculate score after re-ordering / adding / removing cards; also capture removals for undo.
+const handleMutation: MutationCallback = (mutationList) => {
+	for (const record of mutationList) {
+		if (record.type === 'childList' && record.removedNodes.length > 0) {
+			const elements = Array.from(record.removedNodes).filter((n): n is HTMLElement => n instanceof HTMLElement)
+			if (elements.length > 0) {
+				undoState = { container: record.target as HTMLElement, elements, nextSibling: record.nextSibling }
+				updateUndoButton()
+			}
+		}
+	}
+	calculate()
 }
 
 const mutationObserver = new MutationObserver(handleMutation)
 mutationObserver.observe(jokerContainer, { childList: true })
 mutationObserver.observe(playingCardContainer, { childList: true })
+
+// Toggle info-tip popups on click (for touch devices where :hover doesn't fire).
+for (const tip of document.querySelectorAll<HTMLElement>('.info-tip')) {
+	tip.querySelector('.info-tip-btn')?.addEventListener('click', (e) => {
+		e.stopPropagation()
+		tip.classList.toggle('--open')
+	})
+}
+document.addEventListener('click', () => {
+	for (const tip of document.querySelectorAll<HTMLElement>('.info-tip.--open')) {
+		tip.classList.remove('--open')
+	}
+})
 
 export function init () {
 	saveManager.retrieveStoredSaves()

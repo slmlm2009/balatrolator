@@ -54,8 +54,8 @@
 			<button class="chip-button" type="button" popovertarget="drawer-log" title="View the detailed scoring breakdown">
 				<svg class="icon"><use xlink:href="#list-icon"></use></svg><span>Score Log</span>
 			</button>
-			<button class="chip-button" type="button" popovertarget="drawer-info" title="About Balatrolator">
-				<svg class="icon"><use xlink:href="#info-icon"></use></svg><span>About</span>
+			<button class="chip-button" type="button" data-undo-button title="Undo last delete" disabled>
+				<svg class="icon"><use xlink:href="#undo-icon"></use></svg><span>Undo</span>
 			</button>
 			<button class="chip-button --danger" type="button" data-sc-reset-button title="Clear all inputs and start over">
 				<svg class="icon"><use xlink:href="#broom-icon"></use></svg><span>Reset</span>
@@ -69,41 +69,51 @@
 			<section class="round-bar" aria-label="Round data">
 				<div class="round-bar-selectors">
 					<div class="round-bar-select-group">
-						<label class="stat-pill --blind">
-							<span class="stat-label">Blind</span>
-							<combo-box
-								class="stat-combo"
-								id="blindName"
-								name="blindName"
-								value="Small Blind"
-								options-json="blindNamesJson"
-								button-label="Show blind options"
-								input-label="Filter blinds"
-								listbox-label="Blinds"
-							></combo-box>
-							<span class="blind-active-toggle">
-								<input class="r-blind-is-active-input" name="blindIsActive" type="checkbox" value="is-active" checked>
-								<span class="visually-hidden">Blind active</span>
-							</span>
-						</label>
-						<p class="info-desc" data-blind-desc></p>
+						<div class="round-bar-pill-row">
+							<label class="stat-pill --blind">
+								<span class="stat-label">Blind</span>
+								<combo-box
+									class="stat-combo"
+									id="blindName"
+									name="blindName"
+									value="Small Blind"
+									options-json="blindNamesJson"
+									button-label="Show blind options"
+									input-label="Filter blinds"
+									listbox-label="Blinds"
+								></combo-box>
+								<span class="blind-active-toggle">
+									<input class="r-blind-is-active-input" name="blindIsActive" type="checkbox" value="is-active" checked>
+									<span class="visually-hidden">Blind active</span>
+								</span>
+							</label>
+							<div class="info-tip">
+								<button type="button" class="info-tip-btn" aria-label="About this blind">?</button>
+								<span class="info-tip-popup" role="tooltip" data-blind-desc></span>
+							</div>
+						</div>
 					</div>
 
 					<div class="round-bar-select-group">
-						<label class="stat-pill --deck">
-							<span class="stat-label">Deck</span>
-							<combo-box
-								class="stat-combo"
-								id="deck"
-								name="deck"
-								value="Red Deck"
-								options-json="decksJson"
-								button-label="Show deck options"
-								input-label="Filter decks"
-								listbox-label="Decks"
-							></combo-box>
-						</label>
-						<p class="info-desc" data-deck-desc></p>
+						<div class="round-bar-pill-row">
+							<label class="stat-pill --deck">
+								<span class="stat-label">Deck</span>
+								<combo-box
+									class="stat-combo"
+									id="deck"
+									name="deck"
+									value="Red Deck"
+									options-json="decksJson"
+									button-label="Show deck options"
+									input-label="Filter decks"
+									listbox-label="Decks"
+								></combo-box>
+							</label>
+							<div class="info-tip">
+								<button type="button" class="info-tip-btn" aria-label="About this deck">?</button>
+								<span class="info-tip-popup" role="tooltip" data-deck-desc></span>
+							</div>
+						</div>
 					</div>
 				</div>
 
@@ -113,18 +123,18 @@
 						<input class="stat-input" id="money" name="money" type="number" value="0" inputmode="numeric">
 					</label>
 
-					<label class="stat-pill">
+					<label class="stat-pill --hands">
 						<span class="stat-label">Hands</span>
 						<input class="stat-input" id="hands" name="hands" type="number" min="0" value="0" inputmode="numeric">
 					</label>
 
-					<label class="stat-pill">
+					<label class="stat-pill --discards">
 						<span class="stat-label">Discards</span>
 						<input class="stat-input" id="discards" name="discards" type="number" min="0" value="0" inputmode="numeric">
 					</label>
 
-					<label class="stat-pill">
-						<span class="stat-label">Slots</span>
+					<label class="stat-pill --slots">
+						<span class="stat-label">Joker Slots</span>
 						<input class="stat-input" id="jokerSlots" name="jokerSlots" type="number" value="5" inputmode="numeric">
 					</label>
 				</div>
@@ -403,6 +413,11 @@
 				<line x1="40" y1="128" x2="216" y2="128" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="16"/>
 				<polyline points="144 56 216 128 144 200" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="16"/>
 			</symbol>
+
+			<symbol id="undo-icon" role="img" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+					<polyline fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" points="1 4 1 10 7 10"/>
+					<path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M3.51 15a9 9 0 1 0 .49-4.5L1 10"/>
+				</symbol>
 
 			<symbol id="broom-icon" role="img" viewBox="0 0 256 256" xmlns="http://www.w3.org/2000/svg">
 				<path d="M235.5,216.81c-22.56-11-35.5-34.58-35.5-64.8V134.73a15.94,15.94,0,0,0-10.09-14.87L165,110a8,8,0,0,1-4.48-10.34l21.32-53a28,28,0,0,0-16.1-37,28.14,28.14,0,0,0-35.82,16,.61.61,0,0,0,0,.12L108.9,79a8,8,0,0,1-10.37,4.49L73.11,73.14A15.89,15.89,0,0,0,55.74,76.8C34.68,98.45,24,123.75,24,152a111.45,111.45,0,0,0,31.18,77.53A8,8,0,0,0,61,232H232a8,8,0,0,0,3.5-15.19ZM67.14,88l25.41,10.3a24,24,0,0,0,31.23-13.45l21-53c2.56-6.11,9.47-9.27,15.43-7a12,12,0,0,1,6.88,15.92L145.69,93.76a24,24,0,0,0,13.43,31.14L184,134.73V152c0,.33,0,.66,0,1L55.77,101.71A108.84,108.84,0,0,1,67.14,88Zm48,128a87.53,87.53,0,0,1-24.34-42,8,8,0,0,0-15.49,4,105.16,105.16,0,0,0,18.36,38H64.44A95.54,95.54,0,0,1,40,152a85.9,85.9,0,0,1,7.73-36.29l137.8,55.12c3,18,10.56,33.48,21.89,45.16Z"></path>
