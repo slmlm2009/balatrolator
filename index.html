@@ -13,6 +13,14 @@
 	<link rel="icon" href="favicon.ico" sizes="48x48">
 	<link rel="icon" href="icon.svg" sizes="any" type="image/svg+xml">
 
+	<!-- PWA: installable / wrappable as an Android app (TWA). Files live in public/. -->
+	<link rel="manifest" href="manifest.webmanifest">
+	<link rel="apple-touch-icon" href="icon-512.png">
+	<meta name="mobile-web-app-capable" content="yes">
+	<meta name="apple-mobile-web-app-capable" content="yes">
+	<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+	<meta name="apple-mobile-web-app-title" content="Balatrolator">
+
 	<link rel="stylesheet" href="./src/ui/css/styles.css">
 </head>
 
@@ -703,6 +711,15 @@
 ]</script>
 
 	<script src="./src/ui/main.ts" type="module"></script>
+
+	<!-- Register the service worker (offline support + installable app shell). -->
+	<script>
+		if ('serviceWorker' in navigator) {
+			window.addEventListener('load', () => {
+				navigator.serviceWorker.register('sw.js').catch(() => {})
+			})
+		}
+	</script>
 </body>
 
 </html>
