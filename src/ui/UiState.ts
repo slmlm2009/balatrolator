@@ -9,6 +9,7 @@ import { JokerCard } from './components/JokerCard.ts'
 import { PlayingCard } from './components/PlayingCard.ts'
 import { debounce } from './debounce.ts'
 import { readStateFromUrl, saveStateToUrl } from './Storage.ts'
+import { minify, deminify } from './minifier.ts'
 import { setupPanelBackButton } from './panelBackButton.ts'
 import { SaveManager } from './SaveManager.ts'
 import { loadSortable, type SortableOptions } from './vendor.ts'
@@ -33,6 +34,10 @@ const form = document.querySelector<HTMLFormElement>('[data-form]')!
 form.addEventListener('submit', (event) => {
 	event.preventDefault()
 	const state = readStateFromUi()
+	// Every recalculation funnels through here (form changes, drawer changes, and DOM
+	// mutations all call calculate() → requestSubmit()), so this is the single place that
+	// records undo history — covering edits, joker swaps, adds, deletes, and reorders alike.
+	recordSettle(state)
 	applyState(state)
 })
 form.addEventListener('change', () => calculate())
@@ -116,15 +121,7 @@ duplicateCardButton.addEventListener('click', (event) => duplicate(event))
 const playedHandEl = form.querySelector<HTMLElement>('[data-sc-played-hand]')!
 // The reset button lives in the top bar, outside the form.
 document.querySelector<HTMLButtonElement>('[data-sc-reset-button]')!.addEventListener('click', () => {
-	const stateSnapshot = readStateFromUi()
-	skipUndoCapture = true
-	populateUiWithState(getState({}))
-	undoState = { kind: 'full-state', state: stateSnapshot }
-	updateUndoButton()
-	// MutationObserver callbacks are microtasks queued when the DOM mutations happened (inside
-	// populateUiWithState above).  Our queueMicrotask fires AFTER them, so the observer sees
-	// skipUndoCapture=true and won't overwrite the full-state entry we just stored.
-	queueMicrotask(() => { skipUndoCapture = false })
+	replaceState(getState({}))
 })
 
 // Scoreboard (Balatro-style chips × mult = score) elements.
@@ -166,49 +163,65 @@ for (const dialog of document.querySelectorAll('dialog')) {
 	}
 }
 
-// --- Undo last delete / reset ---
-type UndoState =
-	| { kind: 'elements'; container: HTMLElement; elements: HTMLElement[]; nextSibling: ChildNode | null }
-	| { kind: 'full-state'; state: State }
-
-let undoState: UndoState | null = null
-// When true, MutationObserver removals are not captured so programmatic DOM rebuilds
-// (populateUiWithState) don't clobber a pending full-state undo entry.
+// --- Undo (full-state history) ---
+// A stack of prior states. Every kind of change — editing a joker/card attribute, swapping a joker
+// for another, adding, deleting, clearing, reordering, or resetting — produces a new entry, so any
+// of them can be undone (multiple levels deep).
+const MAX_UNDO = 50
+const undoStack: State[] = []
+// The state as of the last settle, used to diff the next change against. Kept as an independent
+// snapshot (via deminify) so later mutation of the live state object can't corrupt history.
+let committedSnapshot: State | null = null
+let committedSerialized: string | null = null
+// When true, programmatic UI rebuilds (populateUiWithState) update the baseline without pushing
+// history — so restoring a state doesn't itself get recorded as an undoable change.
 let skipUndoCapture = false
 const undoButton = document.querySelector<HTMLButtonElement>('[data-undo-button]')
 if (undoButton) undoButton.disabled = true
 
 function updateUndoButton () {
-	if (undoButton) undoButton.disabled = undoState === null
+	if (undoButton) undoButton.disabled = undoStack.length === 0
+}
+
+function pushUndo (state: State) {
+	undoStack.push(state)
+	if (undoStack.length > MAX_UNDO) undoStack.shift()
+	updateUndoButton()
+}
+
+// Called from the form submit handler after every recalculation. Records the previous state on the
+// undo stack when the state actually changed (the minified string is a cheap canonical comparison)
+// and advances the baseline.
+function recordSettle (newState: State) {
+	const serialized = minify(newState)
+	if (serialized === committedSerialized) return
+
+	if (!skipUndoCapture && committedSnapshot !== null) {
+		pushUndo(committedSnapshot)
+	}
+
+	committedSnapshot = deminify(serialized)
+	committedSerialized = serialized
+}
+
+// Replaces the whole state (reset / load / import) as one undoable step.
+function replaceState (state: State) {
+	if (committedSnapshot !== null) {
+		pushUndo(committedSnapshot)
+	}
+	populateUiWithState(state)
 }
 
 undoButton?.addEventListener('click', () => {
-	if (!undoState) return
-	const snapshot = undoState
-	undoState = null
+	const previous = undoStack.pop()
+	if (!previous) return
 	updateUndoButton()
-	if (snapshot.kind === 'full-state') {
-		skipUndoCapture = true
-		populateUiWithState(snapshot.state)
-		queueMicrotask(() => { skipUndoCapture = false })
-	} else {
-		for (const el of snapshot.elements) {
-			snapshot.container.insertBefore(el, snapshot.nextSibling)
-		}
-	}
+	populateUiWithState(previous)
 })
 
-// Re-calculate score after re-ordering / adding / removing cards; also capture removals for undo.
-const handleMutation: MutationCallback = (mutationList) => {
-	for (const record of mutationList) {
-		if (!skipUndoCapture && record.type === 'childList' && record.removedNodes.length > 0) {
-			const elements = Array.from(record.removedNodes).filter((n): n is HTMLElement => n instanceof HTMLElement)
-			if (elements.length > 0) {
-				undoState = { kind: 'elements', container: record.target as HTMLElement, elements, nextSibling: record.nextSibling }
-				updateUndoButton()
-			}
-		}
-	}
+// Re-calculate score after re-ordering / adding / removing cards. Undo history for these mutations
+// is captured centrally in recordSettle (calculate → requestSubmit → submit handler).
+const handleMutation: MutationCallback = () => {
 	calculate()
 }
 
@@ -376,7 +389,7 @@ function loadSave (event: Event) {
 	const name = button.getAttribute('data-save-name')!
 
 	const { state } = saveManager.getSave(name)!
-	populateUiWithState(state)
+	replaceState(state)
 }
 
 function handleSaveSubmit (event: SubmitEvent) {
@@ -441,7 +454,7 @@ function handleImportSubmit (event: SubmitEvent) {
 			const { hand, results } = calculateScore(state)
 			saveManager.save(name, state, hand, results)
 			storeSaves()
-			populateUiWithState(state)
+			replaceState(state)
 		}
 	})
 	fileReader.readAsText(file)
@@ -674,6 +687,16 @@ function readStateFromUi (): State {
  * Populates the UI using a `State` object. Tries to retrieve this object from the URL or local storage.
  */
 function populateUiWithState (state: State) {
+	// This is the only programmatic full rebuild. Clearing/recreating the trays fires the
+	// MutationObserver, which recalculates and settles; suppress undo capture for those so a
+	// restore/load isn't itself recorded, then establish the post-rebuild baseline explicitly (the
+	// trailing observer settles run as microtasks after this function and only re-affirm it).
+	skipUndoCapture = true
+	const serialized = minify(state)
+	committedSnapshot = deminify(serialized)
+	committedSerialized = serialized
+	queueMicrotask(() => { skipUndoCapture = false })
+
 	handsInput.value = String(state.hands)
 	discardsInput.value = String(state.discards)
 	moneyInput.value = String(state.money)
