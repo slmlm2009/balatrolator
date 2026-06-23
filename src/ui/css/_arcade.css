@@ -68,8 +68,12 @@ img[class*='card-'],
 	align-items: center;
 	gap: 0.6rem;
 	flex-wrap: wrap;
-	padding: 0.5rem 0.75rem 0.55rem;
-	padding-block-start: max(0.5rem, env(safe-area-inset-top));
+	/* The bar background spans full width, but its content (brand + toolbar) is constrained to the same
+	   centered 64rem column as .game-table so the toolbar buttons sit directly above the app instead of
+	   hugging the far edge of a wide screen. The +0.6rem matches .game-table's inner padding so the
+	   toolbar's right edge lines up with the tray edge. */
+	padding-block: max(0.5rem, env(safe-area-inset-top)) 0.55rem;
+	padding-inline: max(0.75rem, calc((100% - 64rem) / 2 + 0.6rem));
 	background:
 		radial-gradient(140% 200% at 0% 0%, hsl(266 55% 20% / 0.7), transparent 55%),
 		linear-gradient(hsl(208 48% 11%), hsl(208 52% 8%));
@@ -349,20 +353,22 @@ img[class*='card-'],
 
 .stat-input {
 	inline-size: 3.4rem;
-	min-block-size: 38px;
+	/* max() keeps the iOS-safe 16px/38px floors on normal+mobile screens but lets the control grow with
+	   the fluid root font-size on large/high-res displays. */
+	min-block-size: max(38px, 3.1rem);
 	padding: 0 0.35rem;
 	border: 2px solid var(--surface-line);
 	border-radius: 0.4rem;
 	background: hsl(208 40% 11%);
 	color: var(--ink);
 	font-weight: 700;
-	font-size: 16px;
+	font-size: max(16px, 1.2rem);
 	text-align: end;
 }
 
 /* 16px font on round-bar controls prevents iOS zoom-on-focus; taller for touch. */
 .round-bar combo-box { block-size: auto; }
-.round-bar .cb-button { min-block-size: 38px; font-size: 15px; }
+.round-bar .cb-button { min-block-size: max(38px, 3.1rem); font-size: max(15px, 1.15rem); }
 
 .stat-input.--text { inline-size: 100%; text-align: start; }
 .stat-pill.--grow .stat-input { flex: 1; }
@@ -1149,6 +1155,8 @@ a:hover { color: hsl(43 96% 75%); }
 @media (min-width: 48rem) {
 	.brand-name { font-size: 1.35rem; }
 	.game-table { padding: 1rem; }
+	/* Match the toolbar inset to .game-table's 1rem padding so it stays aligned with the tray edge. */
+	.topbar { padding-inline: max(1rem, calc((100% - 64rem) / 2 + 1rem)); }
 	.game { gap: 0.85rem; }
 	:root { --tray-card-w: 8rem; }
 	.tray { min-block-size: 8rem; }
