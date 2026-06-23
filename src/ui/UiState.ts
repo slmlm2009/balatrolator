@@ -9,6 +9,7 @@ import { JokerCard } from './components/JokerCard.ts'
 import { PlayingCard } from './components/PlayingCard.ts'
 import { debounce } from './debounce.ts'
 import { readStateFromUrl, saveStateToUrl } from './Storage.ts'
+import { setupPanelBackButton } from './panelBackButton.ts'
 import { SaveManager } from './SaveManager.ts'
 import { loadSortable, type SortableOptions } from './vendor.ts'
 import { animateScoreboard } from './animations.ts'
@@ -239,6 +240,7 @@ export function init () {
 
 	setupDragAndDrop()
 	setupTrayScrollbars()
+	setupPanelBackButton()
 }
 
 /**
