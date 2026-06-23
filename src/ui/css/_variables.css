@@ -2,10 +2,12 @@ html {
 	--f-family-sans-serif: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans', Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji';
 	--f-family-mono: 'Fira Mono', 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, Courier, monospace;
 	--f-family: var(--f-family-mono);
-	/* Fluid root size: the entire UI is rem-based, so scaling this scales the whole app. The floor
-	   (0.75em = 12px) keeps 1080p-and-below at the original size; above ~1920px wide it grows so the app
-	   isn't tiny on 1440p/4K displays at 100% OS scaling. 0.65vw hits the 12px floor at 1920px. */
-	--f-size: clamp(0.75em, 0.65vw, 2.5em);
+	/* Fluid root size: the entire UI is rem-based, so scaling this scales the whole app. This is the
+	   baseline/fallback — on desktop, UiState's fit-to-viewport routine measures the real layout and
+	   overrides this inline so the app fills the screen height without scrolling. The min() with vh
+	   keeps even this fallback from overflowing tall content on short/wide screens; the 0.75em floor
+	   keeps phones at the original size. */
+	--f-size: clamp(0.75em, min(0.6vw, 1vh), 2.2em);
 	--f-line-height: 1.3;
 
 	--c-white: #fff;

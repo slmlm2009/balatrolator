@@ -254,6 +254,9 @@ export function init () {
 	setupDragAndDrop()
 	setupTrayScrollbars()
 	setupPanelBackButton()
+
+	// Size the app to the viewport once the initial layout has settled.
+	requestAnimationFrame(() => fitDesktopViewport())
 }
 
 /**
@@ -284,9 +287,62 @@ function setupTrayScrollbars () {
 		tray.addEventListener('scroll', update, { passive: true })
 		new ResizeObserver(update).observe(tray)
 		new MutationObserver(update).observe(tray, { childList: true })
+
+		// Desktop convenience: translate a vertical mouse wheel into horizontal tray scrolling (mouse
+		// users have no other way to reach the 6th+ card). Released at the scroll boundaries so the page
+		// can still scroll past the tray, and skipped when the wheel already carries horizontal intent
+		// (trackpads) or the tray doesn't overflow.
+		tray.addEventListener('wheel', (event) => {
+			if (tray.scrollWidth - tray.clientWidth <= 1) return
+			if (Math.abs(event.deltaX) > Math.abs(event.deltaY)) return
+
+			const atStart = tray.scrollLeft <= 0
+			const atEnd = tray.scrollLeft + tray.clientWidth >= tray.scrollWidth - 1
+			if ((event.deltaY < 0 && atStart) || (event.deltaY > 0 && atEnd)) return
+
+			tray.scrollLeft += event.deltaY
+			event.preventDefault()
+		}, { passive: false })
+
 		update()
 	}
 }
+
+/**
+ * Scales the root font-size so the whole app fills the viewport height without scrolling on desktop.
+ * The UI is rem-based, so its height is ~proportional to the root font; we measure the real layout
+ * height in rem (font-independent) and pick the largest font that still fits the viewport, also
+ * bounded so the 64rem table stays within the viewport width. Phones/tablets keep the CSS default.
+ */
+const fitDesktopViewport = () => {
+	const root = document.documentElement
+	const isDesktop = window.matchMedia('(min-width: 64rem) and (hover: hover) and (pointer: fine)').matches
+	if (!isDesktop) {
+		root.style.removeProperty('font-size')
+		return
+	}
+
+	const topbar = document.querySelector<HTMLElement>('.topbar')
+	const table = document.querySelector<HTMLElement>('.game-table')
+	if (!topbar || !table) return
+
+	const currentPx = Number.parseFloat(getComputedStyle(root).fontSize) || 12
+	// Total content height = the two stacked top-level blocks, expressed in rem so it's stable as we
+	// change the font-size. (Trays scroll horizontally, so card count doesn't change this height.)
+	const remHeight = (topbar.offsetHeight + table.offsetHeight) / currentPx
+	if (remHeight <= 0) return
+
+	const fitToHeight = (window.innerHeight * 0.985) / remHeight
+	const fitToWidth = window.innerWidth / 66 // keep the 64rem table within the viewport width
+	// Floor 11px so a tall stack can still fit a 1080p viewport without scrolling; cap 40px as a
+	// sanity stop on huge displays.
+	const targetPx = Math.max(11, Math.min(fitToHeight, fitToWidth, 40))
+
+	root.style.fontSize = `${targetPx.toFixed(2)}px`
+}
+
+const scheduleFit = debounce(fitDesktopViewport, 120)
+window.addEventListener('resize', scheduleFit)
 
 /**
  * Enables SortableJS pointer drag-and-drop for reordering jokers and playing cards (desktop only).
@@ -601,6 +657,9 @@ function renderScoreboard () {
 	scoreboardEl.classList.toggle('--no-luck-variance', distinctScores.size <= 1)
 
 	animateScoreboard(scoreboardEl)
+
+	// The luck row showing/hiding (and other content changes) alters the layout height; re-fit.
+	scheduleFit()
 }
 
 /**
