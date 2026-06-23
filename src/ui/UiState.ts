@@ -255,8 +255,10 @@ export function init () {
 	setupTrayScrollbars()
 	setupPanelBackButton()
 
-	// Size the app to the viewport once the initial layout has settled.
-	requestAnimationFrame(() => fitDesktopViewport())
+	// Size the app to the viewport once the initial layout has settled. Double-rAF: the first tick
+	// kicks off layout; the second fires after lit-html custom elements have had their first render
+	// pass (they schedule updates via microtask on connectedCallback).
+	requestAnimationFrame(() => requestAnimationFrame(fitDesktopViewport))
 }
 
 /**
@@ -339,6 +341,15 @@ const fitDesktopViewport = () => {
 	const targetPx = Math.max(11, Math.min(fitToHeight, fitToWidth, 40))
 
 	root.style.fontSize = `${targetPx.toFixed(2)}px`
+
+	// Some elements have px floors (e.g. min-block-size: max(38px, 3.1rem)) — they don't shrink with
+	// the font-size, so the actual height after setting may exceed the prediction. One correction pass
+	// reads the real post-set height and proportionally trims if still overflowing.
+	const actualH = topbar.offsetHeight + table.offsetHeight
+	if (actualH > window.innerHeight) {
+		const corrected = Math.max(11, targetPx * (window.innerHeight * 0.985) / actualH)
+		root.style.fontSize = `${corrected.toFixed(2)}px`
+	}
 }
 
 const scheduleFit = debounce(fitDesktopViewport, 120)
