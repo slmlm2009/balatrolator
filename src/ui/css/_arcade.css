@@ -1207,6 +1207,16 @@ a:hover { color: hsl(43 96% 75%); }
 	   the reservation here; it stays `stable` on screens that genuinely scroll (mobile/narrow). */
 	html { scrollbar-gutter: auto; }
 
+	/* Reserve the height of a populated card row in each tray even when empty, so the app scales
+	   identically whether or not cards are present. Otherwise an empty tray collapses to its 6.5rem
+	   floor, the fit balloons the font to fill the viewport, and loading/resetting/undoing a hand then
+	   overflows — flashing a scrollbar — until the re-fit catches up. Heights are derived from the
+	   fixed-width card row: card-art (7.5rem × 95/71 ≈ 10.04rem) + the 2×2 face controls (≈3.95rem) +
+	   the column gaps + tray padding, plus the contribution badge (≈2.9rem) for the joker tray. Rounded
+	   slightly up so loading a card never increases the height (which is what triggers the scrollbar). */
+	.tray[data-j-container] { min-block-size: 18.3rem; }
+	.tray[data-c-container] { min-block-size: 14.9rem; }
+
 	.scoreboard { gap: 0.4rem; padding: 0.6rem 0.7rem; }
 	.tray-section { padding: 0.4rem 0.5rem; }
 	.tray-header { margin-block-end: 0.35rem; }
