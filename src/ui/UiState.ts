@@ -259,6 +259,8 @@ export function init () {
 	// kicks off layout; the second fires after lit-html custom elements have had their first render
 	// pass (they schedule updates via microtask on connectedCallback).
 	requestAnimationFrame(() => requestAnimationFrame(fitDesktopViewport))
+	// Keep re-fitting as async content (card sprites, web fonts) finishes loading after first paint.
+	observeLayoutForFit()
 }
 
 /**
@@ -354,6 +356,25 @@ const fitDesktopViewport = () => {
 
 const scheduleFit = debounce(fitDesktopViewport, 120)
 window.addEventListener('resize', scheduleFit)
+
+// The card-art sprites decode asynchronously (decoding="async", no fixed dimensions), so on first
+// load the game-table is measured shorter than its final height and the initial fit undershoots —
+// leaving a vertical scroll until the next interaction re-fits. Observe the table so we re-fit the
+// moment late-arriving content (decoded images, swapped-in web fonts) changes the height. This
+// converges rather than looping: the layout is rem-based, so once the font-size fits, the height
+// stops changing and the observer goes quiet (re-setting an identical font-size triggers no reflow).
+function observeLayoutForFit () {
+	if (typeof ResizeObserver !== 'function') return
+	const observer = new ResizeObserver(() => scheduleFit())
+	const table = document.querySelector<HTMLElement>('.game-table')
+	const topbar = document.querySelector<HTMLElement>('.topbar')
+	if (table) observer.observe(table)
+	if (topbar) observer.observe(topbar)
+	// Also fire once everything (images, fonts) has finished loading, in case the table's own box
+	// size doesn't change but its content's intrinsic height settles late.
+	if (document.readyState !== 'complete') window.addEventListener('load', () => scheduleFit(), { once: true })
+	document.fonts?.ready.then(() => scheduleFit())
+}
 
 /**
  * Enables SortableJS pointer drag-and-drop for reordering jokers and playing cards (desktop only).
