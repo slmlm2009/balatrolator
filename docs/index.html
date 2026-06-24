@@ -340,6 +340,13 @@
 		margin-block-start: 0.5rem;
 	}
 
+	/* Rendered (occupying its full height) before the debounced contribution pass fills in real data,
+	   so the tray height doesn't jump — and the viewport fit doesn't flash a scrollbar — when the
+	   badges arrive. Hidden via visibility so it still reserves layout space. */
+	.jc-contribution.--placeholder {
+		visibility: hidden;
+	}
+
 	.jc-contribution-value {
 		font-weight: bold;
 	}
@@ -654,12 +661,10 @@
 				</div>
 				</div>
 
-				${this.contribution===null?``:x`
-					<div class="jc-contribution">
-						<span class="jc-contribution-value">${fr(this.contribution.multiplier)}</span>
-						<span class="jc-contribution-percent">${this.contribution.sharePercentage.toFixed(1)}% share</span>
-					</div>
-				`}
+				<div class="jc-contribution ${this.contribution===null?`--placeholder`:``}">
+					<span class="jc-contribution-value">${this.contribution===null?`×0.00`:fr(this.contribution.multiplier)}</span>
+					<span class="jc-contribution-percent">${this.contribution===null?`0.0% share`:`${this.contribution.sharePercentage.toFixed(1)}% share`}</span>
+				</div>
 			</div>
 		`}clone(){return new e({name:this.jokerName,edition:this.edition,plusChips:this.plusChips,plusMultiplier:this.plusMultiplier,timesMultiplier:this.timesMultiplier,active:this.active,count:this.count,rank:this.rank,suit:this.suit})}},hr=await new CSSStyleSheet().replace(`
 	playing-card {

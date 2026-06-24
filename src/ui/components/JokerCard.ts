@@ -133,6 +133,13 @@ const lightCss = /*css*/`
 		margin-block-start: 0.5rem;
 	}
 
+	/* Rendered (occupying its full height) before the debounced contribution pass fills in real data,
+	   so the tray height doesn't jump — and the viewport fit doesn't flash a scrollbar — when the
+	   badges arrive. Hidden via visibility so it still reserves layout space. */
+	.jc-contribution.--placeholder {
+		visibility: hidden;
+	}
+
 	.jc-contribution-value {
 		font-weight: bold;
 	}
@@ -735,12 +742,10 @@ export class JokerCard extends MovableCard {
 				</div>
 				</div>
 
-				${this.contribution !== null ? html`
-					<div class="jc-contribution">
-						<span class="jc-contribution-value">${formatMultiplier(this.contribution.multiplier)}</span>
-						<span class="jc-contribution-percent">${this.contribution.sharePercentage.toFixed(1)}% share</span>
-					</div>
-				` : ''}
+				<div class="jc-contribution ${this.contribution === null ? '--placeholder' : ''}">
+					<span class="jc-contribution-value">${this.contribution !== null ? formatMultiplier(this.contribution.multiplier) : '×0.00'}</span>
+					<span class="jc-contribution-percent">${this.contribution !== null ? `${this.contribution.sharePercentage.toFixed(1)}% share` : '0.0% share'}</span>
+				</div>
 			</div>
 		`
 	}
