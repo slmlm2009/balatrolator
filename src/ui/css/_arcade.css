@@ -1201,6 +1201,12 @@ a:hover { color: hsl(43 96% 75%); }
    the viewport height (see UiState fit-to-viewport). Trim the generous whitespace so the fit lands at
    a comfortable size instead of bottoming out at the minimum. */
 @media (min-width: 64rem) and (hover: hover) and (pointer: fine) {
+	/* This is exactly the context where UiState's fit-to-viewport runs, sizing the app so the page
+	   never scrolls vertically. The globally-reserved `scrollbar-gutter: stable` (see _base.css) would
+	   therefore just show as an empty strip down the right edge, since no scrollbar ever fills it. Drop
+	   the reservation here; it stays `stable` on screens that genuinely scroll (mobile/narrow). */
+	html { scrollbar-gutter: auto; }
+
 	.scoreboard { gap: 0.4rem; padding: 0.6rem 0.7rem; }
 	.tray-section { padding: 0.4rem 0.5rem; }
 	.tray-header { margin-block-end: 0.35rem; }
