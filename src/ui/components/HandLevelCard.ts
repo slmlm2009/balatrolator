@@ -1,5 +1,6 @@
 import { html } from 'lit-html'
 
+import { DEFAULT_HAND_SCORE_SETS, PLANET_SCORE_SETS } from '#lib/data.ts'
 import type { HandLevel, HandName } from '#lib/types.ts'
 import { BaseElement } from './BaseElement.ts'
 
@@ -24,6 +25,16 @@ const lightCss = /*css*/`
 		text-align: end;
 		inline-size: 2.5rem;
 	}
+
+	.hlc-score {
+		margin-block-end: 0.35rem;
+		font-size: 0.78rem;
+		font-weight: 700;
+		font-variant-numeric: tabular-nums;
+	}
+	.hlc-score .hlc-mult { color: var(--c-red, #d4423a); }
+	.hlc-score .hlc-chips { color: var(--c-blue, #3a8fd4); }
+	.hlc-score .hlc-x { color: var(--ink-dim, currentColor); margin-inline: 0.25rem; }
 `
 const lightStyleSheet = await new CSSStyleSheet().replace(lightCss)
 
@@ -80,10 +91,32 @@ export class HandLevelCard extends BaseElement {
 		this.queueRender()
 	}
 
+	#score () {
+		const defaultScore = DEFAULT_HAND_SCORE_SETS[this.#handName]
+		const levelBasedScore = PLANET_SCORE_SETS[this.#handName]
+
+		// Mirrors getHandBaseScores in getState.ts: level 1 applies the default
+		// score set; each level beyond adds the planet (per-level) increment;
+		// level 0 scores nothing.
+		const level = this.#level
+		const chips = level === 0 ? 0 : defaultScore.chips + (level - 1) * levelBasedScore.chips
+		const multiplier = level === 0 ? 0 : defaultScore.multiplier + (level - 1) * levelBasedScore.multiplier
+
+		return { chips, multiplier }
+	}
+
 	template () {
+		const { chips, multiplier } = this.#score()
+
 		return html`
 			<fieldset class="stack">
 				<legend>${this.handName}</legend>
+
+				<div class="hlc-score">
+					<span class="hlc-mult">${multiplier} Mult</span>
+					<span class="hlc-x">×</span>
+					<span class="hlc-chips">${chips} Chips</span>
+				</div>
 
 				<div class="stack">
 					<div class="input-list">
