@@ -189,8 +189,15 @@
 		inline-size: 2.5rem;
 	}
 
-	.hlc-score {
+	.hlc-base {
 		margin-block-start: -0.25rem;
+		font-size: 0.68rem;
+		font-style: italic;
+		font-weight: 500;
+		color: var(--ink-dim, #8a93a6);
+		font-variant-numeric: tabular-nums;
+	}
+	.hlc-score {
 		margin-block-end: 0.45rem;
 		font-size: 0.78rem;
 		font-weight: 700;
@@ -199,14 +206,16 @@
 	.hlc-score .hlc-mult { color: var(--c-red, #d4423a); }
 	.hlc-score .hlc-chips { color: var(--c-blue, #3a8fd4); }
 	.hlc-score .hlc-x { color: var(--ink-dim, currentColor); margin-inline: 0.25rem; }
-`),Nn=class e extends k{static{window.customElements.get(`hand-level-card`)===void 0&&(window.customElements.define(`hand-level-card`,e),document.adoptedStyleSheets.push(Mn))}#e;#t;#n;constructor(e,t){super(),this.#e=e??`High Card`,this.#t=t?.level??1,this.#n=t?.plays??0}get handName(){return this.#e}set handName(e){this.#e=e,this.queueRender()}get level(){return this.#t}set level(e){this.#t=e,this.queueRender()}get plays(){return this.#n}set plays(e){this.#n=e,this.queueRender()}#r(){let e=ze[this.#e],t=Re[this.#e],n=this.#t;return{chips:n===0?0:e.chips+(n-1)*t.chips,multiplier:n===0?0:e.multiplier+(n-1)*t.multiplier}}template(){let{chips:e,multiplier:t}=this.#r();return x`
+`),Nn=class e extends k{static{window.customElements.get(`hand-level-card`)===void 0&&(window.customElements.define(`hand-level-card`,e),document.adoptedStyleSheets.push(Mn))}#e;#t;#n;constructor(e,t){super(),this.#e=e??`High Card`,this.#t=t?.level??1,this.#n=t?.plays??0}get handName(){return this.#e}set handName(e){this.#e=e,this.queueRender()}get level(){return this.#t}set level(e){this.#t=e,this.queueRender()}get plays(){return this.#n}set plays(e){this.#n=e,this.queueRender()}#r(){let e=ze[this.#e],t=Re[this.#e],n=this.#t;return{chips:n===0?0:e.chips+(n-1)*t.chips,multiplier:n===0?0:e.multiplier+(n-1)*t.multiplier,baseChips:e.chips,baseMultiplier:e.multiplier}}template(){let{chips:e,multiplier:t,baseChips:n,baseMultiplier:r}=this.#r();return x`
 			<fieldset class="stack">
 				<legend>${this.handName}</legend>
 
+				<div class="hlc-base">base ${n} Chips × ${r} Mult</div>
+
 				<div class="hlc-score">
-					<span class="hlc-mult">${t} Mult</span>
-					<span class="hlc-x">×</span>
 					<span class="hlc-chips">${e} Chips</span>
+					<span class="hlc-x">×</span>
+					<span class="hlc-mult">${t} Mult</span>
 				</div>
 
 				<div class="stack">

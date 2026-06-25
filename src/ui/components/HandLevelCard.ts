@@ -26,8 +26,15 @@ const lightCss = /*css*/`
 		inline-size: 2.5rem;
 	}
 
-	.hlc-score {
+	.hlc-base {
 		margin-block-start: -0.25rem;
+		font-size: 0.68rem;
+		font-style: italic;
+		font-weight: 500;
+		color: var(--ink-dim, #8a93a6);
+		font-variant-numeric: tabular-nums;
+	}
+	.hlc-score {
 		margin-block-end: 0.45rem;
 		font-size: 0.78rem;
 		font-weight: 700;
@@ -103,20 +110,22 @@ export class HandLevelCard extends BaseElement {
 		const chips = level === 0 ? 0 : defaultScore.chips + (level - 1) * levelBasedScore.chips
 		const multiplier = level === 0 ? 0 : defaultScore.multiplier + (level - 1) * levelBasedScore.multiplier
 
-		return { chips, multiplier }
+		return { chips, multiplier, baseChips: defaultScore.chips, baseMultiplier: defaultScore.multiplier }
 	}
 
 	template () {
-		const { chips, multiplier } = this.#score()
+		const { chips, multiplier, baseChips, baseMultiplier } = this.#score()
 
 		return html`
 			<fieldset class="stack">
 				<legend>${this.handName}</legend>
 
+				<div class="hlc-base">base ${baseChips} Chips × ${baseMultiplier} Mult</div>
+
 				<div class="hlc-score">
-					<span class="hlc-mult">${multiplier} Mult</span>
-					<span class="hlc-x">×</span>
 					<span class="hlc-chips">${chips} Chips</span>
+					<span class="hlc-x">×</span>
+					<span class="hlc-mult">${multiplier} Mult</span>
 				</div>
 
 				<div class="stack">
