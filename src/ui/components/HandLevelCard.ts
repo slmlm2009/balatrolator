@@ -27,7 +27,8 @@ const lightCss = /*css*/`
 	}
 
 	.hlc-score {
-		margin-block-end: 0.35rem;
+		margin-block-start: -0.25rem;
+		margin-block-end: 0.45rem;
 		font-size: 0.78rem;
 		font-weight: 700;
 		font-variant-numeric: tabular-nums;
