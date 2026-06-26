@@ -536,6 +536,7 @@ export class JokerCard extends MovableCard {
 						class="jc-name-input"
 						value="${this.#isNew ? '' : this.jokerName}"
 						.value="${this.#isNew ? '' : this.jokerName}"
+						placeholder="Select Joker"
 						options-json="jokersJson"
 						button-label="Show joker options"
 						input-label="Filter jokers"

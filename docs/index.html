@@ -102,6 +102,11 @@
 		padding: 0.25rem;
 		font-style: italic;
 	}
+
+	.cb-placeholder {
+		font-style: italic;
+		opacity: 0.55;
+	}
 `);(class e extends fe{static{window.customElements.get(`combo-box`)===void 0&&(window.customElements.define(`combo-box`,e),document.adoptedStyleSheets.push(me))}get[Symbol.toStringTag](){return this.tagName}#e=``;#t=!1;#n=!1;#r=null;#i={"Alt+ArrowDown":{action:()=>this.#y()},"Alt+ArrowUp":{action:()=>this.#y()},ArrowDown:{action:()=>this.#y()},ArrowUp:{action:()=>this.#y()},ArrowLeft:{action:()=>this.#b(-1)},ArrowRight:{action:()=>this.#b(1)}};#a=``;#o=0;#s=null;#c={ArrowDown:{action:e=>this.#T(e,1)},ArrowUp:{action:e=>this.#T(e,-1)},Enter:{action:e=>this.#E(e)},Tab:{action:e=>this.#E(e)}};#l=null;#u=[];#d=[];constructor(){super(),this.id||=`${this.tagName.toLowerCase()}-${this.uniqueId}`,this.style.setProperty(`--anchor-name`,`--${this.id}`);let e=`#${this.getAttribute(`options-json`)}`,t=document.querySelector(e);this.#p=JSON.parse(t.textContent.trim()),this.setFormValue(this.value)}formDisabledCallback(e){this.disabledState=e}formResetCallback(){this.#t=!1,this.#_(this.defaultValue,{isUserTriggered:!1})}get defaultValue(){return this.getAttribute(`value`)??``}set defaultValue(e){this.setAttribute(`value`,e),this.#t||this.#_(e,{isUserTriggered:!1})}get disabled(){return this.hasAttribute(`disabled`)}set disabled(e){e?this.setAttribute(`disabled`,``):this.removeAttribute(`disabled`),this.queueRender()}get disabledState(){return this.disabled||this.#n}set disabledState(e){this.#n=e,this.queueRender()}get name(){return this.getAttribute(`name`)??``}set name(e){this.setAttribute(`name`,e)}get id(){return this.getAttribute(`id`)??``}set id(e){this.setAttribute(`id`,e),this.queueRender()}get required(){return this.hasAttribute(`required`)}set required(e){e?this.setAttribute(`required`,``):this.removeAttribute(`required`)}get query(){return this.#a}set query(e){this.#a=e,this.#d=this.#p.filter(t=>t.toLowerCase().includes(e)),this.queueRender()}get#p(){return this.#u}set#p(e){this.#u=e,this.#d=e.filter(e=>e.toLowerCase().includes(this.query)),this.queueRender()}get#m(){return this.#d}get#g(){return this.#o}set#g(e){this.#o=e,this.isConnected&&(this.#s=this.#v(e)),this.queueRender()}get value(){return this.#e||this.defaultValue}set value(e){this.#_(e,{isUserTriggered:!1})}#_(e,{isUserTriggered:t}){t&&(this.#t=!0),this.#e=e,this.setFormValue(this.value),this.#g=this.#m.indexOf(this.value),this.query=``,this.queueUpdate(()=>{this.renderIfIdle(),t&&(this.dispatchEvent(new Event(`input`,{bubbles:!0})),this.dispatchEvent(new Event(`change`,{bubbles:!0})))})}render(){this.isConnected&&(this.classList.add(`combo-box`),le(this.template(),this),this.#r=this.querySelector(`.cb-button`),this.#l=this.querySelector(`.cb-option-list`))}template(){return x`
 			<button
 				class="cb-button"
@@ -112,7 +117,7 @@
 				popovertarget="${this.id}-popover"
 				@keydown="${this.#x}"
 			>
-				${this.value}
+				${this.value?this.value:this.getAttribute(`placeholder`)?x`<span class="cb-placeholder">${this.getAttribute(`placeholder`)}</span>`:``}
 				<svg class="icon">
 					<use xlink:href="#caret-down-icon"></use>
 				</svg>
@@ -505,6 +510,7 @@
 						class="jc-name-input"
 						value="${this.#t?``:this.jokerName}"
 						.value="${this.#t?``:this.jokerName}"
+						placeholder="Select Joker"
 						options-json="jokersJson"
 						button-label="Show joker options"
 						input-label="Filter jokers"

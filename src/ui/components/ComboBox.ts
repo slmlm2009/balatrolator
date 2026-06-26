@@ -83,6 +83,11 @@ const lightCss = /*css*/`
 		padding: 0.25rem;
 		font-style: italic;
 	}
+
+	.cb-placeholder {
+		font-style: italic;
+		opacity: 0.55;
+	}
 `
 const lightStyleSheet = await new CSSStyleSheet().replace(lightCss)
 
@@ -383,7 +388,11 @@ export class ComboBox extends FormAssociatedElement {
 				popovertarget="${this.id}-popover"
 				@keydown="${this.#handleButtonShortcuts}"
 			>
-				${this.value}
+				${this.value
+					? this.value
+					: this.getAttribute('placeholder')
+						? html`<span class="cb-placeholder">${this.getAttribute('placeholder')}</span>`
+						: ''}
 				<svg class="icon">
 					<use xlink:href="#caret-down-icon"></use>
 				</svg>
