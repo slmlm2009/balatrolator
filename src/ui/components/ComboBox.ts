@@ -317,7 +317,7 @@ export class ComboBox extends FormAssociatedElement {
 	 * Sets the dirty flag.
 	 */
 	set value (value: string) {
-		this.#setValue(value, { isUserTriggered: true })
+		this.#setValue(value, { isUserTriggered: false })
 	}
 
 	/**
@@ -468,7 +468,7 @@ export class ComboBox extends FormAssociatedElement {
 		const currentIndex = this.#options.findIndex((option) => option === this.value)
 		const newIndex = Math.max(0, Math.min(currentIndex + direction, this.#options.length - 1))
 		if (newIndex !== currentIndex) {
-			this.value = this.#options[newIndex]!
+			this.#setValue(this.#options[newIndex]!, { isUserTriggered: true })
 		}
 	}
 
@@ -537,7 +537,7 @@ export class ComboBox extends FormAssociatedElement {
 	}
 
 	#selectOption = (value: string) => {
-		this.value = value
+		this.#setValue(value, { isUserTriggered: true })
 
 		this.#button?.focus()
 		if (this.#button?.popoverTargetElement instanceof HTMLElement) {
