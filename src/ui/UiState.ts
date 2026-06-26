@@ -104,19 +104,34 @@ const jokerContainer = form.querySelector<HTMLElement>('[data-j-container]')!
 const addJokerButton = form.querySelector<HTMLButtonElement>('[data-j-add-button]')!
 addJokerButton.addEventListener('click', () => {
 	const el = new JokerCard()
-	jokerContainer.append(el)
+	// Mount off-screen so no 8-Ball placeholder appears in the tray.
+	// position:absolute does NOT create a containing block for position:fixed children,
+	// so the .card-editor overlay still covers the viewport correctly.
+	el.style.cssText = 'position:absolute;top:-9999px;left:-9999px'
+	document.body.append(el)
+	// Cancel the entrance animation immediately — a WAAPI transform makes the element
+	// a containing block for position:fixed descendants (CSS Transforms L1 §2.3),
+	// which would trap .card-editor in the card's off-screen position instead of the viewport.
+	el.getAnimations().forEach(a => a.cancel())
 	el.toggleEditor()
 
 	// Card is only kept if the user explicitly selects a joker name from the dropdown.
-	// The ComboBox value setter is now programmatic-only (no events); change fires only
-	// from #selectOption / #selectNeighboringOption, i.e. genuine user selections.
+	// ComboBox.value setter is programmatic-only; change fires only from user interaction.
 	let committed = false
 	el.querySelector('combo-box')?.addEventListener('change', () => { committed = true }, { once: true })
 
 	const editorObserver = new MutationObserver(() => {
 		if (!el.classList.contains('--editing')) {
 			editorObserver.disconnect()
-			if (!committed) el.remove()
+			if (!committed) {
+				el.remove()
+			} else {
+				// Clear off-screen positioning, then move into the tray.
+				// The disconnect+reconnect triggers connectedCallback which re-runs
+				// applyTilt and animateCardEntrance for the normal entrance pop.
+				el.style.cssText = ''
+				jokerContainer.append(el)
+			}
 		}
 	})
 	editorObserver.observe(el, { attributes: true, attributeFilter: ['class'] })
