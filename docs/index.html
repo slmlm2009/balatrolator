@@ -427,13 +427,13 @@
 	.jc-toggle-switch:checked + .jc-toggle-label {
 		color: var(--c-text);
 	}
-`),mr=class e extends Rn{static{window.customElements.get(`joker-card`)===void 0&&(window.customElements.define(`joker-card`,e),document.adoptedStyleSheets.push(pr))}#e;#t;#n;#r;#i;#a;#o;#s;#c;#l;#u;constructor(e){super(),this.#e=`8 Ball`,this.#t=1,this.#n=`Base`,this.#r=0,this.#i=0,this.#a=1,this.#o=!0,this.#s=`Ace`,this.#c=`Clubs`,this.#l=null,this.#u={ArrowLeft:{action:()=>this.swapLeft()},"Ctrl+ArrowLeft":{action:()=>this.moveToStart()},ArrowRight:{action:()=>this.swapRight()},"Ctrl+ArrowRight":{action:()=>this.moveToEnd()},Backspace:{action:e=>{e.target===this&&this.remove()}},Delete:{action:e=>{e.target===this&&this.remove()}}},this.toggleEditor=()=>{let e=!this.classList.contains(`--editing`);if(e)for(let e of document.querySelectorAll(`.card.--editing`))e.classList.remove(`--editing`);this.classList.toggle(`--editing`,e)},this.showDuplicateModal=e=>{let t=e.currentTarget,n=document.querySelector(`dialog[id="${t.getAttribute(`popovertarget`)}"]`);n instanceof HTMLDialogElement&&(n.setAttribute(`data-duplicate-target-id`,this.id),n.showModal())},this.id||=`${this.tagName.toLowerCase()}-${this.uniqueId}`,this.classList.add(`card`),this.draggable=!1,this.tabIndex=0,this.role=`group`,this.setAttribute(`aria-labelledby`,`${this.tagName.toLowerCase()}-${this.uniqueId}-title`),e&&(this.jokerName=e.name,this.count=e.count,this.edition=e.edition,this.plusChips=e.plusChips,this.plusMultiplier=e.plusMultiplier,this.timesMultiplier=e.timesMultiplier,this.active=e.active,e.rank&&(this.rank=e.rank),e.suit&&(this.suit=e.suit)),this.addEventListener(`keydown`,e=>{let t=pe(e),n=this.#u[t];n&&n.action(e)})}get index(){return Array.from(this.parentElement.children).indexOf(this)}get jokerName(){return this.#e}set jokerName(e){this.#e=e;let t=He[this.jokerName];this.classList[t.hasPlusChipsInput?`add`:`remove`](`--has-plus-chips`),this.classList[t.hasPlusMultiplierInput?`add`:`remove`](`--has-plus-multiplier`),this.classList[t.hasTimesMultiplierInput?`add`:`remove`](`--has-times-multiplier`),this.classList.add(`--has-is-active`),this.classList[t.hasRankInput?`add`:`remove`](`--has-rank`),this.classList[t.hasSuitInput?`add`:`remove`](`--has-suit`),this.queueRender()}get count(){return this.#t}set count(e){this.#t=e,this.queueRender()}get edition(){return this.#n}set edition(e){this.#n=e;for(let t of[`base`,`foil`,`holographic`,`polychrome`,`negative`])this.classList.toggle(`--edition-${t}`,e.toLowerCase()===t);this.queueRender()}get plusChips(){return this.#r}set plusChips(e){this.#r=e,this.queueRender()}get plusMultiplier(){return this.#i}set plusMultiplier(e){this.#i=e,this.queueRender()}get timesMultiplier(){return this.#a}set timesMultiplier(e){this.#a=e,this.queueRender()}get rank(){return this.#s}set rank(e){this.#s=e,this.queueRender()}get suit(){return this.#c}set suit(e){this.#c=e,this.queueRender()}get active(){return this.#o}set active(e){this.#o=e,this.queueRender()}get contribution(){return this.#l}set contribution(e){this.#l=e,this.queueRender()}toString(){let e=[this.edition===`Base`?void 0:this.edition].filter(e=>e!==void 0);return`Joker ${this.index+1}: ${this.jokerName}`+(e.length>0?` (${e.join(`, `)})`:``)}#d;connectedCallback(){super.connectedCallback(),this.isConnected&&(this.render(),this.#d||(this.#d=er(this),rr(this)),dr(()=>this.queueRender()))}disconnectedCallback(){super.disconnectedCallback(),this.#d?.(),this.#d=void 0}#f(){let e=Yn(this.jokerName),t=Zn(this.edition),n=ur(this.jokerName),r=n?`${n.name} — ${n.effect}`:this.jokerName;return x`
+`),mr=class e extends Rn{static{window.customElements.get(`joker-card`)===void 0&&(window.customElements.define(`joker-card`,e),document.adoptedStyleSheets.push(pr))}#e;#t;#n;#r;#i;#a;#o;#s;#c;#l;#u;#d;constructor(e){super(),this.#e=`8 Ball`,this.#t=!0,this.#n=1,this.#r=`Base`,this.#i=0,this.#a=0,this.#o=1,this.#s=!0,this.#c=`Ace`,this.#l=`Clubs`,this.#u=null,this.#d={ArrowLeft:{action:()=>this.swapLeft()},"Ctrl+ArrowLeft":{action:()=>this.moveToStart()},ArrowRight:{action:()=>this.swapRight()},"Ctrl+ArrowRight":{action:()=>this.moveToEnd()},Backspace:{action:e=>{e.target===this&&this.remove()}},Delete:{action:e=>{e.target===this&&this.remove()}}},this.toggleEditor=()=>{let e=!this.classList.contains(`--editing`);if(e)for(let e of document.querySelectorAll(`.card.--editing`))e.classList.remove(`--editing`);this.classList.toggle(`--editing`,e)},this.showDuplicateModal=e=>{let t=e.currentTarget,n=document.querySelector(`dialog[id="${t.getAttribute(`popovertarget`)}"]`);n instanceof HTMLDialogElement&&(n.setAttribute(`data-duplicate-target-id`,this.id),n.showModal())},this.id||=`${this.tagName.toLowerCase()}-${this.uniqueId}`,this.classList.add(`card`),this.draggable=!1,this.tabIndex=0,this.role=`group`,this.setAttribute(`aria-labelledby`,`${this.tagName.toLowerCase()}-${this.uniqueId}-title`),e&&(this.#t=!1,this.jokerName=e.name,this.count=e.count,this.edition=e.edition,this.plusChips=e.plusChips,this.plusMultiplier=e.plusMultiplier,this.timesMultiplier=e.timesMultiplier,this.active=e.active,e.rank&&(this.rank=e.rank),e.suit&&(this.suit=e.suit)),this.addEventListener(`keydown`,e=>{let t=pe(e),n=this.#d[t];n&&n.action(e)})}get index(){return Array.from(this.parentElement.children).indexOf(this)}get jokerName(){return this.#e}set jokerName(e){this.#e=e;let t=He[this.jokerName];this.classList[t.hasPlusChipsInput?`add`:`remove`](`--has-plus-chips`),this.classList[t.hasPlusMultiplierInput?`add`:`remove`](`--has-plus-multiplier`),this.classList[t.hasTimesMultiplierInput?`add`:`remove`](`--has-times-multiplier`),this.classList.add(`--has-is-active`),this.classList[t.hasRankInput?`add`:`remove`](`--has-rank`),this.classList[t.hasSuitInput?`add`:`remove`](`--has-suit`),this.queueRender()}get count(){return this.#n}set count(e){this.#n=e,this.queueRender()}get edition(){return this.#r}set edition(e){this.#r=e;for(let t of[`base`,`foil`,`holographic`,`polychrome`,`negative`])this.classList.toggle(`--edition-${t}`,e.toLowerCase()===t);this.queueRender()}get plusChips(){return this.#i}set plusChips(e){this.#i=e,this.queueRender()}get plusMultiplier(){return this.#a}set plusMultiplier(e){this.#a=e,this.queueRender()}get timesMultiplier(){return this.#o}set timesMultiplier(e){this.#o=e,this.queueRender()}get rank(){return this.#c}set rank(e){this.#c=e,this.queueRender()}get suit(){return this.#l}set suit(e){this.#l=e,this.queueRender()}get active(){return this.#s}set active(e){this.#s=e,this.queueRender()}get contribution(){return this.#u}set contribution(e){this.#u=e,this.queueRender()}toString(){let e=[this.edition===`Base`?void 0:this.edition].filter(e=>e!==void 0);return`Joker ${this.index+1}: ${this.jokerName}`+(e.length>0?` (${e.join(`, `)})`:``)}#f;connectedCallback(){super.connectedCallback(),this.isConnected&&(this.render(),this.#f||(this.#f=er(this),rr(this)),dr(()=>this.queueRender()))}disconnectedCallback(){super.disconnectedCallback(),this.#f?.(),this.#f=void 0}#p(){let e=Yn(this.jokerName),t=Zn(this.edition),n=ur(this.jokerName),r=n?`${n.name} — ${n.effect}`:this.jokerName;return x`
 			<div class="card-art ${this.active?``:`--inactive`}" aria-hidden="true" title="${r}" @click="${this.toggleEditor}">
 				<img class="card-art-img" src="${e}" alt="" draggable="false" decoding="async">
 				${t===null?``:x`<div class="card-edition" style="background:${t}"></div>`}
 				<div class="card-glare"></div>
 			</div>
-		`}#p(){let e=ur(this.jokerName);return e?x`
+		`}#m(){if(this.#t)return``;let e=ur(this.jokerName);return e?x`
 			<div class="joker-info">
 				<div class="joker-info-meta">
 					${e.rarity?x`<span class="joker-rarity --${e.rarity.toLowerCase()}">${e.rarity}</span>`:``}
@@ -443,7 +443,7 @@
 			</div>
 		`:``}template(){return x`
 			<div class="stack">
-				${this.#f()}
+				${this.#p()}
 
 				<div class="card-face-actions">
 					<button
@@ -495,7 +495,7 @@
 					<button class="button --primary" type="button" @click="${()=>this.classList.remove(`--editing`)}">Done</button>
 				</div>
 
-				${this.#p()}
+				${this.#m()}
 				<label>
 					<span class="visually-hidden">Joker name</span>
 
@@ -503,13 +503,13 @@
 						id="joker-name-${this.uniqueId}"
 						name="joker-name-${this.uniqueId}"
 						class="jc-name-input"
-						value="8 Ball"
-						.value="${this.jokerName}"
+						value="${this.#t?``:this.jokerName}"
+						.value="${this.#t?``:this.jokerName}"
 						options-json="jokersJson"
 						button-label="Show joker options"
 						input-label="Filter jokers"
 						listbox-label="Jokers"
-						@change="${e=>{let t=e.target;this.jokerName=t.value}}"
+						@change="${e=>{let t=e.target;this.#t=!1,this.jokerName=t.value}}"
 					></combo-box>
 				</label>
 

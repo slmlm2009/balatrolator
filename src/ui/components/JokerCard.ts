@@ -206,6 +206,7 @@ export class JokerCard extends MovableCard {
 	}
 
 	#jokerName: JokerName = '8 Ball'
+	#isNew = true  // true until the user explicitly picks a joker name
 	#count = 1
 	#edition: JokerEdition = 'Base'
 	#plusChips = 0
@@ -260,6 +261,7 @@ export class JokerCard extends MovableCard {
 		this.setAttribute('aria-labelledby', `${this.tagName.toLowerCase()}-${this.uniqueId}-title`)
 
 		if (joker) {
+			this.#isNew = false
 			this.jokerName = joker.name
 			this.count = joker.count
 			this.edition = joker.edition
@@ -449,6 +451,7 @@ export class JokerCard extends MovableCard {
 
 	// Balatro-style reference panel (rarity / cost / effect) shown at the top of the editor sheet.
 	#infoTemplate () {
+		if (this.#isNew) return ''
 		const info = getJokerInfo(this.jokerName)
 		if (!info) {
 			return ''
@@ -531,14 +534,15 @@ export class JokerCard extends MovableCard {
 						id="joker-name-${this.uniqueId}"
 						name="joker-name-${this.uniqueId}"
 						class="jc-name-input"
-						value="8 Ball"
-						.value="${this.jokerName}"
+						value="${this.#isNew ? '' : this.jokerName}"
+						.value="${this.#isNew ? '' : this.jokerName}"
 						options-json="jokersJson"
 						button-label="Show joker options"
 						input-label="Filter jokers"
 						listbox-label="Jokers"
 						@change="${(event: Event) => {
 							const input = event.target as HTMLInputElement
+							this.#isNew = false
 							this.jokerName = input.value as JokerName
 						}}"
 					></combo-box>
