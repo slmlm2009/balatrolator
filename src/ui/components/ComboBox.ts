@@ -448,11 +448,11 @@ export class ComboBox extends FormAssociatedElement {
 		`
 	}
 
-	#getOptionByIndex (index: number): HTMLElement {
+	#getOptionByIndex (index: number): HTMLElement | null {
 		const optionList = this.#optionList?.children ?? []
 		const option = optionList[index]
 		if (!(option instanceof HTMLElement)) {
-			throw new Error(`<${this.tagName.toLowerCase()} id="${this.id}">: no option at index ${index}!`)
+			return null
 		}
 
 		return option

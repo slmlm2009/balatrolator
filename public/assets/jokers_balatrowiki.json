@@ -194,7 +194,7 @@
   {
     "nr": 17,
     "name": "Joker Stencil",
-    "effect": "X1 Mult for each empty Joker slot Joker Stencil included (Currently X1 )",
+    "effect": "X1 Mult for each empty Joker slot Joker Stencil included",
     "cost": "$8",
     "rarity": "Uncommon",
     "unlock": "Available from start.",
@@ -242,7 +242,7 @@
   {
     "nr": 21,
     "name": "Ceremonial Dagger",
-    "effect": "When Blind is selected, destroy Joker to the right and permanently add double its sell value to this Mult (Currently +0 Mult )",
+    "effect": "When Blind is selected, destroy Joker to the right and permanently add double its sell value to this Mult",
     "cost": "$6",
     "rarity": "Uncommon",
     "unlock": "Available from start.",
@@ -374,7 +374,7 @@
   {
     "nr": 32,
     "name": "Steel Joker",
-    "effect": "Gives X0.2 Mult for each Steel Card in your full deck (Currently X1 Mult )",
+    "effect": "Gives X0.2 Mult for each Steel Card in your full deck",
     "cost": "$7",
     "rarity": "Uncommon",
     "unlock": "Available from start.",
@@ -398,7 +398,7 @@
   {
     "nr": 34,
     "name": "Abstract Joker",
-    "effect": "+3 Mult for each Joker card (Currently +0 Mult )",
+    "effect": "+3 Mult for each Joker card",
     "cost": "$4",
     "rarity": "Common",
     "unlock": "Available from start.",
@@ -518,7 +518,7 @@
   {
     "nr": 44,
     "name": "Ride the Bus",
-    "effect": "This Joker gains +1 Mult per consecutive hand played without a scoring face card (Currently +0 Mult )",
+    "effect": "This Joker gains +1 Mult per consecutive hand played without a scoring face card",
     "cost": "$6",
     "rarity": "Common",
     "unlock": "Available from start.",
@@ -578,7 +578,7 @@
   {
     "nr": 49,
     "name": "Runner",
-    "effect": "Gains +15 Chips if played hand contains a Straight (Currently +0 Chips )",
+    "effect": "Gains +15 Chips if played hand contains a Straight",
     "cost": "$5",
     "rarity": "Common",
     "unlock": "Available from start.",
@@ -626,7 +626,7 @@
   {
     "nr": 53,
     "name": "Blue Joker",
-    "effect": "+2 Chips for each remaining card in deck (Currently +104 Chips )",
+    "effect": "+2 Chips for each remaining card in deck",
     "cost": "$5",
     "rarity": "Common",
     "unlock": "Available from start.",
@@ -650,7 +650,7 @@
   {
     "nr": 55,
     "name": "Constellation",
-    "effect": "This Joker gains X0.1 Mult every time a Planet card is used (Currently X1 Mult )",
+    "effect": "This Joker gains X0.1 Mult every time a Planet card is used",
     "cost": "$6",
     "rarity": "Uncommon",
     "unlock": "Available from start.",
@@ -686,7 +686,7 @@
   {
     "nr": 58,
     "name": "Green Joker",
-    "effect": "+1 Mult per hand played -1 Mult per discard (Currently +0 Mult )",
+    "effect": "+1 Mult per hand played -1 Mult per discard",
     "cost": "$4",
     "rarity": "Common",
     "unlock": "Available from start.",
@@ -746,7 +746,7 @@
   {
     "nr": 63,
     "name": "Red Card",
-    "effect": "This Joker gains +3 Mult when any Booster Pack is skipped (Currently +0 Mult )",
+    "effect": "This Joker gains +3 Mult when any Booster Pack is skipped",
     "cost": "$5",
     "rarity": "Common",
     "unlock": "Available from start.",
@@ -758,7 +758,7 @@
   {
     "nr": 64,
     "name": "Madness",
-    "effect": "When Small Blind or Big Blind is selected, gain X0.5 Mult and destroy a random Joker (Currently X1 Mult )",
+    "effect": "When Small Blind or Big Blind is selected, gain X0.5 Mult and destroy a random Joker",
     "cost": "$7",
     "rarity": "Uncommon",
     "unlock": "Available from start.",
@@ -770,7 +770,7 @@
   {
     "nr": 65,
     "name": "Square Joker",
-    "effect": "This Joker gains +4 Chips if played hand has exactly 4 cards (Currently 0 Chips )",
+    "effect": "This Joker gains +4 Chips if played hand has exactly 4 cards",
     "cost": "$4",
     "rarity": "Common",
     "unlock": "Available from start.",
@@ -806,7 +806,7 @@
   {
     "nr": 68,
     "name": "Vampire",
-    "effect": "This Joker gains X0.1 Mult per scoring Enhanced card played, removes card Enhancement (Currently X1 Mult )",
+    "effect": "This Joker gains X0.1 Mult per scoring Enhanced card played, removes card Enhancement",
     "cost": "$7",
     "rarity": "Uncommon",
     "unlock": "Available from start.",
@@ -830,7 +830,7 @@
   {
     "nr": 70,
     "name": "Hologram",
-    "effect": "This Joker gains X0.25 Mult every time a playing card is added to your deck (Currently X1 Mult )",
+    "effect": "This Joker gains X0.25 Mult every time a playing card is added to your deck",
     "cost": "$7",
     "rarity": "Uncommon",
     "unlock": "Available from start.",
@@ -866,7 +866,7 @@
   {
     "nr": 73,
     "name": "Cloud 9",
-    "effect": "Earn $1 for each 9 in your full deck at end of round (Currently $4 )",
+    "effect": "Earn $1 for each 9 in your full deck at end of round",
     "cost": "$7",
     "rarity": "Uncommon",
     "unlock": "Available from start.",
@@ -890,7 +890,7 @@
   {
     "nr": 75,
     "name": "Obelisk",
-    "effect": "This Joker gains X0.2 Mult per consecutive hand played without playing your most played poker hand (Currently X1 Mult )",
+    "effect": "This Joker gains X0.2 Mult per consecutive hand played without playing your most played poker hand",
     "cost": "$8",
     "rarity": "Rare",
     "unlock": "Available from start.",
@@ -962,7 +962,7 @@
   {
     "nr": 81,
     "name": "Erosion",
-    "effect": "+4 Mult for each card below [the deck's starting size] in your full deck (Currently +0 Mult )",
+    "effect": "+4 Mult for each card below [the deck's starting size] in your full deck",
     "cost": "$6",
     "rarity": "Uncommon",
     "unlock": "Available from start.",
@@ -1022,7 +1022,7 @@
   {
     "nr": 86,
     "name": "Fortune Teller",
-    "effect": "+1 Mult per Tarot card used this run (Currently +0 )",
+    "effect": "+1 Mult per Tarot card used this run",
     "cost": "$6",
     "rarity": "Common",
     "unlock": "Available from start.",
@@ -1058,7 +1058,7 @@
   {
     "nr": 89,
     "name": "Stone Joker",
-    "effect": "Gives +25 Chips for each Stone Card in your full deck (Currently +0 Chips )",
+    "effect": "Gives +25 Chips for each Stone Card in your full deck",
     "cost": "$6",
     "rarity": "Uncommon",
     "unlock": "Available from start.",
@@ -1082,7 +1082,7 @@
   {
     "nr": 91,
     "name": "Lucky Cat",
-    "effect": "This Joker gains X0.25 Mult every time a Lucky card successfully triggers (Currently X1 Mult )",
+    "effect": "This Joker gains X0.25 Mult every time a Lucky card successfully triggers",
     "cost": "$6",
     "rarity": "Uncommon",
     "unlock": "Available from start.",
@@ -1106,7 +1106,7 @@
   {
     "nr": 93,
     "name": "Bull",
-    "effect": "+2 Chips for each $1 you have (Currently +0 Chips )",
+    "effect": "+2 Chips for each $1 you have",
     "cost": "$6",
     "rarity": "Uncommon",
     "unlock": "Available from start.",
@@ -1142,7 +1142,7 @@
   {
     "nr": 96,
     "name": "Flash Card",
-    "effect": "This Joker gains +2 Mult per reroll in the shop (Currently +0 Mult )",
+    "effect": "This Joker gains +2 Mult per reroll in the shop",
     "cost": "$5",
     "rarity": "Uncommon",
     "unlock": "Available from start.",
@@ -1166,7 +1166,7 @@
   {
     "nr": 98,
     "name": "Spare Trousers",
-    "effect": "This Joker gains +2 Mult if played hand contains a Two Pair (Currently +0 Mult )",
+    "effect": "This Joker gains +2 Mult if played hand contains a Two Pair",
     "cost": "$6",
     "rarity": "Uncommon",
     "unlock": "Available from start.",
@@ -1226,7 +1226,7 @@
   {
     "nr": 103,
     "name": "Castle",
-    "effect": "This Joker gains +3 Chips per discarded [suit] card, suit changes every round (Currently +0 Chips )",
+    "effect": "This Joker gains +3 Chips per discarded [suit] card, suit changes every round",
     "cost": "$6",
     "rarity": "Uncommon",
     "unlock": "Available from start.",
@@ -1250,7 +1250,7 @@
   {
     "nr": 105,
     "name": "Campfire",
-    "effect": "This Joker gains X0.25 Mult for each card sold , resets when Boss Blind is defeated (Currently X1 Mult )",
+    "effect": "This Joker gains X0.25 Mult for each card sold , resets when Boss Blind is defeated",
     "cost": "$9",
     "rarity": "Rare",
     "unlock": "Available from start.",
@@ -1310,7 +1310,7 @@
   {
     "nr": 110,
     "name": "Swashbuckler",
-    "effect": "Adds the sell value of all other owned Jokers to Mult (Currently +1 Mult )",
+    "effect": "Adds the sell value of all other owned Jokers to Mult",
     "cost": "$4",
     "rarity": "Common",
     "unlock": "Sell a total of 20 Joker cards",
@@ -1358,7 +1358,7 @@
   {
     "nr": 114,
     "name": "Throwback",
-    "effect": "X0.25 Mult for each Blind skipped this run (Currently X1 Mult )",
+    "effect": "X0.25 Mult for each Blind skipped this run",
     "cost": "$6",
     "rarity": "Uncommon",
     "unlock": "Continue a saved run from the main menu",
@@ -1430,7 +1430,7 @@
   {
     "nr": 120,
     "name": "Glass Joker",
-    "effect": "This Joker gains X0.75 Mult for every Glass Card that is destroyed (Currently X1 Mult )",
+    "effect": "This Joker gains X0.75 Mult for every Glass Card that is destroyed",
     "cost": "$6",
     "rarity": "Uncommon",
     "unlock": "Have at least 5 Glass Cards in your deck",
@@ -1478,7 +1478,7 @@
   {
     "nr": 124,
     "name": "Wee Joker",
-    "effect": "This Joker gains +8 Chips when each played 2 is scored (Currently +0 Chips )",
+    "effect": "This Joker gains +8 Chips when each played 2 is scored",
     "cost": "$8",
     "rarity": "Rare",
     "unlock": "Win a run in 18 or fewer rounds",
@@ -1550,7 +1550,7 @@
   {
     "nr": 130,
     "name": "Hit the Road",
-    "effect": "This Joker gains X0.5 Mult for every Jack discarded this round (Currently X1 Mult )",
+    "effect": "This Joker gains X0.5 Mult for every Jack discarded this round",
     "cost": "$8",
     "rarity": "Rare",
     "unlock": "Discard 5 Jacks at the same time.",
@@ -1634,7 +1634,7 @@
   {
     "nr": 137,
     "name": "Invisible Joker",
-    "effect": "After 2 rounds, sell this card to Duplicate a random Joker (Currently 0 /2) (Removes Negative from copy)",
+    "effect": "After 2 rounds, sell this card to Duplicate a random Joker (Removes Negative from copy)",
     "cost": "$8",
     "rarity": "Rare",
     "unlock": "Win a run without ever having more than 4 Jokers",
@@ -1682,7 +1682,7 @@
   {
     "nr": 141,
     "name": "Driver's License",
-    "effect": "X3 Mult if you have at least 16 Enhanced cards in your full deck (Currently 0 )",
+    "effect": "X3 Mult if you have at least 16 Enhanced cards in your full deck",
     "cost": "$7",
     "rarity": "Rare",
     "unlock": "Enhance 16 cards in your deck",
@@ -1730,7 +1730,7 @@
   {
     "nr": 145,
     "name": "Bootstraps",
-    "effect": "+2 Mult for every $5 you have (Currently +0 Mult )",
+    "effect": "+2 Mult for every $5 you have",
     "cost": "$7",
     "rarity": "Uncommon",
     "unlock": "Have at least 2 Polychrome Jokers at the same time.",
@@ -1742,7 +1742,7 @@
   {
     "nr": 146,
     "name": "Canio",
-    "effect": "This Joker gains X1 Mult when a face card is destroyed (Currently X1 Mult )",
+    "effect": "This Joker gains X1 Mult when a face card is destroyed",
     "cost": "N/A",
     "rarity": "Legendary",
     "unlock": "Find this Joker from the Soul card.",
@@ -1766,7 +1766,7 @@
   {
     "nr": 148,
     "name": "Yorick",
-    "effect": "This Joker gains X1 Mult every 23 [23] cards discarded (Currently X1 Mult )",
+    "effect": "This Joker gains X1 Mult every 23 [23] cards discarded",
     "cost": "N/A",
     "rarity": "Legendary",
     "unlock": "Find this Joker from the Soul card.",

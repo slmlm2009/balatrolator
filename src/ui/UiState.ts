@@ -102,7 +102,31 @@ for (const observatoryInput of observatoryInputs) {
 
 const jokerContainer = form.querySelector<HTMLElement>('[data-j-container]')!
 const addJokerButton = form.querySelector<HTMLButtonElement>('[data-j-add-button]')!
-addJokerButton.addEventListener('click', () => addJoker())
+addJokerButton.addEventListener('click', () => {
+	const el = new JokerCard()
+	jokerContainer.append(el)
+	el.toggleEditor()
+
+	// Card is only kept if the user explicitly selects a joker name.
+	let committed = false
+	el.querySelector('combo-box')?.addEventListener('change', () => { committed = true }, { once: true })
+
+	// Watch for the editor closing; remove the card if no selection was made.
+	const editorObserver = new MutationObserver(() => {
+		if (!el.classList.contains('--editing')) {
+			editorObserver.disconnect()
+			if (!committed) el.remove()
+		}
+	})
+	editorObserver.observe(el, { attributes: true, attributeFilter: ['class'] })
+
+	// Wait two animation frames so the editor overlay is fully laid out before
+	// opening the combo-box — prevents the popover from briefly anchoring to the
+	// card's tray position and then jumping to the centered editor position.
+	requestAnimationFrame(() => requestAnimationFrame(() => {
+		el.querySelector<HTMLButtonElement>('.cb-button')?.click()
+	}))
+})
 form.querySelector<HTMLButtonElement>('[data-j-clear-button]')?.addEventListener('click', () => {
 	jokerContainer.innerHTML = ''
 })
