@@ -45,6 +45,7 @@ const lightCss = /*css*/`
 		display: flex;
 		flex-direction: column;
 		overflow-y: auto;
+		overscroll-behavior: contain;
 		margin-block-start: 0.25rem;
 		border: 2px solid var(--c-border);
 		border-radius: 0.5rem;
@@ -386,6 +387,7 @@ export class ComboBox extends FormAssociatedElement {
 				aria-expanded="false"
 				aria-controls="${this.id}-popover"
 				popovertarget="${this.id}-popover"
+				popovertargetaction="show"
 				@keydown="${this.#handleButtonShortcuts}"
 			>
 				${this.value
