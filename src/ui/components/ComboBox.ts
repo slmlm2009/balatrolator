@@ -136,6 +136,9 @@ export class ComboBox extends FormAssociatedElement {
 		ArrowRight: {
 			action: () => this.#selectNeighboringOption(1),
 		},
+		Escape: {
+			action: () => this.#closePopover(),
+		},
 	}
 
 	#query = ''
@@ -153,6 +156,9 @@ export class ComboBox extends FormAssociatedElement {
 		},
 		Tab: {
 			action: (event) => this.#selectHighlightedOption(event),
+		},
+		Escape: {
+			action: (event) => { event.preventDefault(); this.#closePopover() },
 		},
 	}
 
@@ -403,14 +409,13 @@ export class ComboBox extends FormAssociatedElement {
 			<div
 				id="${this.id}-popover"
 				class="cb-popover"
-				popover
+				popover="manual"
 				@toggle="${this.#handleTogglePopover}"
 			>
 				<input
 					class="cb-input text-input"
 					aria-label="${this.getAttribute('input-label') ?? 'Search'}"
 					autocomplete="off"
-					autofocus
 					role="combobox"
 					aria-autocomplete="list"
 					aria-expanded="true"
@@ -503,6 +508,28 @@ export class ComboBox extends FormAssociatedElement {
 			if (selectedOption) {
 				scrollIntoViewIfNeeded(selectedOption, this.#optionList!)
 			}
+			// Use 'click' (not 'pointerdown') for outside-dismiss: click only fires
+			// after a genuine tap, never during a scroll gesture, so dragging
+			// through the popover area can never accidentally close the list.
+			document.addEventListener('click', this.#handleOutsideClick, { capture: true })
+		} else {
+			document.removeEventListener('click', this.#handleOutsideClick, { capture: true })
+		}
+	}
+
+	#handleOutsideClick = (event: Event) => {
+		const popover = this.#button?.popoverTargetElement
+		if (!(popover instanceof HTMLElement)) return
+		if (!popover.contains(event.target as Node) && event.target !== this.#button) {
+			popover.hidePopover()
+		}
+	}
+
+	#closePopover = () => {
+		const popover = this.#button?.popoverTargetElement
+		if (popover instanceof HTMLElement) {
+			popover.hidePopover()
+			this.#button?.focus()
 		}
 	}
 
