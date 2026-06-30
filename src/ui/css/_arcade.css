@@ -1,42 +1,43 @@
 /*
-Arcade theme — a tactile, mobile-first Balatro "game table" UI.
+Paper Classic theme — a warm-paper, hard-block-shadow "Robo" reskin of the Balatro "game table" UI.
 
-Layout: a top bar with drawer toggles, a compact round-data bar, a joker tray, the chips × mult
-scoreboard, and the hand tray. Config panels (levels, planets, saves, log) live in slide-up drawers.
-Everything is loaded after the structural CSS and is additive: the calculator still works if the
-runtime libraries fail. Card art is rendered with image-rendering: pixelated.
+Same one-column layout as before: a top bar with drawer toggles, a compact round-data bar, a joker
+tray, the chips × mult scoreboard, and the hand tray. Config panels (levels, planets, saves, log)
+live in slide-up drawers. This is a CSS reskin only — the DOM, scoring engine, scroll-trays, tilt,
+and the fit-to-viewport routine are unchanged. Card art is rendered with image-rendering: pixelated.
 
+The reskin works by REDEFINING this file's local theme variables (below) onto the Paper Classic
+tokens from _variables.css: felt stays dark (tray wells + top bar), but --ink flips to dark charcoal
+(text/borders on paper), surfaces flip to light card stock, and --surface-line becomes ink so the
+signature 2px-ink-border + hard-offset-block-shadow look propagates through the existing rules.
 Input surfaces are themed by setting the existing --c-* custom properties on container scopes, which
 the form components read — this avoids fighting the components' adopted stylesheets.
 */
 
 html {
-	--felt-0: hsl(202 45% 9%);
-	--felt-1: hsl(208 44% 13%);
-	--ink: hsl(40 30% 94%);
-	--ink-dim: hsl(210 16% 68%);
+	--felt-0: var(--c-felt-2);   /* top-bar background (darkest) */
+	--felt-1: var(--c-felt);     /* tray well */
+	--ink: var(--c-ink);         /* now DARK — primary text/border on paper */
+	--ink-dim: var(--c-ink-soft);/* muted captions on paper */
 
-	--chips: hsl(206 100% 52%);
-	--chips-dark: hsl(208 100% 30%);
-	--mult: hsl(5 95% 64%);
-	--mult-dark: hsl(5 75% 38%);
-	--gold: hsl(43 96% 56%);
-	--gold-dark: hsl(38 92% 38%);
+	--chips: var(--c-blue);
+	--chips-dark: var(--c-blue-dk);
+	--mult: var(--c-red);
+	--mult-dark: var(--c-red-dk);
+	--gold: var(--c-gold);
+	--gold-dark: var(--c-gold-dk);
 
-	--surface: hsl(209 38% 16%);
-	--surface-2: hsl(209 34% 20%);
-	--surface-line: hsl(208 30% 32%);
+	--surface: var(--c-card);    /* raised light card face */
+	--surface-2: var(--c-paper-2);/* hover / sunken light surface */
+	--surface-line: var(--c-ink);/* borders are ink */
 
-	--radius: 0.85rem;
-	--shadow: 0 6px 0 hsl(206 60% 4% / 0.55), 0 14px 26px hsl(206 60% 4% / 0.5);
+	--radius: var(--radius-md);  /* 6px sharp card corners */
+	--shadow: var(--shadow-block); /* signature hard offset block, no blur */
 
-	color-scheme: dark;
-	color: var(--ink);
-	background:
-		radial-gradient(ellipse 110% 70% at 50% -8%, hsl(196 60% 20%), transparent 60%),
-		radial-gradient(ellipse 120% 80% at 50% 120%, hsl(265 50% 18%), transparent 55%),
-		linear-gradient(165deg, var(--felt-1), var(--felt-0)) !important;
-	font-family: var(--f-family-sans-serif);
+	color-scheme: light;
+	color: var(--c-ink);
+	background: var(--c-paper) !important; /* flat warm paper — no felt gradients */
+	font-family: var(--font-body);
 }
 
 body {
@@ -74,21 +75,19 @@ img[class*='card-'],
 	   toolbar's right edge lines up with the tray edge. */
 	padding-block: max(0.5rem, env(safe-area-inset-top)) 0.55rem;
 	padding-inline: max(0.75rem, calc((100% - 64rem) / 2 + 0.6rem));
-	background:
-		radial-gradient(140% 200% at 0% 0%, hsl(266 55% 20% / 0.7), transparent 55%),
-		linear-gradient(hsl(208 48% 11%), hsl(208 52% 8%));
-	box-shadow: 0 6px 18px hsl(206 60% 4% / 0.55), inset 0 1px 0 hsl(0 0% 100% / 0.05);
+	background: var(--c-felt-2);
+	box-shadow: none;
 }
 
-/* Casino-marquee accent line along the bottom of the bar. */
+/* Signature 3px ink underline along the bottom of the bar. */
 .topbar::after {
 	content: '';
 	position: absolute;
 	inset-inline: 0;
 	inset-block-end: 0;
-	block-size: 2px;
-	background: linear-gradient(90deg, transparent, var(--gold-dark), var(--gold), var(--mult), var(--chips), transparent);
-	opacity: 0.85;
+	block-size: var(--bw-thick);
+	background: var(--c-ink);
+	opacity: 1;
 }
 
 .brand {
@@ -98,27 +97,26 @@ img[class*='card-'],
 }
 
 .brand-name {
-	font-weight: 900;
-	font-size: 1.3rem;
-	letter-spacing: 0.04em;
-	background: linear-gradient(hsl(48 100% 74%), var(--gold) 55%, var(--gold-dark));
-	-webkit-background-clip: text;
-	background-clip: text;
-	color: transparent;
-	filter: drop-shadow(0 1px 0 hsl(5 80% 24%)) drop-shadow(0 0 7px hsl(43 96% 56% / 0.35));
+	font-family: var(--font-pixel);
+	font-weight: 400;
+	font-size: 0.95rem;
+	letter-spacing: 0.06em;
+	color: var(--text-on-dark);
 }
 
 .brand-suits {
 	display: inline-flex;
 	gap: 0.12rem;
 	padding: 0.2rem 0.3rem;
-	border-radius: 0.5rem;
+	border-radius: var(--radius-sm);
 	background: hsl(208 45% 7% / 0.5);
-	border: 1px solid var(--surface-line);
+	border: 1px solid var(--c-felt-edge);
 }
 
-.brand-suits .--suit-h, .brand-suits .--suit-d { color: var(--mult); }
-.brand-suits .--suit-s, .brand-suits .--suit-c { color: var(--chips); }
+.brand-suits .--suit-h { color: var(--c-red); }
+.brand-suits .--suit-d { color: var(--c-gold); }
+.brand-suits .--suit-s { color: var(--c-blue); }
+.brand-suits .--suit-c { color: var(--c-green-lt); }
 .brand-suits .icon { inline-size: 0.85rem; block-size: 0.85rem; }
 
 .toolbar {
@@ -128,8 +126,8 @@ img[class*='card-'],
 	margin-inline-start: auto;
 	padding: 0.25rem;
 	border-radius: 0.7rem;
-	background: hsl(208 48% 6% / 0.6);
-	border: 1px solid var(--surface-line);
+	background: transparent;
+	border: none;
 }
 
 .chip-button {
@@ -141,21 +139,23 @@ img[class*='card-'],
 	min-block-size: 2.35rem;
 	min-inline-size: 2.35rem;
 	padding: 0 0.6rem;
-	border: 2px solid var(--surface-line);
-	border-radius: 0.55rem;
-	background: linear-gradient(hsl(209 36% 23%), hsl(209 40% 15%));
-	color: var(--ink);
-	font-weight: 700;
+	border: var(--bw) solid var(--c-ink);
+	border-radius: var(--radius-sm);
+	background: var(--c-card);
+	color: var(--c-ink);
+	font-family: var(--font-body);
+	font-weight: 600;
 	font-size: 0.82rem;
 	cursor: pointer;
-	box-shadow: inset 0 1px 0 hsl(0 0% 100% / 0.09), 0 2px 0 hsl(206 60% 4% / 0.5);
-	transition: transform 0.08s ease, border-color 0.15s ease, filter 0.15s ease;
+	box-shadow: var(--shadow-block-sm);
+	transition: transform var(--dur-fast) var(--ease-snap), background-color var(--dur) var(--ease-snap), box-shadow var(--dur-fast) var(--ease-snap);
 }
 
-.chip-button:hover { border-color: var(--gold); filter: brightness(1.12); }
-.chip-button:active { transform: translateY(1px); box-shadow: inset 0 1px 0 hsl(0 0% 100% / 0.09); }
-.chip-button.--danger { color: hsl(5 95% 80%); }
-.chip-button.--danger:hover { border-color: var(--mult); }
+.chip-button:hover { background: var(--c-white); }
+/* Press = the block shadow collapses and the chip translates 2px down-right (physically presses in). */
+.chip-button:active { transform: translate(2px, 2px); box-shadow: none; }
+.chip-button.--danger { background: var(--c-red); border-color: var(--c-ink); color: var(--c-white); }
+.chip-button.--danger:hover { background: var(--c-red-lt); }
 .chip-button .icon { inline-size: 1.05rem; block-size: 1.05rem; }
 
 /* ============ TABLE ============ */
@@ -188,24 +188,30 @@ img[class*='card-'],
 /* ============ ROUND DATA BAR ============ */
 
 .round-bar {
-	--c-text: var(--ink);
-	--c-background-lighter: var(--surface);
-	--c-background-light: var(--surface-2);
-	--c-border: var(--surface-line);
+	/* Scope overrides read by the combo-box / input components: white field on ink border. */
+	--c-text: var(--c-ink);
+	--c-background-lighter: var(--c-white);
+	--c-background-light: var(--c-paper-2);
+	--c-border: var(--c-ink);
 
 	display: flex;
-	flex-direction: column;
-	gap: 0.5rem;
-	padding: 0.5rem;
-	background: hsl(209 38% 16% / 0.6);
-	border: 1px solid var(--surface-line);
+	flex-direction: row;
+	flex-wrap: wrap;
+	justify-content: space-between;
+	align-items: flex-start;
+	gap: 0.6rem 0.9rem;
+	padding: 0.7rem 0.85rem;
+	background: var(--c-card);
+	border: var(--bw) solid var(--c-ink);
 	border-radius: var(--radius);
+	box-shadow: var(--shadow-block);
 }
 
 .round-bar-selectors {
 	display: flex;
 	flex-wrap: wrap;
-	gap: 0.4rem;
+	gap: 0.6rem;
+	flex: 1 1 22rem;
 }
 
 .round-bar-select-group {
@@ -257,8 +263,8 @@ img[class*='card-'],
 	block-size: 1.6rem;
 	border-radius: 50%;
 	border: 1px solid var(--surface-line);
-	background: hsl(208 40% 16%);
-	color: var(--ink-dim);
+	background: var(--c-card);
+	color: var(--c-ink-soft);
 	font-size: 0.85rem;
 	font-weight: 900;
 	cursor: pointer;
@@ -280,12 +286,13 @@ img[class*='card-'],
 	inline-size: 14rem;
 	max-inline-size: calc(100vw - 2rem);
 	padding: 0.5rem 0.7rem;
-	background: hsl(208 48% 11%);
+	background: var(--c-card);
 	border: 1px solid var(--surface-line);
 	border-radius: 0.5rem;
+	box-shadow: var(--shadow-pop);
 	font-size: 0.72rem;
 	line-height: 1.45;
-	color: var(--ink);
+	color: var(--c-ink);
 	z-index: 100;
 	/* Use visibility+opacity so the hidden element is still clipped by overflow:clip on <body>
 	   without creating unwanted horizontal scroll area. */
@@ -305,49 +312,41 @@ img[class*='card-'],
 	pointer-events: auto;
 }
 
-/* Stats: $ on left spans both rows, HANDS/DISCARDS stacked in middle, JOKER SLOTS on right spans both rows. */
+/* Stats: a wrapping row of label-above number pills ($, Hands, Discards, Joker Slots). */
 .round-bar-stats {
-	display: grid;
-	grid-template-columns: auto 1fr 1fr;
-	grid-template-areas:
-		"money hands   slots"
-		"money discards slots";
-	gap: 0.4rem;
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.5rem 0.7rem;
+	align-items: flex-start;
 }
 
-.round-bar-stats .stat-pill.--money    { grid-area: money; }
-.round-bar-stats .stat-pill.--hands    { grid-area: hands; }
-.round-bar-stats .stat-pill.--discards { grid-area: discards; }
-.round-bar-stats .stat-pill.--slots    { grid-area: slots; }
-.round-bar-stats .stat-pill { inline-size: 100%; box-sizing: border-box; }
-.round-bar-stats .stat-input { flex: 1; min-inline-size: 0; }
+.round-bar-stats .stat-pill { flex: 0 0 auto; }
+.round-bar-stats .stat-input { inline-size: 3.6rem; }
 
-/* Force HANDS and DISCARDS labels to the same width so both inputs fill equal remaining space. */
-.round-bar-stats .stat-pill.--hands .stat-label,
-.round-bar-stats .stat-pill.--discards .stat-label { flex: 0 0 4rem; }
-
+/* A labeled control: label sits ABOVE the field (label takes the full flex row, field wraps below). */
 .stat-pill {
-	display: inline-flex;
+	display: flex;
+	flex-wrap: wrap;
 	align-items: center;
-	gap: 0.35rem;
-	padding: 0.2rem 0.5rem;
-	background: var(--surface);
-	border: 2px solid var(--surface-line);
-	border-radius: 0.6rem;
-	min-block-size: 2.4rem;
+	gap: 0.2rem 0.4rem;
+	padding: 0;
+	background: transparent;
+	border: none;
+	min-block-size: 0;
 }
 
 .stat-pill.--grow { flex: 1; }
-.stat-pill.--money { border-color: var(--gold-dark); }
-.stat-pill.--money .stat-label { color: var(--gold); font-weight: 900; }
+.stat-pill.--money .stat-label { color: var(--c-gold-dk); font-weight: 700; }
 .stat-pill.--money .stat-input { inline-size: 4.5rem; }
 
 .stat-label {
+	flex-basis: 100%;
+	font-family: var(--font-body);
 	font-size: 0.72rem;
-	font-weight: 700;
-	letter-spacing: 0.03em;
-	color: var(--ink-dim);
-	text-transform: uppercase;
+	font-weight: 600;
+	letter-spacing: 0;
+	color: var(--c-ink-2);
+	text-transform: none;
 	white-space: nowrap;
 }
 
@@ -357,20 +356,22 @@ img[class*='card-'],
 	   the fluid root font-size on large/high-res displays. */
 	min-block-size: max(38px, 3.1rem);
 	padding: 0 0.35rem;
-	border: 2px solid var(--surface-line);
-	border-radius: 0.4rem;
-	background: hsl(208 40% 11%);
-	color: var(--ink);
+	border: var(--bw) solid var(--c-ink);
+	border-radius: var(--radius-sm);
+	background: var(--c-white);
+	color: var(--c-ink);
+	font-family: var(--font-mono);
 	font-weight: 700;
 	font-size: max(16px, 1.2rem);
-	text-align: end;
+	text-align: center;
+	box-shadow: var(--shadow-inset);
 }
 
 /* 16px font on round-bar controls prevents iOS zoom-on-focus; taller for touch. */
 .round-bar combo-box { block-size: auto; }
 .round-bar .cb-button { min-block-size: max(38px, 3.1rem); font-size: max(15px, 1.15rem); }
 
-.stat-input.--text { inline-size: 100%; text-align: start; }
+.stat-input.--text { inline-size: 100%; text-align: start; font-family: var(--font-body); font-weight: 400; }
 .stat-pill.--grow .stat-input { flex: 1; }
 
 .stat-combo { inline-size: 8.5rem; }
@@ -382,31 +383,35 @@ img[class*='card-'],
 /* ============ TRAYS (jokers / hand) ============ */
 
 .tray-section {
-	background: hsl(209 38% 16% / 0.55);
-	border: 1px solid var(--surface-line);
+	background: var(--c-paper-2);
+	border: var(--bw) solid var(--c-ink);
 	border-radius: var(--radius);
+	box-shadow: var(--shadow-block);
 	padding: 0.5rem;
 }
 
-.tray-section.--jokers { border-color: hsl(5 60% 32%); }
-.tray-section.--hand { border-color: hsl(43 70% 34%); }
-
+/* Full-bleed paper-2 header strip with an ink underline — negative margins reach the section border
+   without changing the .tray content width the 5-card-fit calc depends on. */
 .tray-header {
 	display: flex;
 	align-items: center;
 	gap: 0.5rem;
-	margin-block-end: 0.5rem;
+	margin: -0.5rem -0.5rem 0.5rem;
+	padding: 0.4rem 0.6rem;
+	background: var(--c-paper-2);
+	border-block-end: var(--bw) solid var(--c-ink);
+	border-start-start-radius: calc(var(--radius) - var(--bw));
+	border-start-end-radius: calc(var(--radius) - var(--bw));
 }
 
 .tray-header h2 {
-	font-size: 0.95rem;
-	font-weight: 800;
-	letter-spacing: 0.05em;
-	text-transform: uppercase;
+	font-family: var(--font-display);
+	font-size: 1rem;
+	font-weight: 700;
+	letter-spacing: -0.01em;
+	text-transform: none;
+	color: var(--c-ink);
 }
-
-.tray-section.--jokers .tray-header h2 { color: var(--mult); }
-.tray-section.--hand .tray-header h2 { color: var(--gold); }
 
 .round-add-button {
 	margin-inline-start: auto;
@@ -415,23 +420,23 @@ img[class*='card-'],
 	inline-size: 2.3rem;
 	block-size: 2.3rem;
 	padding: 0; /* clear the UA button padding that was pushing the + icon off-centre */
-	border: 2px solid var(--gold-dark);
-	border-radius: 0.55rem;
-	background: linear-gradient(var(--gold), var(--gold-dark));
-	color: hsl(206 60% 8%);
+	border: var(--bw) solid var(--c-ink);
+	border-radius: var(--radius-sm);
+	background: var(--c-gold);
+	color: var(--c-ink);
 	cursor: pointer;
-	box-shadow: inset 0 1px 0 hsl(0 0% 100% / 0.25), 0 2px 0 hsl(206 60% 4% / 0.5);
-	transition: transform 0.08s ease, filter 0.15s ease;
+	box-shadow: var(--shadow-block-sm);
+	transition: transform var(--dur-fast) var(--ease-snap), filter var(--dur) var(--ease-snap), box-shadow var(--dur-fast) var(--ease-snap);
 }
 
-.round-add-button:hover { filter: brightness(1.1); }
-.round-add-button:active { transform: translateY(1px); box-shadow: inset 0 1px 0 hsl(0 0% 100% / 0.25); }
+.round-add-button:hover { filter: brightness(1.06); }
+.round-add-button:active { transform: translate(2px, 2px); box-shadow: none; }
 .round-add-button .icon { inline-size: 1.3rem; block-size: 1.3rem; }
 
 .round-add-button.--clear {
-	background: linear-gradient(hsl(5 60% 42%), hsl(5 60% 28%));
-	border-color: hsl(5 60% 28%);
-	color: hsl(5 100% 93%);
+	background: var(--c-paper-3);
+	border-color: var(--c-ink);
+	color: var(--c-ink);
 	margin-inline-start: 0.3rem;
 }
 
@@ -444,6 +449,10 @@ img[class*='card-'],
 	overflow-y: hidden;
 	padding: 0.35rem 0 0.4rem;
 	min-block-size: 6.5rem;
+	/* The dark felt well behind the sprites — a subtle radial vignette + dark inset, on the warm-paper section. */
+	background: radial-gradient(circle at 50% 0%, hsl(208 44% 18%), var(--c-felt));
+	border-radius: var(--radius-sm);
+	box-shadow: inset 0 2px 5px hsl(206 60% 4% / 0.55);
 	scroll-snap-type: x proximity;
 	/* Native scrollbar hidden; a custom always-visible one is rendered under the tray (tray-scroll). */
 	scrollbar-width: none;
@@ -505,11 +514,14 @@ img[class*='card-'],
 
 .tray:empty::after {
 	content: 'Tap + to add';
-	color: var(--ink-dim);
-	font-size: 0.85rem;
+	color: hsl(208 14% 62%); /* muted light — readable on the dark felt well */
+	font-family: var(--font-pixel);
+	font-size: 0.62rem;
+	letter-spacing: 0.12em;
+	text-transform: uppercase;
 	align-self: center;
 	margin: 0 auto;
-	font-style: italic;
+	font-style: normal;
 }
 
 
@@ -548,10 +560,12 @@ playing-card {
 	aspect-ratio: 71 / 95;
 	border-radius: 0.55rem;
 	overflow: hidden;
-	background: linear-gradient(160deg, hsl(255 25% 24%), hsl(255 25% 15%));
+	background: var(--c-card);
+	/* Thin ink frame + soft paper-toned drop. Hardcode --c-ink (NOT var(--c-border)) so JokerCard's
+	   adopted red --c-border can't leak back in as a red frame. */
 	box-shadow:
-		0 0 0 2px var(--c-border, hsl(255 40% 45%)),
-		0 5px 12px hsl(206 60% 4% / 0.6);
+		0 0 0 2px var(--c-ink),
+		0 4px 10px hsl(35 20% 20% / 0.25);
 	cursor: grab;
 	transform: perspective(700px) rotateX(var(--tilt-rx, 0deg)) rotateY(var(--tilt-ry, 0deg));
 	transition: transform 0.16s ease-out, box-shadow 0.2s ease;
@@ -633,7 +647,8 @@ playing-card:not(.--is-played) .card-art {
 }
 
 playing-card.--is-played .card-art {
-	box-shadow: 0 0 0 2px var(--gold), 0 0 14px hsl(43 96% 56% / 0.5), 0 8px 16px hsl(206 60% 4% / 0.6);
+	/* Selected/scoring card = a lifted gold ring framed by ink. */
+	box-shadow: 0 0 0 2px var(--c-gold), 0 0 0 4px var(--c-ink), 0 6px 12px hsl(35 20% 20% / 0.3);
 }
 
 joker-card.--edition-negative .card-art { box-shadow: 0 0 0 2px hsl(190 90% 55%), 0 0 16px hsl(200 90% 50% / 0.6), 0 5px 12px hsl(206 60% 4% / 0.6); }
@@ -680,8 +695,8 @@ playing-card .stack {
 .face-btn:disabled { opacity: 0.3; cursor: default; }
 .face-btn .icon { inline-size: 1.05rem; block-size: 1.05rem; }
 
-.face-btn.--danger { color: hsl(5 95% 78%); border-color: var(--mult-dark); }
-.face-btn.--danger:hover:not(:disabled) { border-color: var(--mult); background: hsl(5 55% 20%); }
+.face-btn.--danger { color: var(--c-red); border-color: var(--c-red-dk); }
+.face-btn.--danger:hover:not(:disabled) { border-color: var(--c-red); background: hsl(5 85% 94%); }
 
 /* Play (cards) / Active (jokers) tick. */
 .card-toggle {
@@ -692,7 +707,7 @@ playing-card .stack {
 	min-block-size: 1.85rem;
 	border: 2px solid var(--surface-line);
 	border-radius: 0.45rem;
-	background: hsl(208 40% 11%);
+	background: var(--c-card);
 	cursor: pointer;
 	transition: background-color 0.15s ease, border-color 0.15s ease;
 }
@@ -706,10 +721,10 @@ playing-card .stack {
    panel (.editor-sheet). Collapsed (display:none) until --editing. Roomy, touch-friendly controls. */
 .card-editor {
 	display: none;
-	--c-text: var(--ink);
-	--c-background-lighter: hsl(208 40% 11%);
-	--c-background-light: var(--surface-2);
-	--c-border: var(--surface-line);
+	--c-text: var(--c-ink);
+	--c-background-lighter: var(--c-white);
+	--c-background-light: var(--c-paper-2);
+	--c-border: var(--c-ink);
 }
 
 .card.--editing .card-editor {
@@ -736,12 +751,12 @@ playing-card .stack {
 	gap: 0.55rem;
 	padding: 0.85rem;
 	padding-block-end: max(1rem, env(safe-area-inset-bottom));
-	background: linear-gradient(hsl(208 40% 15%), hsl(208 42% 12%));
+	background: var(--c-card);
 	border: 2px solid var(--surface-line);
 	border-block-end: none;
 	border-start-start-radius: 1.1rem;
 	border-start-end-radius: 1.1rem;
-	box-shadow: 0 -10px 30px hsl(206 60% 4% / 0.6);
+	box-shadow: var(--shadow-pop);
 	animation: editor-slide 0.22s cubic-bezier(0.2, 0, 0, 1);
 }
 
@@ -755,12 +770,12 @@ playing-card .stack {
 	display: flex;
 	align-items: center;
 	gap: 0.5rem;
-	background: hsl(208 45% 11% / 0.97);
+	background: var(--c-paper-2);
 	border-block-end: 1px solid var(--surface-line);
 	z-index: 1;
 }
 
-.editor-title { font-weight: 800; font-size: 16px; color: var(--gold); margin-inline-end: auto; }
+.editor-title { font-family: var(--font-display); font-weight: 800; font-size: 16px; color: var(--c-ink); margin-inline-end: auto; }
 .editor-head .button { min-block-size: 44px; padding-inline: 1.1rem; font-size: 15px; }
 .editor-head .button.--danger .icon { inline-size: 1rem; block-size: 1rem; }
 
@@ -826,6 +841,11 @@ playing-card .stack {
 
 .editor-sheet .checkbox-control input { inline-size: 1.4rem; block-size: 1.4rem; accent-color: var(--gold); }
 
+/* JokerCard's adopted stylesheet colors this pill toggle from the old red --c-* family; re-point it to
+   the paper palette (higher specificity than the bare .jc-toggle-switch rule it ships). */
+.editor-sheet .jc-toggle-switch { background: var(--c-ink-faint); }
+.editor-sheet .jc-toggle-switch:checked { background: var(--c-green); }
+
 /* The play toggle stays on the compact face for quick access. */
 playing-card .checkbox-control {
 	gap: 0.3rem;
@@ -845,24 +865,26 @@ playing-card .checkbox-control input { inline-size: 1.05rem; block-size: 1.05rem
 	padding: 0.15rem 0.15rem;
 	text-align: center;
 	line-height: 1.1;
-	background: hsl(206 60% 6% / 0.75) !important;
-	border: 1px solid var(--mult-dark);
+	/* A small paper chip on the felt well; !important + the joker-card prefix below win the cascade
+	   tie against JokerCard's adopted stylesheet (which sets these same classes). */
+	background: var(--c-card) !important;
+	border: 1px solid var(--c-ink);
 	border-radius: 0.35rem;
 }
 
-.jc-contribution-value {
+joker-card .jc-contribution-value {
 	font-size: 0.72rem;
 	font-weight: 800;
-	color: var(--mult);
+	color: var(--c-red);
 	overflow-wrap: anywhere;
 }
 
-.jc-contribution-percent { font-size: 0.64rem; color: var(--ink-dim); font-weight: 700; }
+joker-card .jc-contribution-percent { font-size: 0.64rem; color: var(--c-ink-soft); font-weight: 700; }
 
 /* Balatro-style joker reference panel (rarity / cost / effect) in the editor sheet. */
 .joker-info {
 	padding: 0.55rem 0.65rem;
-	background: hsl(208 45% 9% / 0.85);
+	background: var(--c-paper-2);
 	border: 2px solid var(--surface-line);
 	border-radius: 0.6rem;
 }
@@ -896,12 +918,10 @@ playing-card .checkbox-control input { inline-size: 1.05rem; block-size: 1.05rem
 	align-items: center;
 	gap: 0.55rem;
 	padding: 0.9rem 0.7rem;
-	background:
-		radial-gradient(ellipse 80% 60% at 50% 0%, hsl(206 50% 22% / 0.7), transparent 70%),
-		hsl(208 42% 14% / 0.85);
-	border: 2px solid var(--surface-line);
+	background: var(--c-card);
+	border: var(--bw) solid var(--c-green);
 	border-radius: var(--radius);
-	box-shadow: var(--shadow), inset 0 1px 0 hsl(0 0% 100% / 0.06);
+	box-shadow: var(--shadow-block);
 }
 
 .sb-hand {
@@ -911,20 +931,24 @@ playing-card .checkbox-control input { inline-size: 1.05rem; block-size: 1.05rem
 }
 
 .sb-hand-name {
-	font-size: 1.35rem;
-	font-weight: 900;
-	letter-spacing: 0.02em;
-	color: var(--ink);
-	text-shadow: 0 2px 0 hsl(206 60% 6%);
+	font-family: var(--font-display);
+	font-size: 1.375rem;
+	font-weight: 800;
+	letter-spacing: -0.02em;
+	color: var(--c-ink);
+	text-shadow: none;
 }
 
 .sb-hand-level {
-	font-size: 0.8rem;
-	font-weight: 800;
-	color: hsl(206 60% 8%);
-	background: var(--gold);
-	padding: 0.05rem 0.45rem;
-	border-radius: 999px;
+	font-family: var(--font-pixel);
+	font-size: 0.55rem;
+	letter-spacing: 0.1em;
+	text-transform: uppercase;
+	font-weight: 400;
+	color: var(--c-gold-dk);
+	background: hsl(43 96% 52% / 0.22);
+	padding: 0.15rem 0.4rem;
+	border-radius: var(--radius-sm);
 }
 
 .sb-equation {
@@ -938,56 +962,77 @@ playing-card .checkbox-control input { inline-size: 1.05rem; block-size: 1.05rem
 .sb-box {
 	flex: 1;
 	display: flex;
+	flex-direction: column;
 	align-items: center;
 	justify-content: center;
 	min-block-size: 3.4rem;
 	padding: 0.3rem 0.6rem;
-	border-radius: 0.6rem;
+	border-radius: var(--radius-md);
 	font-weight: 900;
 	font-size: clamp(1.4rem, 7vw, 2.4rem);
 	font-variant-numeric: tabular-nums;
-	color: var(--ink);
-	box-shadow: inset 0 2px 0 hsl(0 0% 100% / 0.18), 0 4px 0 hsl(0 0% 0% / 0.35);
+	color: var(--c-white);
+	box-shadow: var(--shadow-block-sm);
 	overflow: hidden;
 }
 
-.sb-box-value { overflow: hidden; text-overflow: ellipsis; }
+/* Tiny Silkscreen eyebrow above the value (CHIPS / MULT) — added in CSS so the DOM stays untouched. */
+.sb-box::before {
+	font-family: var(--font-pixel);
+	font-size: 0.5rem;
+	letter-spacing: 0.14em;
+	text-transform: uppercase;
+	color: hsl(0 0% 100% / 0.88);
+	line-height: 1;
+	margin-block-end: 0.1rem;
+}
 
-.sb-box.--chips { background: linear-gradient(hsl(206 100% 58%), var(--chips)); border: 2px solid var(--chips-dark); }
-.sb-box.--mult { background: linear-gradient(hsl(5 95% 70%), var(--mult)); border: 2px solid var(--mult-dark); }
+.sb-box.--chips::before { content: 'Chips'; }
+.sb-box.--mult::before { content: 'Mult'; }
+
+.sb-box-value { overflow: hidden; text-overflow: ellipsis; font-family: var(--font-mono); font-weight: 700; }
+
+.sb-box.--chips { background: var(--c-blue); border: var(--bw) solid var(--c-ink); }
+.sb-box.--mult { background: var(--c-red); border: var(--bw) solid var(--c-ink); }
 
 .sb-times {
 	display: flex;
 	align-items: center;
+	font-family: var(--font-display);
 	font-size: 1.6rem;
-	font-weight: 900;
-	color: var(--ink-dim);
+	font-weight: 800;
+	color: var(--c-ink);
 }
 
 .sb-total {
-	display: flex;
-	flex-direction: column;
+	display: inline-flex;
 	align-items: center;
-	gap: 0.1rem;
+	gap: 0.5rem;
+	padding: 0.25rem 0.85rem;
+	/* If --score-flash is driven (0→1→0) the chip pulses lighter — a paper-friendly replacement for
+	   the old neon glow. Falls back to solid gold when unset. */
+	background: color-mix(in srgb, var(--c-gold), #fff calc(var(--score-flash, 0) * 55%));
+	border: var(--bw) solid var(--c-ink);
+	border-radius: var(--radius-md);
+	box-shadow: var(--shadow-block-sm);
 }
 
 .sb-total-label {
-	font-size: 0.7rem;
-	font-weight: 800;
-	letter-spacing: 0.18em;
+	font-family: var(--font-pixel);
+	font-size: 0.6rem;
+	font-weight: 400;
+	letter-spacing: 0.14em;
 	text-transform: uppercase;
-	color: var(--ink-dim);
+	color: var(--c-ink);
 }
 
 .sb-total-value {
-	font-size: clamp(2rem, 11vw, 3.4rem);
-	font-weight: 900;
+	font-family: var(--font-mono);
+	font-size: clamp(2rem, 11vw, 3rem);
+	font-weight: 700;
 	line-height: 1;
 	font-variant-numeric: tabular-nums;
-	color: var(--gold);
-	text-shadow:
-		0 0 calc(6px + var(--score-flash, 0) * 22px) hsl(43 96% 56% / calc(0.5 + var(--score-flash, 0) * 0.5)),
-		0 3px 0 hsl(38 92% 26%);
+	color: var(--c-ink);
 }
 
 .sb-luck {
@@ -1006,44 +1051,46 @@ playing-card .checkbox-control input { inline-size: 1.05rem; block-size: 1.05rem
 	align-items: center;
 	gap: 0.1rem;
 	padding: 0.35rem 0.3rem;
-	border: 2px solid var(--surface-line);
-	border-radius: 0.55rem;
-	background: var(--surface);
-	color: var(--ink-dim);
+	border: var(--bw-hair) solid var(--c-hairline);
+	border-radius: var(--radius-sm);
+	background: var(--c-paper-2);
+	color: var(--c-ink-soft);
 	cursor: pointer;
-	transition: transform 0.08s ease, border-color 0.15s ease, color 0.15s ease, background-color 0.15s ease;
+	transition: transform var(--dur-fast) var(--ease-snap), border-color var(--dur) var(--ease-snap), color var(--dur) var(--ease-snap), background-color var(--dur) var(--ease-snap), box-shadow var(--dur-fast) var(--ease-snap);
 }
 
-.sb-luck-pill:hover { background: var(--surface-2); }
-.sb-luck-pill:active { transform: translateY(1px); }
+.sb-luck-pill:hover { background: var(--c-card); }
+/* Press = translate 2px down-right + collapse the block shadow. */
+.sb-luck-pill:active { transform: translate(2px, 2px); box-shadow: none; }
 
 .sb-luck-pill.--active {
-	border-color: var(--gold);
-	color: var(--ink);
-	background: hsl(43 60% 20% / 0.5);
+	border: var(--bw) solid var(--c-ink);
+	color: var(--c-ink);
+	background: var(--c-white);
+	box-shadow: var(--shadow-block-sm);
 }
 
-.sb-luck-name { font-size: 0.66rem; font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase; }
-.sb-luck-score { font-size: 0.95rem; font-weight: 900; font-variant-numeric: tabular-nums; }
-.sb-luck-pill.--active .sb-luck-score { color: var(--gold); }
+.sb-luck-name { font-family: var(--font-pixel); font-size: 0.55rem; font-weight: 400; letter-spacing: 0.1em; text-transform: uppercase; }
+.sb-luck-score { font-family: var(--font-mono); font-size: 0.95rem; font-weight: 700; font-variant-numeric: tabular-nums; }
+.sb-luck-pill.--active .sb-luck-score { color: var(--c-ink); }
 
 /* ============ DRAWERS ============ */
 
 .drawer {
-	--c-text: var(--ink);
-	--c-background-lighter: hsl(208 40% 11%);
-	--c-background-light: var(--surface-2);
-	--c-border: var(--surface-line);
+	--c-text: var(--c-ink);
+	--c-background-lighter: var(--c-white);
+	--c-background-light: var(--c-paper-2);
+	--c-border: var(--c-ink);
 
-	color: var(--ink);
+	color: var(--c-ink);
 	inline-size: min(34rem, 96vw);
 	max-block-size: 86svh;
 	margin: auto;
 	padding: 0;
-	border: 2px solid var(--surface-line);
+	border: var(--bw) solid var(--c-ink);
 	border-radius: var(--radius);
-	background: linear-gradient(hsl(208 40% 15%), hsl(208 42% 12%));
-	box-shadow: var(--shadow);
+	background: var(--c-card);
+	box-shadow: var(--shadow-pop); /* soft ambient — drawers float */
 	overflow: auto;
 	overscroll-behavior: contain;
 }
@@ -1065,19 +1112,19 @@ playing-card .checkbox-control input { inline-size: 1.05rem; block-size: 1.05rem
 	inset-block-start: -0.85rem;
 	margin: -0.85rem -0.85rem 0;
 	padding: 0.7rem 0.85rem;
-	background: hsl(208 45% 11% / 0.95);
+	background: var(--c-paper-2);
 	border-block-end: 1px solid var(--surface-line);
 	z-index: 1;
 }
 
-.drawer-header h2 { font-size: 1.1rem; font-weight: 800; color: var(--gold); }
+.drawer-header h2 { font-family: var(--font-display); font-size: 1.1rem; font-weight: 800; color: var(--c-ink); }
 .drawer-header .button { margin-inline-start: auto; }
 .drawer-hint { font-size: 0.82rem; color: var(--ink-dim); }
 
 .level-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(10.5rem, 1fr)); gap: 0.4rem; }
 .level-grid hand-level-card { display: block; }
 .level-grid hand-level-card fieldset { padding: 0.45rem 0.55rem; border: 2px solid var(--surface-line); border-radius: 0.5rem; background: var(--surface); }
-.level-grid legend { display: block; inline-size: 100%; margin-block-end: 0.35rem; font-size: 0.82rem; font-weight: 800; color: var(--gold); }
+.level-grid legend { display: block; inline-size: 100%; margin-block-end: 0.35rem; font-family: var(--font-display); font-size: 0.82rem; font-weight: 800; color: var(--c-ink); }
 
 /* Two clean aligned rows per hand: "lvl [n]" and "# [n]" (label left, input right). */
 .level-grid .input-list { display: flex; flex-direction: column; align-items: stretch; gap: 0.3rem; }
@@ -1121,63 +1168,65 @@ playing-card .checkbox-control input { inline-size: 1.05rem; block-size: 1.05rem
 	flex: 1;
 	min-inline-size: 0;
 	padding: 0.4rem;
-	background: hsl(208 40% 11%);
+	background: var(--c-white);
 	border: 2px solid var(--surface-line);
 	border-radius: 0.5rem;
-	color: var(--ink);
+	color: var(--c-ink);
 	font-size: 0.82rem;
 }
 
 .table-wrapper { max-block-size: 16rem; overflow: auto; border: 1px solid var(--surface-line); border-radius: 0.5rem; }
 .drawer table { inline-size: 100%; border-collapse: collapse; font-size: 0.82rem; }
 .drawer th, .drawer td { padding: 0.35rem 0.5rem; text-align: start; }
-.drawer thead th { position: sticky; inset-block-start: 0; background: hsl(208 45% 11%); color: var(--gold); }
-.drawer tbody tr { border-block-start: 1px solid var(--surface-line); }
+.drawer thead th { position: sticky; inset-block-start: 0; background: var(--c-paper-2); color: var(--c-ink); }
+.drawer tbody tr { border-block-start: 1px solid var(--c-hairline); }
 
 /* ============ BUTTONS ============ */
 
 .button {
 	min-block-size: 2.2rem;
 	padding: 0 0.8rem;
-	border: 2px solid var(--surface-line);
-	border-radius: 0.5rem;
+	border: var(--bw) solid var(--c-ink);
+	border-radius: var(--radius-sm);
 	display: inline-flex;
 	align-items: center;
 	gap: 0.3rem;
-	color: var(--ink);
-	background: var(--surface);
-	font-weight: 700;
+	color: var(--c-ink);
+	background: var(--c-card);
+	font-family: var(--font-body);
+	font-weight: 600;
 	cursor: pointer;
-	transition: transform 0.08s ease, background-color 0.15s ease, border-color 0.15s ease;
+	box-shadow: var(--shadow-block-sm);
+	transition: transform var(--dur-fast) var(--ease-snap), background-color var(--dur) var(--ease-snap), box-shadow var(--dur-fast) var(--ease-snap);
 }
 
-.button:hover { background: var(--surface-2); }
-.button:active { transform: translateY(1px); }
+.button:hover { background: var(--c-white); }
+.button:active { transform: translate(2px, 2px); box-shadow: none; }
 .button.--icon { inline-size: 2.2rem; padding: 0; justify-content: center; }
-.button.--primary { background: linear-gradient(var(--gold), var(--gold-dark)); border-color: var(--gold-dark); color: hsl(206 60% 8%); }
-.button.--primary:hover { filter: brightness(1.08); background: linear-gradient(var(--gold), var(--gold-dark)); }
-.button.--danger { background: hsl(5 60% 22%); border-color: var(--mult-dark); color: hsl(5 95% 82%); }
-.button.--danger:hover { background: hsl(5 65% 30%); border-color: var(--mult); }
-.button:disabled { opacity: 0.45; cursor: default; }
+.button.--primary { background: var(--c-gold); border-color: var(--c-ink); color: var(--c-ink); }
+.button.--primary:hover { filter: brightness(1.06); background: var(--c-gold); }
+.button.--danger { background: var(--c-red); border-color: var(--c-ink); color: var(--c-white); }
+.button.--danger:hover { background: var(--c-red-lt); }
+.button:disabled { opacity: 0.45; cursor: default; box-shadow: none; }
 
-a { color: var(--gold); }
-a:hover { color: hsl(43 96% 75%); }
+a { color: var(--c-red-dk); }
+a:hover { color: var(--c-red); }
 
 /* ============ SORTABLEJS DRAG STATES ============ */
 
 .sortable-ghost .card-art { opacity: 0.35; filter: brightness(1.3); }
-.sortable-chosen .card-art { box-shadow: 0 0 0 3px var(--gold), 0 0 22px hsl(43 96% 56% / 0.7), 0 12px 24px hsl(206 60% 4% / 0.7); }
+.sortable-chosen .card-art { box-shadow: 0 0 0 3px var(--c-gold), 0 0 0 5px var(--c-ink), 0 10px 20px hsl(35 20% 20% / 0.4); }
 .sortable-drag .card-art { cursor: grabbing; }
 
 /* ============ LOG ============ */
 
 .log {
-	background: hsl(206 50% 7% / 0.8);
-	border: 1px solid var(--surface-line);
+	background: var(--c-paper-3);
+	border: 1px solid var(--c-ink);
 	border-radius: 0.5rem;
 	padding: 0.5rem;
 	font-size: 0.78rem;
-	color: hsl(150 45% 75%);
+	color: var(--c-ink);
 	max-block-size: 60svh;
 	overflow: auto;
 	white-space: pre-wrap;

@@ -1,0 +1,44 @@
+/* ============================================================
+   Paper Classic — webfonts (inlined into the single-file build)
+   Geist        → display / headers (bold geometric sans)
+   Inter        → body / UI text
+   Silkscreen   → pixel accent (eyebrows, UPPERCASE labels)
+   Pixelify Sans → numerals / scoreboard
+   Fonts live in src/ui/assets/fonts/; Vite resolves the url() and
+   vite-plugin-singlefile base64-inlines them on build.
+   ============================================================ */
+
+@font-face {
+	font-family: 'Geist';
+	src: url('../assets/fonts/Geist-Variable.ttf') format('truetype');
+	font-weight: 100 900;
+	font-display: swap;
+}
+
+@font-face {
+	font-family: 'Inter';
+	src: url('../assets/fonts/Inter-Variable.ttf') format('truetype');
+	font-weight: 100 900;
+	font-display: swap;
+}
+
+@font-face {
+	font-family: 'Silkscreen';
+	src: url('../assets/fonts/Silkscreen-Regular.ttf') format('truetype');
+	font-weight: 400;
+	font-display: swap;
+}
+
+@font-face {
+	font-family: 'Silkscreen';
+	src: url('../assets/fonts/Silkscreen-Bold.ttf') format('truetype');
+	font-weight: 700;
+	font-display: swap;
+}
+
+@font-face {
+	font-family: 'Pixelify Sans';
+	src: url('../assets/fonts/PixelifySans-Variable.ttf') format('truetype');
+	font-weight: 400 700;
+	font-display: swap;
+}

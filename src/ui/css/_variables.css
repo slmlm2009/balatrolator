@@ -37,3 +37,73 @@ html {
 
 	--s-card-max-inline-size: 16rem;
 }
+
+/* ============================================================
+   Paper Classic design tokens
+   Merged from design-prototypes/design_handoff_paper_classic/design-tokens/.
+   A warm-paper + charcoal-ink "Robo" foundation carrying Balatro's
+   functional color pairing (chips=blue · mult=red · score=gold ·
+   positive=green). Consumed by the paper-classic theme in _arcade.css.
+   Dark/light variants use -dk/-lt suffixes so they don't clobber the
+   existing --c-red-dark / --c-blue-dark family the components read.
+   ============================================================ */
+html {
+	/* Neutrals: warm paper + charcoal ink */
+	--c-paper: #f0ede4;   /* primary app background */
+	--c-paper-2: #e7e3d7; /* sunken / alternate surface, tray header */
+	--c-paper-3: #dcd7c8; /* hairline wells, track fills */
+	--c-card: #faf8f2;    /* raised card face (off-white) */
+
+	--c-ink: #1a1714;      /* text AND borders — never pure black */
+	--c-ink-2: #3a3630;    /* strong secondary text */
+	--c-ink-soft: #6b6660; /* muted captions */
+	--c-ink-faint: #9a948a;/* placeholder / disabled */
+	--c-hairline: #cfc9bb; /* dividers */
+
+	/* Brand + Balatro functional pairing */
+	--c-red: hsl(5 85% 52%);     /* PRIMARY crimson — Reset, mult box */
+	--c-red-dk: hsl(5 80% 42%);
+	--c-red-lt: hsl(5 88% 62%);
+	--c-orange: hsl(20 88% 52%); /* secondary Robo accent */
+	--c-blue: hsl(206 100% 52%); /* chips box */
+	--c-blue-dk: hsl(208 100% 38%);
+	--c-gold: hsl(43 96% 52%);   /* score chip + highlights */
+	--c-gold-dk: hsl(38 92% 42%);
+	--c-green: hsl(145 70% 36%); /* positive / scoreboard frame / money */
+	--c-green-lt: hsl(145 70% 44%);
+
+	/* Felt — dark surfaces for game-table contexts */
+	--c-felt: hsl(208 44% 13%);  /* tray well behind sprites */
+	--c-felt-2: hsl(202 45% 9%); /* top-bar background */
+	--c-felt-edge: hsl(208 30% 32%);
+
+	--text-on-dark: #f3efe6; /* text on felt / ink surfaces */
+
+	/* Typography families */
+	--font-display: 'Geist', system-ui, -apple-system, sans-serif;        /* headers, hand name */
+	--font-body: 'Inter', system-ui, -apple-system, sans-serif;           /* labels, body, buttons */
+	--font-pixel: 'Silkscreen', monospace;                                /* eyebrows, UPPERCASE labels */
+	--font-mono: 'Pixelify Sans', 'Fira Mono', ui-monospace, monospace;   /* all numerals */
+
+	/* Borders / radius */
+	--bw-hair: 1px;
+	--bw: 2px;        /* default geometric border */
+	--bw-thick: 3px;  /* top bar / outer panel emphasis */
+	--radius-sm: 0.25rem;  /* 4px — buttons & inputs */
+	--radius-md: 0.375rem; /* 6px — cards */
+
+	/* Signature hard offset block shadow (no blur) */
+	--shadow-block: 4px 4px 0 var(--c-ink);
+	--shadow-block-sm: 2px 2px 0 var(--c-ink);
+	--shadow-block-lg: 6px 6px 0 var(--c-ink);
+
+	/* Soft ambient — floating drawers/menus only */
+	--shadow-soft: 0 2px 8px hsl(35 20% 20% / 0.12);
+	--shadow-pop: 0 8px 24px hsl(35 20% 18% / 0.18);
+	--shadow-inset: inset 0 1px 3px hsl(35 20% 20% / 0.14);
+
+	/* Motion — quick + mechanical */
+	--ease-snap: cubic-bezier(0.2, 0.8, 0.2, 1);
+	--dur-fast: 120ms;
+	--dur: 180ms;
+}
