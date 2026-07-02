@@ -115,6 +115,11 @@ addJokerButton.addEventListener('click', () => {
 	el.getAnimations().forEach(a => a.cancel())
 	el.toggleEditor()
 
+	// Open the joker list and focus its search box right away, so the first tap on “Add
+	// joker” lands the user straight in the picker (and raises the keyboard on mobile).
+	// This must stay synchronous within the click handler for the mobile keyboard to show.
+	el.querySelector<ComboBox>('combo-box')?.openAndFocusSearch()
+
 	// Card is only kept if the user explicitly selects a joker name from the dropdown.
 	// ComboBox.value setter is programmatic-only; change fires only from user interaction.
 	let committed = false

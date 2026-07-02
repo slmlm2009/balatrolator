@@ -480,6 +480,20 @@ export class ComboBox extends FormAssociatedElement {
 		}
 	}
 
+	/**
+	 * Opens the option list and moves focus into the search input.
+	 *
+	 * Call this synchronously from a user gesture (e.g. the “Add joker” tap) so the option
+	 * list and — on mobile — the on-screen keyboard appear immediately, without the extra
+	 * taps otherwise needed to open the list and then focus its input.
+	 */
+	openAndFocusSearch () {
+		// Open first: the search input lives inside the popover and is `display: none`
+		// (and thus unfocusable) until it is shown.
+		this.#openPopover()
+		this.querySelector<HTMLInputElement>('.cb-input')?.focus()
+	}
+
 	#selectNeighboringOption = (direction: -1 | 1) => {
 		const currentIndex = this.#options.findIndex((option) => option === this.value)
 		const newIndex = Math.max(0, Math.min(currentIndex + direction, this.#options.length - 1))
