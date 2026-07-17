@@ -394,6 +394,7 @@ export class ComboBox extends FormAssociatedElement {
 				aria-controls="${this.id}-popover"
 				popovertarget="${this.id}-popover"
 				popovertargetaction="show"
+				@click="${this.#handleButtonClick}"
 				@keydown="${this.#handleButtonShortcuts}"
 			>
 				${this.value
@@ -478,6 +479,16 @@ export class ComboBox extends FormAssociatedElement {
 		if (this.#button?.popoverTargetElement instanceof HTMLElement) {
 			this.#button.popoverTargetElement.showPopover()
 		}
+	}
+
+	/**
+	 * Runs on every button click/tap, opening the popover and focusing the search input
+	 * synchronously so the on-screen keyboard appears immediately on mobile, without a
+	 * second tap. The native `popovertargetaction="show"` action that also fires is
+	 * idempotent, so calling this first is safe.
+	 */
+	#handleButtonClick = () => {
+		this.openAndFocusSearch()
 	}
 
 	/**
